@@ -43,7 +43,7 @@ function parseMD(markdown = '', properties = []) {
     .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_blank">$1</a>')
     .replace(/%%/g, '<br>')
     ;
-  let parseForSection = (tag, str, key = tag) => str.replace(new RegExp('\s*' + key + ':(.*)', 'g'), (str, match) => (push('<' + tag + '>' + parseForInlineFormatting(match.trim()) + '</' + tag + '>'), ''));
+  let parseForSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + ':(.*)', 'g'), (str, match) => (push('<' + tag + '>' + parseForInlineFormatting(match.trim()) + '</' + tag + '>'), ''));
   markdown.split(/\n/g).forEach((object, index, array) => {
     if(object.trim().startsWith('<') && object.trim().endsWith('>')) push(object);
     else {
