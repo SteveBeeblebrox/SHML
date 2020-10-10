@@ -53,7 +53,7 @@ function parseMD(markdown = '', properties = []) {
 
       for(var i = 1; i < 7; i++) parseForSection('h' + i, object);
       parseForSection('p', object);
-      object.replace(new RegExp('\s*(?:bull:|\\+)(.*)', 'g'), (str, match) => (push('<ul><li>' + parseForInlineFormatting(match.trim()) + '</li></ul>'), ''));
+      object.replace(/^\s*?(?:bull:|\+)(.*)/g, (str, match) => (push('<ul><li>' + parseForInlineFormatting(match.trim()) + '</li></ul>'), ''));
       object.replace(/\s*---+\s*/, () => (push('<hr>'), ''));
       object.replace(/\s*%%\s*/, () => (push('<br>'), ''));
     }
