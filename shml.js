@@ -39,6 +39,7 @@ function parseMD(markdown = '', properties = []) {
     .replace(/(\*)(.*?)\1/g, '<i>$2</i>')
     .replace(/(__)(.*?)\1/g, '<u>$2</u>')
     .replace(/(~~)(.*?)\1/g, '<del>$2</del>')
+    .replace(/(\^)(.*?)\1/g, '<sup>$2</sup>')
     .replace(/(`)(.*?)\1/g, '<code>$2</code>')
     .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_blank">$1</a>')
     .replace(/%%/g, '<br>')
