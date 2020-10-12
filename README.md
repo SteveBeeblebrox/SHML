@@ -28,7 +28,7 @@ shml.js only provides the methods needed to convert a SHML string to HTMl. It wi
 ### Example 1
 ``` html
 <template class="shml">
-title: SHML Example 1
+!title: SHML Example 1
 h1: Hello World
 </template>
 <script>
