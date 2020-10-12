@@ -22,7 +22,7 @@ Comments - any line that is not a valid section (or a line break, see below) is 
 ### Miscellaneous
 Line Break - A double `%` (inline or as a standalone section) is converted into a line break  
 ## Properties
-SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result.
+SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are pased as an array of strings in the second argument to `parseMarkup`. They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string.
 ## Usage
 shml.js only provides the methods needed to convert a SHML string to HTMl. It will not modify any HTML elements. It must be given the SHML as a string and it will output HTML that can be added to a document.
 ### Example 1
