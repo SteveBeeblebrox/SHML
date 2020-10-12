@@ -9,6 +9,9 @@ SHML is composed of two main types of styling: inline and sections. All sections
 ***Bold & Italics*** - Wrap text in three `*`  
 Underlined - Wrap text in two `__`  
 ~~Strikethrough~~ - Wrap text in two `~`
+Superscript - Wrap text in one `^`  
+Subscript - Wrap text in two `,`
+Highlighted - Wrap text in a single `|`
 `Code` - Wrap text in a single backtick
 ### Section Formatting
 Header 1-6 - Start a line with `h<number here>: ` (for example `h1:`)  
@@ -31,9 +34,9 @@ h1: Hello World
 <script>
 (function() {
   let element = document.querySelector('template.shml');
-  let result = parseMD(element.innerHTML, ['title']);
+  let result = SHML.parseMarkup(element.innerHTML, ['title']);
   element.insertAdjacentHTML('afterend', result.toHTML());
-  document.title = result.get('title');
+  document.title = result.getProperty('title');
 })();
 </script>
 ```
