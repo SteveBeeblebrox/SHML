@@ -51,7 +51,7 @@ SHML = {
       else {
         for(var property of properties)
           if(data.properties[property] === undefined)
-            object.replace(new RegExp('^\\s*?' + property + ':(.*)'), (str, match) => (data.properties[property] = match.trim(), ''));
+            object.replace(new RegExp('^\\s*?!' + property + ':(.*)'), (str, match) => (data.properties[property] = match.trim(), ''));
 
         for(var i = 1; i < 7; i++) parseForSection('h' + i, object);
         parseForSection('p', object);
