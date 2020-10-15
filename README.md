@@ -26,6 +26,7 @@ SHML can be given additional string keys to look for. This allows for the storag
 ## Usage
 shml.js only provides the methods needed to convert a SHML string to HTMl. It will not modify any HTML elements. It must be given the SHML as a string and it will output HTML that can be added to a document.
 ### Example 1
+#### Code
 ``` html
 <template class="shml">
 !title: SHML Example 1
@@ -40,9 +41,12 @@ h1: Hello World
   })();
 </script>
 ```
+#### Result
+># Hello World
 #### Explanation
 The above example gets the HTML contents of the template element and parses them for sections such as hearers as well as inline formatting like bold or underlined text. The method is also told to look for a property called title. Next, the formatted text is insered after the template so it appears on the document. Finally, the document title is set to the title property of the markup that was requested earlier.
 ### Example 2
+#### Code
 ``` html
 <script>
   (function() {
@@ -50,5 +54,8 @@ The above example gets the HTML contents of the template element and parses them
   })();
 </script>
 ```
+#### Result
+>**Hello ~~World~~ User!**  
+>*This is an example of inline formatting.*
 #### Explanation
 The above code parses the string for inline formatting and writes the result to the document. Any inline formatting like bold or underlined text will be formatted, but headers and other sections will not be (line breaks count as inline formatting in this case).
