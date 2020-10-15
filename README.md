@@ -42,7 +42,7 @@ h1: Hello World
 </script>
 ```
 #### Result
-># Hello World
+<code><h1>Hello World</h1></code>
 #### Explanation
 The above example gets the HTML contents of the template element and parses them for sections such as hearers as well as inline formatting like bold or underlined text. The method is also told to look for a property called title. Next, the formatted text is insered after the template so it appears on the document. Finally, the document title is set to the title property of the markup that was requested earlier.
 ### Example 2
@@ -55,7 +55,7 @@ The above example gets the HTML contents of the template element and parses them
 </script>
 ```
 #### Result
->**Hello ~~World~~ User!**  
->*This is an example of inline formatting.*
+<code><strong>Hello <del>World</del> User!</strong><br><em>This is an example of inline formatting.</em></code>
+
 #### Explanation
 The above code parses the string for inline formatting and writes the result to the document. Any inline formatting like bold or underlined text will be formatted, but headers and other sections will not be (line breaks count as inline formatting in this case).
