@@ -24,9 +24,9 @@ SOFTWARE.
 SHML = {
   parseInlineMarkup: function(str) {
     return str
-      .replace(/(\*\*\*)(.*?)\1/gs, '<strong><i>$2</i></strong>')
+      .replace(/(\*\*\*)(.*?)\1/gs, '<strong><em>$2</em></strong>')
       .replace(/(\*\*)(.*?)\1/gs, '<strong>$2</strong>')
-      .replace(/(\*)(.*?)\1/g, '<i>$2</i>')
+      .replace(/(\*)(.*?)\1/g, '<em>$2</em>')
       .replace(/(__)(.*?)\1/g, '<u>$2</u>')
       .replace(/(~~)(.*?)\1/g, '<del>$2</del>')
       .replace(/(\^)(.*?)\1/g, '<sup>$2</sup>')
