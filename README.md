@@ -19,15 +19,15 @@ Paragraph - Start a line with a `p: `
 Horizontal Rule - Start a line with three or more `-`  
 Raw HTML - Any valid SHML is valid HTML and any HTML is also valid SHML. Any section starting with a `<` and ending with a `>` (ignoring whitespace) is treated as HTML and does not have any inline formatting applied  
 Comments - any line that is not a valid section (or a line break, see below) is ignored
+### Properties
+SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are pased as an array of strings in the second argument to `parseMarkup`. They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string.
 ### Miscellaneous
 Line Break - A double `%` (inline or as a standalone section) is converted into a line break  
-## Properties
-SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are pased as an array of strings in the second argument to `parseMarkup`. They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string.
 ## Usage
 shml.js only provides the methods needed to convert a SHML string to HTMl. It will not modify any HTML elements. It must be given the SHML as a string and it will output HTML that can be added to a document.
 ### Example 1
 #### Code
-``` html
+```html
 <template class="shml">
 !title: SHML Example 1
 h1: Hello World
@@ -49,7 +49,7 @@ h1: Hello World
 The above example gets the HTML contents of the template element and parses them for sections such as hearers as well as inline formatting like bold or underlined text. The method is also told to look for a property called title. Next, the formatted text is insered after the template so it appears on the document. Finally, the document title is set to the title property of the markup that was requested earlier.
 ### Example 2
 #### Code
-``` html
+```html
 <script>
   (function() {
     document.write(SHML.parseInlineMarkup('**Hello ~~World~~ User!**%%*This is an example of inline formatting.*'))
