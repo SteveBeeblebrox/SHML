@@ -41,7 +41,7 @@ h1: Hello World
   })();
 </script>
 ```
-#### Result
+#### Parsing Result
 ```html
 <h1>Hello World</h1>;
 ```
@@ -56,7 +56,7 @@ The above example gets the HTML contents of the template element and parses them
   })();
 </script>
 ```
-#### Result
+#### Parsing Result
 ```html
 <strong>Hello <del>World</del> User!</strong><br><em>This is an example of inline formatting.</em>
 ```
