@@ -32,7 +32,7 @@ SHML = {
       .replace(/(\^)(.*?)\1/g, '<sup>$2</sup>')
       .replace(/(,,)(.*?)\1/g, '<sub>$2</sub>')
       .replace(/(\|)(.*?)\1/g, '<mark>$2</mark>')
-      .replace(/([^\s])--([^\s])/g, '$1<wbr>$2')
+      .replace(/(\S)--(\S)/g, '$1<wbr>$2')
       .replace(/(`)(.*?)\1/g, '<code>$2</code>')
       .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_blank">$1</a>')
       .replace(/%%/g, '<br>')
