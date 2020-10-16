@@ -12,7 +12,7 @@ Underlined - Wrap text in two `__`
 Superscript - Wrap text in one `^`  
 Subscript - Wrap text in two `,`  
 Highlighted - Wrap text in a single `|`  
-`Code` - Wrap text in a single backtick
+`Code` - Wrap text in a single backtick  
 [Links](https://stevebeeblebrox.github.io) - Put the text you want to display in square brackets followed by the url in parentheses (`[<Title>](<url>)`). Currently all links open in a new tab.
 ### Section Formatting
 Header 1-6 - Start a line with `h<number here>: ` (for example `h1:`)  
