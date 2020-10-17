@@ -23,20 +23,26 @@ SOFTWARE.
 */
 SHML = {
   parseInlineMarkup: function(str) {
-    return str
-      .replace(/(\*\*\*)(.*?)\1/gs, '<strong><em>$2</em></strong>')
-      .replace(/(\*\*)(.*?)\1/gs, '<strong>$2</strong>')
-      .replace(/(\*)(.*?)\1/g, '<em>$2</em>')
-      .replace(/(__)(.*?)\1/g, '<u>$2</u>')
-      .replace(/(~~)(.*?)\1/g, '<del>$2</del>')
-      .replace(/(\^)(.*?)\1/g, '<sup>$2</sup>')
-      .replace(/(,,)(.*?)\1/g, '<sub>$2</sub>')
-      .replace(/(\|)(.*?)\1/g, '<mark>$2</mark>')
-      .replace(/(\S)--(\S)/g, '$1<wbr>$2')
-      .replace(/(`)(.*?)\1/g, '<code>$2</code>')
-      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_blank">$1</a>')
-      .replace(/%%/g, '<br>')
-    ;
+    let array = str.split(/(`|\$\$)([\S\s]*?)(\1)/g), result = '', code = false, escaped = false;
+    array.forEach(object => {
+      if(object === '`') code = !code, object = '';
+      if(object === '$$') escaped = !escaped, object = '';
+      result += !code && !escaped ? object
+          .replace(/(\*\*\*)(.*?)\1/gs, '<strong><em>$2</em></strong>')
+          .replace(/(\*\*)(.*?)\1/gs, '<strong>$2</strong>')
+          .replace(/(\*)(.*?)\1/g, '<em>$2</em>')
+          .replace(/(__)(.*?)\1/g, '<u>$2</u>')
+          .replace(/(~~)(.*?)\1/g, '<del>$2</del>')
+          .replace(/(\^)(.*?)\1/g, '<sup>$2</sup>')
+          .replace(/(,,)(.*?)\1/g, '<sub>$2</sub>')
+          .replace(/(\|)(.*?)\1/g, '<mark>$2</mark>')
+          .replace(/(\S)--(\S)/g, '$1<wbr>$2')
+          .replace(/(`)(.*?)\1/g, '<code>$2</code>')
+          .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_blank">$1</a>')
+          .replace(/%%/g, '<br>')
+        : object === '' ? '' :  code ? '<code>'+object+'</code>' : object;
+    })
+    return result;
   },
   parseMarkup: function(markdown = '', properties = []) {
     let data = {
