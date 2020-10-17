@@ -12,7 +12,7 @@ Underlined - Wrap text in two `__`
 Superscript - Wrap text in one `^`  
 Subscript - Wrap text in two `,`  
 Highlighted - Wrap text in a single `|`  
-Word Break - Include two `-` where you want a word to break onto a new line if needed
+Word Break - Include two `-` where you want a word to break onto a new line if needed  
 `Code` - Wrap text in a single backtick  
 [Links](https://stevebeeblebrox.github.io) - Put the text you want to display in square brackets followed by the url in parentheses (`[<Title>](<url>)`). Currently all links open in a new tab.
 ### Section Formatting
