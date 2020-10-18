@@ -4,16 +4,17 @@ Simplified HTML Markup Language (Or Simplified Hypertext Markup Language Markup 
 ## Syntax
 SHML is composed of two main types of styling: inline and sections. All sections must be on their own line. Inline formatting can be applied to any part of a section.
 ### Inline Formatting
-*Italics* - Wrap text in a single `*`  
-**Bold** -  Wrap text in a double `*`  
-***Bold & Italics*** - Wrap text in three `*`  
-Underlined - Wrap text in two `__`  
-~~Strikethrough~~ - Wrap text in two `~`
-Superscript - Wrap text in one `^`  
-Subscript - Wrap text in two `,`  
-Highlighted - Wrap text in a single `|`  
-Word Break - Include two `-` where you want a word to break onto a new line if needed  
-`Code` - Wrap text in a single backtick  
+*Italics* - Wrap text in a single `*`.  
+**Bold** -  Wrap text in a double `*`.  
+***Bold & Italics*** - Wrap text in three `*`.  
+Underlined - Wrap text in two `__`.  
+~~Strikethrough~~ - Wrap text in two `~`.
+Superscript - Wrap text in one `^`.  
+Subscript - Wrap text in two `,`.  
+Highlighted - Wrap text in a single `|`.  
+Word Break - Include two `-` where you want a word to break onto a new line if needed.  
+`Code` - Wrap text in a single backtick. Other than a backtick or double `$`, all other special characters are escaped.  
+Escaped Characters - To escape a character or set of characters that usually have a special meaning to the parser, wrap them in a double `$`.
 [Links](https://stevebeeblebrox.github.io) - Put the text you want to display in square brackets followed by the url in parentheses (`[<Title>](<url>)`). Currently all links open in a new tab.
 ### Section Formatting
 Header 1-6 - Start a line with `h<number here>: ` (for example `h1:`)  
