@@ -83,13 +83,14 @@ SHML can be given additional string keys to look for. This allows for the storag
   * Actual HTML Tag: `<br>`
   * Example: `Hello%%World`
 ## Usage
-shml.js only provides the methods needed to convert a SHML string to HTMl. It will not modify any HTML elements. It must be given the SHML as a string and it will output HTML that can be added to a document.
+SHML does not modify the document in any way. It does not format any particular elements. SHML converts a string into another string. That is it. You must give it the string to parse and then do something with the result. **SHML is not XSS secure!** If you are going to use SHML to allow users to format text (in comments for example), make sure to sanitize the input **after** it is sent through SHML.  
+Ok, enough talk. I know what you are really looking for...
 ### Example 1
 #### Code
 ```html
 <template class="shml">
-!title: SHML Example 1
-h1: Hello World
+ !title: SHML Example 1
+ h1: Hello World
 </template>
 <script>
   (function() {
@@ -105,7 +106,7 @@ h1: Hello World
 <h1>Hello World</h1>;
 ```
 #### Explanation
-The above example gets the HTML contents of the template element and parses them for sections such as hearers as well as inline formatting like bold or underlined text. The method is also told to look for a property called title. Next, the formatted text is insered after the template so it appears on the document. Finally, the document title is set to the title property of the markup that was requested earlier.
+The above example gets the HTML contents of the template element and parses them for sections such as headers as well as inline formatting like bold or underlined text. The method is also told to look for a property called title. Next, the formatted text is insered after the template so it appears on the document. Finally, the document title is set to the title property of the markup that was requested earlier.
 ### Example 2
 #### Code
 ```html
