@@ -7,64 +7,64 @@ SHML is composed of two main types of styling: inline and sections. All sections
 + *Italics*
   * Formatting sequence: `*`
   * Needs closing sequence: Yes
-  * Actual HTML Tag: `<em>`
+  * Resulting HTML Tag: `<em>`
   * Example: `*Italics*`
 + **Bold**
   * Formatting sequence: `**`
   * Needs closing sequence: Yes
-  * Actual HTML Tag: `<strong>`
+  * Resulting HTML Tag: `<strong>`
   * Example: `**Bold**`
 + ***Bold & Italics***
   * Formatting sequence: `***`
   * Needs closing sequence: Yes
-  * Actual HTML Tag: `<strong>` & `<em>`
+  * Resulting HTML Tags: `<strong>` & `<em>`
   * Example: `***Bold and Italics***`
 + Underlined
   * Formatting sequence: `__`
   * Needs closing character: Yes
-  * Actual HTML Tag: `<u>`
+  * Resulting HTML Tag: `<u>`
   * Example: `__Underlined__`
 + ~~Strikethrough~~
   * Formatting sequence: `~~`
   * Needs closing sequence: Yes
-  * Actual HTML Tag: `<del>`
+  * Resulting HTML Tag: `<del>`
   * Example: `~~Strikethrough~~`
 + Superscript
   * Formatting sequence: `^`
   * Needs closing sequence: Yes
-  * Actual HTML Tag: `<sup>`
+  * Resulting HTML Tag: `<sup>`
   * Example: `^Superscript^`
 + Subscript
   * Formatting sequence: `,,`
   * Needs closing sequence: Yes
-  * Actual HTML Tag: `<sub>`
+  * Resulting HTML Tag: `<sub>`
   * Example: `,,Subscript,,`
 + Highlighted
   * Formatting sequence: `|`
   * Needs closing sequence: Yes
-  * Actual HTML Tag: `<mark>`
+  * Resulting HTML Tag: `<mark>`
   * Example: `|Highlighted|`
 + Word Break
   * Formatting sequence: `--`
   * Needs closing sequence: No
-  * Actual HTML Tag: `<wbr>`
+  * Resulting HTML Tag: `<wbr>`
   * Example: `Pneumono--ultra--microscopic--silicovol--canoconiosis` (Yes that is a word. [Source](https://en.wikipedia.org/wiki/Longest_word_in_English#:~:text=Pneumonoultramicroscopicsilicovolcanoconiosis))
 + `Code`
   * Formatting sequence: `` ` ``
   * Needs closing sequence: Yes
-  * Actual HTML Tag: `<code>`
+  * Resulting HTML Tag: `<code>`
   * Example: ``` `Code` ```
   * Notes: Aside from a `` ` ``, all other formatting sequence are escaped.
 + Escaped Characters
   * Formatting sequence: `$$`
   * Needs closing sequence: Yes
-  * Actual HTML Tag: None
+  * Resulting HTML Tag: None
   * Example: `$$**Not Bold**$$`
   * Notes: Aside from a `$$`, all other formatting sequence are escaped. Unlike a code block, no additional formatting is applied.
 + [Links](https://www.youtube.com/watch?v=oHg5SJYRHA0) <!--¯\_(ツ)_/¯-->
   * Formatting sequence: `[<text to display>](<url>)`
   * Needs closing sequence: No
-  * Actual HTML Tag: `<a>`
+  * Resulting HTML Tag: `<a>`
   * Example: `[Links](https://stevebeeblebrox.github.io)`
   * Notes: All links open in a new tab.
 ### Section Formatting
