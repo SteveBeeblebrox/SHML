@@ -4,28 +4,80 @@ Simplified HTML Markup Language (Or Simplified Hypertext Markup Language Markup 
 ## Syntax
 SHML is composed of two main types of styling: inline and sections. All sections must be on their own line. Inline formatting can be applied to any part of a section.
 ### Inline Formatting
-*Italics* - Wrap text in a single `*`.  
-**Bold** -  Wrap text in a double `*`.  
-***Bold & Italics*** - Wrap text in three `*`.  
-Underlined - Wrap text in two `__`.  
-~~Strikethrough~~ - Wrap text in two `~`.
-Superscript - Wrap text in one `^`.  
-Subscript - Wrap text in two `,`.  
-Highlighted - Wrap text in a single `|`.  
-Word Break - Include two `-` where you want a word to break onto a new line if needed.  
-`Code` - Wrap text in a single backtick. Other than a backtick or double `$`, all other special characters are escaped.  
-Escaped Characters - To escape a character or set of characters that usually have a special meaning to the parser, wrap them in a double `$`. Unlike a code block, no additional formatting is applied to text in a plain escape sequence.  
-[Links](https://stevebeeblebrox.github.io) - Put the text you want to display in square brackets followed by the url in parentheses (`[<Title>](<url>)`). Currently all links open in a new tab.
++ *Italics*
+  * Formatting sequence: `*`
+  * Needs closing sequence: Yes
+  * Actual HTML Tag: `<em>`
+  * Example: `*Italics*`
++ **Bold**
+  * Formatting sequence: `**`
+  * Needs closing sequence: Yes
+  * Actual HTML Tag: `<strong>`
+  * Example: `**Bold**`
++ ***Bold & Italics***
+  * Formatting sequence: `***`
+  * Needs closing sequence: Yes
+  * Actual HTML Tag: `<strong>` & `<em>`
+  * Example: `***Bold and Italics***`
++ Underlined
+  * Formatting sequence: `__`
+  * Needs closing character: Yes
+  * Actual HTML Tag: `<u>`
+  * Example: `__Underlined__`
++ ~~Strikethrough~~
+  * Formatting sequence: `~~`
+  * Needs closing sequence: Yes
+  * Actual HTML Tag: `<del>`
+  * Example: `~~Strikethrough~~`
++ Superscript
+  * Formatting sequence: `^`
+  * Needs closing sequence: Yes
+  * Actual HTML Tag: `<sup>`
+  * Example: `^Superscript^`
++ Subscript
+  * Formatting sequence: `,,`
+  * Needs closing sequence: Yes
+  * Actual HTML Tag: `<sub>`
+  * Example: `,,Subscript,,`
++ Highlighted
+  * Formatting sequence: `|`
+  * Needs closing sequence: Yes
+  * Actual HTML Tag: `<mark>`
+  * Example: `|Highlighted|`
++ Word Break
+  * Formatting sequence: `--`
+  * Needs closing sequence: No
+  * Actual HTML Tag: `<wbr>`
+  * Example: `Pneumono--ultra--microscopic--silicovol--canoconiosis` (Yes that is a word. [Source](https://en.wikipedia.org/wiki/Longest_word_in_English#:~:text=Pneumonoultramicroscopicsilicovolcanoconiosis))
++ `Code`
+  * Formatting sequence: `` ` ``
+  * Needs closing sequence: Yes
+  * Actual HTML Tag: `<code>`
+  * Example: ``` `Code` ```
+  * Notes: Aside from a `` ` ``, all other formatting sequence are escaped.
++ Escaped Characters
+  * Formatting sequence: `$$`
+  * Needs closing sequence: Yes
+  * Actual HTML Tag: None
+  * Example: `$$**Not Bold**$$`
+  * Notes: Aside from a `$$`, all other formatting sequence are escaped. Unlike a code block, no additional formatting is applied.
++ [Links](https://www.youtube.com/watch?v=oHg5SJYRHA0) <!--¯\_(ツ)_/¯-->
+  * Formatting sequence: `[<text to display>](<url>)`
+  * Needs closing sequence: No
+  * Actual HTML Tag: `<a>`
+  * Example: `[Links](https://stevebeeblebrox.github.io)`
+  * Notes: All links open in a new tab.
 ### Section Formatting
-Header 1-6 - Start a line with `h<number here>: ` (for example `h1:`)  
+<!--Header 1-6 - Start a line with `h<number here>: ` (for example `h1:`)  
 Paragraph - Start a line with a `p: `  
 Horizontal Rule - Start a line with three or more `-`  
 Raw HTML - Any valid SHML is valid HTML and any HTML is also valid SHML. Any section starting with a `<` and ending with a `>` (ignoring whitespace) is treated as HTML and does not have any inline formatting applied  
-Comments - any line that is not a valid section (or a line break, see below) is ignored
+Comments - any line that is not a valid section (or a line break, see below) is ignored-->
+**Work in progress, expect major changes!**
 ### Properties
 SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are pased as an array of strings in the second argument to `parseMarkup`. They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string.
 ### Miscellaneous
-Line Break - A double `%` (inline or as a standalone section) is converted into a line break  
++ Line Break - A double `%` (inline or as a standalone section) is converted into a line break  
 ## Usage
 shml.js only provides the methods needed to convert a SHML string to HTMl. It will not modify any HTML elements. It must be given the SHML as a string and it will output HTML that can be added to a document.
 ### Example 1
