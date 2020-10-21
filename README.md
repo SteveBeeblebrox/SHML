@@ -138,7 +138,7 @@ The above code parses the string for inline formatting and writes the result to 
 ```
 #### Equivalent HTML
 ```html
-<strong>Hello-/strong><span style="color: blue;"><strong>World</strong></span>
+<strong>Hello-</strong><span style="color: blue;"><strong>World</strong></span>
 ```
 #### Explanation
 SHML does not provide a way to override the styles for the elements it generates, nor does it add any class that could be used to indentify the output in the document. If you wish to apply styling to the output HTML, the easiest way to do this is to insert the result into an element with a class or id and then use a CSS selector to target specific types of elements within that wrapper element. In the above example, the HTML resulting from parsing `**World**` is put into a `<span>` element with the class `shml-result` (Note that the class name could also be `wasdf`. There is nothing special about including `shml` in the name.). Finally, a CSS selector is used to style all `<strong>` elements within a element that has the class `shml-result` which results in "World" being blue (but not "Hello-").
