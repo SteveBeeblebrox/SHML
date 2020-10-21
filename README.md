@@ -85,7 +85,7 @@ SHML can be given additional string keys to look for. This allows for the storag
 ## Usage
 SHML does not modify the document in any way. It does not format any particular elements. SHML converts a string into another string. That is it. You must give it the string to parse and then do something with the result. **SHML is not XSS secure!** If you are going to use SHML to allow users to format text (in comments for example), make sure to sanitize the input **after** it is sent through SHML.  
 Ok, enough talk. I know what you are really looking for...
-### Example 1
+### Example 1: Basic Usage
 #### Code
 ```html
 <template class="shml">
@@ -101,13 +101,13 @@ Ok, enough talk. I know what you are really looking for...
   })();
 </script>
 ```
-#### Parsing Result
+#### Equivalent HTML
 ```html
 <h1>Hello World</h1>;
 ```
 #### Explanation
 The above example gets the HTML contents of the template element and parses them for sections such as headers as well as inline formatting like bold or underlined text. The method is also told to look for a property called title. Next, the formatted text is insered after the template so it appears on the document. Finally, the document title is set to the title property of the markup that was requested earlier.
-### Example 2
+### Example 2: Inline Formatting
 #### Code
 ```html
 <script>
@@ -116,10 +116,29 @@ The above example gets the HTML contents of the template element and parses them
   })();
 </script>
 ```
-#### Parsing Result
+#### Equivalent HTML
 ```html
 <strong>Hello <del>World</del> User!</strong><br><em>This is an example of inline formatting.</em>
 ```
-
 #### Explanation
 The above code parses the string for inline formatting and writes the result to the document. Any inline formatting like bold or underlined text will be formatted, but headers and other sections will not be (line breaks count as inline formatting in this case).
+### Example 3: Styling The Result
+```html
+<style>
+ .shml-result strong {
+     color: blue;
+ }
+</style>
+<strong>Hello-</strong>
+<span class="shml-result">
+ <script>
+   document.write(SHML.parseInlineMarkup("**World**"))    
+ </script>
+</span>
+```
+#### Equivalent HTML
+```html
+<strong>Hello-/strong><span style="color: blue;"><strong>World</strong></span>
+```
+#### Explanation
+SHML does not provide a way to override the styles for the elements it generates, nor does it add any class that could be used to indentify the output in the document. If you wish to apply styling to the output HTML, the easiest way to do this is to insert the result into an element with a class or id and then use a CSS selector to target specific types of elements within that wrapper element. In the above example, the HTML resulting from parsing `**World**` is put into a `<span>` element with the class `shml-result` (Note that the class name could also be `wasdf`. There is nothing special about including `shml` in the name.). Finally, a CSS selector is used to style all `<strong>` elements within a element that has the class `shml-result` which results in "World" being blue (but not "Hello-").
