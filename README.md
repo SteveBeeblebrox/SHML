@@ -75,7 +75,7 @@ Raw HTML - Any valid SHML is valid HTML and any HTML is also valid SHML. Any sec
 Comments - any line that is not a valid section (or a line break, see below) is ignored-->
 **Work in progress, expect major changes!**
 ### Properties
-SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are pased as an array of strings in the second argument to `parseMarkup`. They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string.
+SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are passed as an array of strings in the second argument to `parseMarkup`. They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string.
 ### Miscellaneous
 + Line Break
   * Formatting sequence: `%%`
@@ -106,7 +106,7 @@ Ok, enough talk. I know what you are really looking for...
 <h1>Hello World</h1>;
 ```
 #### Explanation
-The above example gets the HTML contents of the template element and parses them for sections such as headers as well as inline formatting like bold or underlined text. The method is also told to look for a property called title. Next, the formatted text is insered after the template so it appears on the document. Finally, the document title is set to the title property of the markup that was requested earlier.
+The above example gets the HTML contents of the template element and parses them for sections such as headers as well as inline formatting like bold or underlined text. The method is also told to look for a property called title. Next, the formatted text is inserted after the template so it appears on the document. Finally, the document title is set to the title property of the markup that was requested earlier.
 ### Example 2: Inline Formatting
 #### Code
 ```html
@@ -141,4 +141,4 @@ The above code parses the string for inline formatting and writes the result to 
 <strong>Hello-</strong><span style="color: blue;"><strong>World</strong></span>
 ```
 #### Explanation
-SHML does not provide a way to override the styles for the elements it generates, nor does it add any class that could be used to indentify the output in the document. If you wish to apply styling to the output HTML, the easiest way to do this is to insert the result into an element with a class or id and then use a CSS selector to target specific types of elements within that wrapper element. In the above example, the HTML resulting from parsing `**World**` is put into a `<span>` element with the class `shml-result` (Note that the class name could also be `wasdf`. There is nothing special about including `shml` in the name.). Finally, a CSS selector is used to style all `<strong>` elements within a element that has the class `shml-result` which results in "World" being blue (but not "Hello-").
+SHML does not provide a way to override the styles for the elements it generates, nor does it add any class that could be used to identify the output in the document. If you wish to apply styling to the output HTML, the easiest way to do this is to insert the result into an element with a class or id and then use a CSS selector to target specific types of elements within that wrapper element. In the above example, the HTML resulting from parsing `**World**` is put into a `<span>` element with the class `shml-result` (Note that the class name could also be `wasdf`. There is nothing special about including `shml` in the name.). Finally, a CSS selector is used to style all `<strong>` elements within a element that has the class `shml-result` which results in "World" being blue (but not "Hello-").
