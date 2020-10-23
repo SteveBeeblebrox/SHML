@@ -47,11 +47,11 @@ SHML = {
   parseMarkup: function(markdown = '', properties = []) {
     let data = {
       properties: {},
-      stack: [],
-      toHTML: () => data.stack.join(''),
+      value: [],
+      toHTML: () => data.value.join(''),
       getProperty: (property) => data.properties[property]
     };
-    let push = object => data.stack.push(object);
+    let push = object => data.value.push(object);
     let parseForSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + ':(.*)', 'g'), (str, match) => (push('<' + tag + '>' + SHML.parseInlineMarkup(match.trim()).toHTML() + '</' + tag + '>'), ''));
     markdown.split(/\n/g).forEach((object, index, array) => {
       if(object.trim().startsWith('<') && object.trim().endsWith('>')) push(object);
