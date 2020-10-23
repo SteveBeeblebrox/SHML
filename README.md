@@ -112,7 +112,7 @@ The above example gets the HTML contents of the template element and parses them
 ```html
 <script>
   (function() {
-    document.write(SHML.parseInlineMarkup('**Hello ~~World~~ User!**%%*This is an example of inline formatting.*'))
+    document.write(SHML.parseInlineMarkup('**Hello ~~World~~ User!**%%*This is an example of inline formatting.*').toHTML())
   })();
 </script>
 ```
@@ -132,7 +132,7 @@ The above code parses the string for inline formatting and writes the result to 
 <strong>Hello-</strong>
 <span class="shml-result">
  <script>
-   document.write(SHML.parseInlineMarkup("**World**"))    
+   document.write(SHML.parseInlineMarkup("**World**").toHTML())    
  </script>
 </span>
 ```
