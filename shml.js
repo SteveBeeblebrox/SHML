@@ -23,11 +23,11 @@ SOFTWARE.
 */
 SHML = {
   parseInlineMarkup: function(str) {
-    let array = str.split(/(`|\$\$)([\S\s]*?)(\1)/g), result = {toHTML: () => result.value, value: ''}, code = false, escaped = false;
+    let array = str.split(/(`|\$\$)([\S\s]*?)(\1)/g), result = {toHTML: () => result._value, _value: ''}, code = false, escaped = false;
     array.forEach(object => {
       if(object === '`') code = !code, object = '';
       if(object === '$$') escaped = !escaped, object = '';
-      result.value += !code && !escaped ? object
+      result._value += !code && !escaped ? object
           .replace(/(\*\*\*)(.*?)\1/gs, '<strong><em>$2</em></strong>')
           .replace(/(\*\*)(.*?)\1/gs, '<strong>$2</strong>')
           .replace(/(\*)(.*?)\1/g, '<em>$2</em>')
@@ -47,11 +47,11 @@ SHML = {
   parseMarkup: function(markdown = '', properties = []) {
     let data = {
       properties: {},
-      value: [],
-      toHTML: () => data.value.join(''),
+      _value: [],
+      toHTML: () => data._value.join(''),
       getProperty: (property) => data.properties[property]
     };
-    let push = object => data.value.push(object);
+    let push = object => data._value.push(object);
     let parseForSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + ':(.*)', 'g'), (str, match) => (push('<' + tag + '>' + SHML.parseInlineMarkup(match.trim()).toHTML() + '</' + tag + '>'), ''));
     markdown.split(/\n/g).forEach((object, index, array) => {
       if(object.trim().startsWith('<') && object.trim().endsWith('>')) push(object);
