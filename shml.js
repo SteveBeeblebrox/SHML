@@ -46,10 +46,10 @@ SHML = {
   },
   parseMarkup: function(markdown = '', properties = []) {
     let data = {
-      properties: {},
+      _properties: {},
       _value: [],
       toHTML: () => data._value.join(''),
-      getProperty: (property) => data.properties[property]
+      getProperty: (property) => data._properties[property]
     };
     let push = object => data._value.push(object);
     let parseForSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + ':(.*)', 'g'), (str, match) => (push('<' + tag + '>' + SHML.parseInlineMarkup(match.trim()).toHTML() + '</' + tag + '>'), ''));
@@ -57,8 +57,8 @@ SHML = {
       if(object.trim().startsWith('<') && object.trim().endsWith('>')) push(object);
       else {
         for(var property of properties)
-          if(data.properties[property] === undefined)
-            object.replace(new RegExp('^\\s*?!' + property + ':(.*)'), (str, match) => (data.properties[property] = match.trim(), ''));
+          if(data._properties[property] === undefined)
+            object.replace(new RegExp('^\\s*?!' + property + ':(.*)'), (str, match) => (data._properties[property] = match.trim(), ''));
 
         for(var i = 1; i < 7; i++) parseForSection('h' + i, object);
         parseForSection('p', object);
