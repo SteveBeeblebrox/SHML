@@ -49,7 +49,8 @@ SHML = {
       _properties: {},
       _value: [],
       toHTML: () => data._value.join(''),
-      getProperty: (property) => data._properties[property]
+      getProperty: (property) => data._properties[property],
+      getProperties: () => ({...data._properties})
     };
     let push = object => data._value.push(object);
     let parseForSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + ':(.*)', 'g'), (str, match) => (push('<' + tag + '>' + SHML.parseInlineMarkup(match.trim()).toHTML() + '</' + tag + '>'), ''));
