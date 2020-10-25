@@ -62,11 +62,11 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Example: `$$**Not Bold**$$`
   * Notes: Aside from a `$$`, all other formatting sequence are escaped. Unlike a code block, no additional formatting is applied.
 + [Links](https://www.youtube.com/watch?v=oHg5SJYRHA0) <!--¯\_(ツ)_/¯-->
-  * Formatting sequence: `[<text to display>](<url>)`
+  * Formatting sequence: `[<text to display>](<url>)` (Opens in current tab) or `+[<text to display>](<url>)` (Opens in new tab)
   * Needs closing sequence: No
   * Resulting HTML Tag: `<a>`
-  * Example: `[Links](https://stevebeeblebrox.github.io)`
-  * Notes: All links open in a new tab.
+  * Example: `[Links](https://stevebeeblebrox.github.io)` or `+[Links](https://stevebeeblebrox.github.io)`
+  * Notes: A link's text &amp; title is set to the contents of the `[]`.
 ### Section Formatting
 <!--Header 1-6 - Start a line with `h<number here>: ` (for example `h1:`)  
 Paragraph - Start a line with a `p: `  
