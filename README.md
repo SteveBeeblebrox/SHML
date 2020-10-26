@@ -65,7 +65,7 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Formatting sequence: `[<text to display>](<url>)` (Opens in current tab) or `+[<text to display>](<url>)` (Opens in new tab)
   * Needs closing sequence: No
   * Resulting HTML Tag: `<a>`
-  * Example: `[Links](https://stevebeeblebrox.github.io)` or `+[Links](https://stevebeeblebrox.github.io)`
+  * Example: `[Links](https://stevebeeblebrox.github.io)` (Opens in current tab) or `+[Links](https://stevebeeblebrox.github.io)` (Opens in new tab)
   * Notes: A link's text &amp; title is set to the contents of the `[]`.
 ### Section Formatting
 <!--Header 1-6 - Start a line with `h<number here>: ` (for example `h1:`)  
