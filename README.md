@@ -75,7 +75,7 @@ Raw HTML - Any valid SHML is valid HTML and any HTML is also valid SHML. Any sec
 Comments - any line that is not a valid section (or a line break, see below) is ignored-->
 **Work in progress, expect major changes!**
 ### Properties
-SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are passed as an array of strings in the attribute caled `properties` of the second argument to `parseMarkup`. They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string.
+SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are passed as an array of strings in the attribute called `properties` of the second argument to `parseMarkup`. They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string.
 ### Miscellaneous
 + Line Break
   * Formatting sequence: `%%`
@@ -83,7 +83,7 @@ SHML can be given additional string keys to look for. This allows for the storag
   * Actual HTML Tag: `<br>`
   * Example: `Hello%%World`
 ## Usage
-SHML does not modify the document in any way. It does not format any particular elements. SHML converts a string into another string. That is it. You must give it the string to parse and then do something with the result. **SHML is not XSS secure!** If you are going to use SHML to allow users to format text (in comments for example), make sure to sanitize the input **after** it is sent through SHML.  
+SHML does not modify the document in any way. It does not reformat any elements. SHML converts a string into another string. That is it. You must give it the string to parse and then do something with the result. **SHML is not XSS secure!** If you are going to use SHML to allow users to format text (in comments for example), make sure to sanitize the input **after** it is sent through SHML.  
 Ok, enough talk. I know what you are really looking for...
 ### Example 1: Basic Usage
 #### Code
@@ -106,7 +106,7 @@ Ok, enough talk. I know what you are really looking for...
 <h1>Hello World</h1>;
 ```
 #### Explanation
-The above example gets the HTML contents of the template element and parses them for sections such as headers as well as inline formatting like bold or underlined text. The method is also told to look for a property called title. Next, the formatted text is inserted after the template so it appears on the document. Finally, the document title is set to the title property of the markup that was requested earlier.
+The above example gets the HTML contents of the template element and parses them for sections such as headers as well as inline formatting like bold or underlined text. The method is also told to look for a property called title. Next, the formatted text is inserted after the template, so it appears on the document. Finally, the document title is set to the title property of the markup that was requested earlier.
 ### Example 2: Inline Formatting
 #### Code
 ```html
