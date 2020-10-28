@@ -45,7 +45,7 @@ SHML = {
     })
     return result;
   },
-  parseMarkup: function(markdown = '', properties = []) {
+  parseMarkup: function(markdown = '', config = {properties: []}) {
     let data = {
       _properties: {},
       _value: [],
@@ -58,7 +58,7 @@ SHML = {
     markdown.split(/\n/g).forEach((object, index, array) => {
       if(object.trim().startsWith('<') && object.trim().endsWith('>')) push(object);
       else {
-        for(var property of properties)
+        for(var property of (config.properties ?? []))
           if(data._properties[property] === undefined)
             object.replace(new RegExp('^\\s*?!' + property + ':(.*)'), (str, match) => (data._properties[property] = match.trim(), ''));
 
