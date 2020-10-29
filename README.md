@@ -75,7 +75,7 @@ Raw HTML - Any valid SHML is valid HTML and any HTML is also valid SHML. Any sec
 Comments - any line that is not a valid section (or a line break, see below) is ignored-->
 **Work in progress, expect major changes!**
 ### Properties
-SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are passed as an array of strings in the attribute `properties` of the second argument to `parseMarkup` (`parseMarkup('...', {properties: []})`). They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string.
+SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are passed as an array of strings in the attribute `properties` of the second argument to `parseMarkup` (`parseMarkup('...', {properties: []})`). They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string. By default, SHML does not look for any properties. Properties are not supported in inline markup.
 ### Miscellaneous
 + Line Break
   * Formatting sequence: `%%`
