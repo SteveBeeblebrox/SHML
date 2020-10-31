@@ -66,7 +66,7 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Needs closing sequence: No
   * Resulting HTML Tag: `<a>`
   * Example: `[Links](https://stevebeeblebrox.github.io)` (Opens in current tab or frame [`target="_self"`]) or `+[Links](https://stevebeeblebrox.github.io)` (Opens in new tab [`target="_blank"`])
-  * Notes: A link's text &amp; title is set to the contents of the `[]`.
+  * Notes: A link's text &amp; title are set to the contents of the `[]`. There are no restrictions on link values. You can use `mailto` links, `http` links, `https` links, relative links, or any other link that is valid for an HTML anchor `href`.
 ### Section Formatting
 <!--Header 1-6 - Start a line with `h<number here>: ` (for example `h1:`)  
 Paragraph - Start a line with a `p: `  
