@@ -83,7 +83,9 @@ SHML can be given additional string keys to look for. This allows for the storag
   * Actual HTML Tag: `<br>`
   * Example: `Hello%%World`
 ## Usage
-SHML does not modify the document in any way. It does not reformat any elements. SHML converts a string into another string. That is it. You must give it the string to parse and then do something with the result. **SHML is not XSS secure!** If you are going to use SHML to allow users to format text (in comments for example), make sure to sanitize the input **after** it is sent through SHML.  
+### Overview
+SHML does not modify the document in any way. It does not reformat any elements. SHML converts one string into another string. That is it. You must give it the string to parse and then do something with the result. **SHML is not XSS secure!** If you are going to use SHML to allow users to format text (in comments for example), make sure to sanitize the input **AFTER** it is sent through SHML.  
+  
 Ok, enough talk. I know what you are really looking for...
 ### Example 1: Basic Usage
 #### Code
@@ -106,7 +108,7 @@ Ok, enough talk. I know what you are really looking for...
 <h1>Hello World</h1>;
 ```
 #### Explanation
-The above example gets the HTML contents of the template element and parses them for sections such as headers as well as inline formatting like bold or underlined text. The method is also told to look for a property called title. Next, the formatted text is inserted after the template, so it appears on the document. Finally, the document title is set to the title property of the markup that was requested earlier.
+The above example gets the HTML contents of the template element and parses them for sections such as headers as well as inline formatting like bold or underlined text. The parser is also told to look for a property called "title" by passing an object containing a string array, called properties, as the second argument. Next, the formatted text is inserted after the template, so it appears on the document. Finally, the document title is set to the title property of the markup that was requested earlier.
 ### Example 2: Inline Formatting
 #### Code
 ```html
