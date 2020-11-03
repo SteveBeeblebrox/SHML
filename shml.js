@@ -26,7 +26,7 @@ SHML = {
       default: {properties: [], inline: {}},
       actual: {properties: [], inline: {}}
   },
-  parseInlineMarkup: function(str, localConfig = config.actual) {
+  parseInlineMarkup: function(str, localConfig = config.actual.inline) {
     let array = str.split(/(`|\$\$)([\S\s]*?)(\1)/g), result = {toHTML: () => result._value, _value: ''}, code = false, escaped = false;
     array.forEach(object => {
       if(object === '`') code = !code, object = '';
