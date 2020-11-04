@@ -27,7 +27,7 @@ SHML = {
       static get initial() {return {properties: [], inline: {}};};
       static actual = {properties: [], inline: {}};
   },
-  parseInlineMarkup: function(str, localConfig = Config.actual.inline) {
+  parseInlineMarkup: function(str, localConfig = SHML.Config.actual.inline) {
     let array = str.split(/(`|\$\$)([\S\s]*?)(\1)/g), result = {toHTML: () => result._value, _value: ''}, code = false, escaped = false;
     array.forEach(object => {
       if(object === '`') code = !code, object = '';
@@ -50,7 +50,7 @@ SHML = {
     })
     return result;
   },
-  parseMarkup: function(markdown = '', localConfig = Config.actual) {
+  parseMarkup: function(markdown = '', localConfig = SHML.Config.actual) {
     let data = {
       _properties: {},
       _value: [],
