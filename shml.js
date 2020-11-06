@@ -27,7 +27,7 @@ SHML = {
       static get initial() {
         return {properties: [], inline: {}};
       }
-      static #actual = this.initial;
+      static #actual = {properties: [], inline: {}};
       static get actual() {
         return this.#actual;
       }
