@@ -25,7 +25,9 @@ SHML = {
   Config: class {
       constructor() {return {};};
       static get initial() {return {properties: [], inline: {}};};
-      static actual = {properties: [], inline: {}};
+      static #actual = {properties: [], inline: {}};
+      static get actual() {return this.#actual;};
+      static set actual(value) {this.#actual = value;};
   },
   parseInlineMarkup: function(str, localConfig = SHML.Config.actual.inline) {
     let array = str.split(/(`|\$\$)([\S\s]*?)(\1)/g), result = {toHTML: () => result._value, _value: ''}, code = false, escaped = false;
