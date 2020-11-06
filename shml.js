@@ -25,7 +25,7 @@ SHML = {
   Config: class {
       constructor() {return {};};
       static get initial() {return {properties: [], inline: {}};};
-      static #actual = {properties: [], inline: {}};
+      static #actual = this.initial;
       static get actual() {return this.#actual;};
       static set actual(value) {this.#actual = value;};
   },
