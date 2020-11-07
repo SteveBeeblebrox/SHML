@@ -22,20 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 SHML = {
-  Config: class {
-      constructor() {return {};}
-      static get initial() {
-        return {properties: [], inline: {}};
-      }
-      static #actual = {properties: [], inline: {}};
-      static get actual() {
-        return this.#actual;
-      }
-      static set actual(value) {
-        this.#actual = value;
-      }
-  },
-  parseInlineMarkup: function(str, localConfig = SHML.Config.actual.inline) {
+  config: {properties: [], inline: {}},
+  parseInlineMarkup: function(str, localConfig = SHML.config.inline) {
     let array = str.split(/(`|\$\$)([\S\s]*?)(\1)/g), result = {toHTML: () => result._value, _value: ''}, code = false, escaped = false;
     array.forEach(object => {
       if(object === '`') code = !code, object = '';
@@ -58,7 +46,7 @@ SHML = {
     })
     return result;
   },
-  parseMarkup: function(markdown = '', localConfig = SHML.Config.actual) {
+  parseMarkup: function(markdown = '', localConfig = SHML.config) {
     let data = {
       _properties: {},
       _value: [],
