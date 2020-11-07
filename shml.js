@@ -21,9 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-SHML = {
-  config: {properties: [], inline: {}},
-  parseInlineMarkup: function(str, localConfig = SHML.config.inline) {
+class SHML {
+  static config = {properties: [], inline: {}}
+  static parseInlineMarkup(str, localConfig = SHML.config.inline) {
     let array = str.split(/(`|\$\$)([\S\s]*?)(\1)/g), result = {toHTML: () => result._value, _value: ''}, code = false, escaped = false;
     array.forEach(object => {
       if(object === '`') code = !code, object = '';
@@ -45,8 +45,8 @@ SHML = {
         : object === '' ? '' :  code ? '<code>'+object+'</code>' : object;
     })
     return result;
-  },
-  parseMarkup: function(markdown = '', localConfig = SHML.config) {
+  }
+  static parseMarkup(markdown = '', localConfig = SHML.config) {
     let data = {
       _properties: {},
       _value: [],
