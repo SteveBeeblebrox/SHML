@@ -54,7 +54,7 @@ class SHML {
       _value: [],
       toHTML: () => data._value.join(''),
       getProperty: (property) => data._properties[Symbol.for(property)],
-      getProperties: () => ({__proto__: null, ...data._properties})
+      getProperties: () => new Proxy({__proto__: null, ...data._properties})
     };
     let push = object => data._value.push(object);
     let parseForSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + ':(.*)', 'g'), (str, match) => (push('<' + tag + '>' + SHML.parseInlineMarkup(match.trim()).toHTML() + '</' + tag + '>'), ''));
