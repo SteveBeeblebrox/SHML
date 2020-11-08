@@ -56,7 +56,7 @@ class SHML {
       getProperties: () => ({...data._properties})
     };
     let push = object => data._value.push(object);
-    let parseForSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + ':(.*)', 'g'), (str, match) => (push('<' + tag + '>' + SHML.parseInlineMarkup(match.trim(), localConfig.inline ?? {}).toHTML() + '</' + tag + '>'), ''));
+    let parseForSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + ':(.*)', 'g'), (str, match) => (push('<' + tag + '>' + SHML.parseInlineMarkup(match.trim(), localConfig.inline ?? Object.create(null)).toHTML() + '</' + tag + '>'), ''));
     markdown.split(/\n/g).forEach((object, index, array) => {
       if(object.trim().startsWith('<') && object.trim().endsWith('>')) push(object);
       else {
@@ -66,7 +66,7 @@ class SHML {
 
         for(var i = 1; i < 7; i++) parseForSection('h' + i, object);
         parseForSection('p', object);
-        object.replace(/^\s*?(?:bull:|\+)(.*)/g, (str, match) => (push('<ul><li>' + SHML.parseInlineMarkup(match.trim(), localConfig.inline ?? {}).toHTML() + '</li></ul>'), ''));
+        object.replace(/^\s*?(?:bull:|\+)(.*)/g, (str, match) => (push('<ul><li>' + SHML.parseInlineMarkup(match.trim(), localConfig.inline ?? Object.create(null)).toHTML() + '</li></ul>'), ''));
         object.replace(/\s*---+\s*/, () => (push('<hr>'), ''));
         object.replace(/\s*%%\s*/, () => (push('<br>'), ''));
       }
