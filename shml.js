@@ -57,7 +57,7 @@ class SHML {
       _properties: {},
       _value: [],
       toHTML: () => data._value.join(''),
-      getProperty: (property) => data._properties[property],
+      getProperty: (property) => data._properties[Symbol.for(property)],
       getProperties: () => ({__proto__: null, ...data._properties})
     };
     let push = object => data._value.push(object);
@@ -66,8 +66,8 @@ class SHML {
       if(object.trim().startsWith('<') && object.trim().endsWith('>')) push(object);
       else {
         for(var property of (localConfig.properties ?? []))
-          if(data._properties[property] === undefined)
-            object.replace(new RegExp('^\\s*?!' + property + ':(.*)'), (str, match) => (data._properties[property] = match.trim(), ''));
+          if(data._properties[Symbol.for(property)] === undefined)
+            object.replace(new RegExp('^\\s*?!' + property + ':(.*)'), (str, match) => (data._properties[Symbol.for(property)] = match.trim(), ''));
 
         for(var i = 1; i < 7; i++) parseForSection('h' + i, object);
         parseForSection('p', object);
