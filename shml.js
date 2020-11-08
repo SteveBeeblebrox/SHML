@@ -54,7 +54,15 @@ class SHML {
       _value: [],
       toHTML: () => data._value.join(''),
       getProperty: (property) => data._properties[Symbol.for(property)],
-      getProperties: () => new Proxy({__proto__: null, ...data._properties})
+      getProperties: () => new Proxy({__proto__: null, ...data._properties},
+      {
+        get: function(target, name, receiver) {
+          if (name === Symbol.iterator) return (function*() {
+            for(let prop of Object.getOwnPropertySymbols(target).filter(object => object !== Symbol.iterator)) yield [prop, target[prop]]
+          }).bind(target);
+          else return target[Symbol.for(name)];
+        }
+      })
     };
     let push = object => data._value.push(object);
     let parseForSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + ':(.*)', 'g'), (str, match) => (push('<' + tag + '>' + SHML.parseInlineMarkup(match.trim()).toHTML() + '</' + tag + '>'), ''));
