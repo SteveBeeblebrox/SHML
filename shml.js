@@ -25,8 +25,8 @@ class SHML {
   constructor() {return {};}
   static properties = [];
   static parseInlineMarkup(str) {
-    let array = str.split(/(`|\$\$)([\S\s]*?)(\1)/g), result = {__proto__: null, toHTML: () => result._value, _value: ''}, code = false, escaped = false;
-    array.forEach(object => {
+    let result = {__proto__: null, toHTML: () => result._value, _value: ''}, code = false, escaped = false;
+    str.split(/(`|\$\$)([\S\s]*?)(\1)/g).forEach(object => {
       if(object === '`') code = !code, object = '';
       if(object === '$$') escaped = !escaped, object = '';
       result._value += !code && !escaped ? object
