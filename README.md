@@ -98,7 +98,7 @@ Ok, enough talk. I know what you are really looking for...
 <script>
   (function() {
     let element = document.querySelector('template.shml');
-    let result = SHML.parseMarkup(element.innerHTML, {properties: ['title'], inline: {}});
+    let result = SHML.parseMarkup(element.innerHTML, ['title']);
     element.insertAdjacentHTML('afterend', result.toHTML());
     document.title = result.getProperty('title');
   })();
