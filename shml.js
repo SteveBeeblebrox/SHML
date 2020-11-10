@@ -44,7 +44,7 @@ class SHML {
           .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_self">$1</a>')
           .replace(/%%/g, '<br>')
         : object === '' ? '' :  code ? '<code>'+object+'</code>' : object;
-    })
+    });
     return result;
   }
   static parseMarkup(markdown = '', properties = SHML.properties ?? []) {
