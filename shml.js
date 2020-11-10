@@ -72,13 +72,14 @@ class SHML {
       else {
         for(var property of properties)
           if(data._properties[Symbol.for(property)] === undefined)
-            object.replace(new RegExp('^\\s*?!' + property + ':(.*)'), (str, match) => (data._properties[Symbol.for(property)] = match.trim(), ''));
+            object = object.replace(new RegExp('^\\s*?!' + property + ':(.*)'), (str, match) => (data._properties[Symbol.for(property)] = match.trim(), ''));
 
-        for(var i = 1; i < 7; i++) parseForSection('h' + i, object);
-        parseForSection('p', object);
-        object.replace(/^\s*?(?:bull:|\+)(.*)/g, (str, match) => (push('<ul><li>' + SHML.parseInlineMarkup(match.trim()).toHTML() + '</li></ul>'), ''));
-        object.replace(/\s*---+\s*/, () => (push('<hr>'), ''));
-        object.replace(/\s*%%\s*/, () => (push('<br>'), ''));
+        for(var i = 6; i > 0; i--) object = parseForHeader(i, object);
+        for(var i = 1; i < 7; i++) object = parseForSection('h' + i, object);
+        object = parseForSection('p', object);
+        object = object.replace(/^\s*?(?:bull:|\+)(.*)/g, (str, match) => (push('<ul><li>' + SHML.parseInlineMarkup(match.trim()).toHTML() + '</li></ul>'), ''));
+        object = object.replace(/\s*---+\s*/, () => (push('<hr>'), ''));
+        object = object.replace(/\s*%%\s*/, () => (push('<br>'), ''));
       }
     });
     return data;
