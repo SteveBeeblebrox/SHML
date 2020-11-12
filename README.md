@@ -68,11 +68,12 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Example: `[Links](https://stevebeeblebrox.github.io)` (Opens in current tab or frame [`target="_self"`]) or `+[Links](https://stevebeeblebrox.github.io)` (Opens in new tab [`target="_blank"`])
   * Notes: A link's text &amp; title are set to the contents of the `[]`. There are no restrictions on link values. You can use `mailto` links, `http` links, `https` links, relative links, or any other link that is valid for an HTML anchor `href`.
 ### Section Formatting
-<!--Header 1-6 - Start a line with `h<number here>: ` (for example `h1:`)  
+Header 1-6 - Start a line with `h<number here>: ` (for example `h1:`)  
 Paragraph - Start a line with a `p: `  
 Horizontal Rule - Start a line with three or more `-`  
 Raw HTML - Any valid SHML is valid HTML and any HTML is also valid SHML. Any section starting with a `<` and ending with a `>` (ignoring whitespace) is treated as HTML and does not have any inline formatting applied  
-Comments - any line that is not a valid section (or a line break, see below) is ignored-->
+Comments - any line that is not a valid section (or a line break) is ignored  
+  
 **Work in progress, expect major changes!**
 ### Properties
 SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are passed as an array of strings in the second argument to `parseMarkup`. If no properties are passed in the second argument, the parser will look at the global property `properties` of SHML. They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string. By default, SHML does not look for any properties. Properties are not supported in inline markup.
