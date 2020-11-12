@@ -24,6 +24,21 @@ SOFTWARE.
 class SHML {
   constructor() {return {};}
   static properties = [];
+  static #styles = void (function() {
+    if(typeof window === 'object') window.addEventListener('DOMContentLoaded', event => {
+      const stylesheet = new CSSStyleSheet();
+      stylesheet.replaceSync(`
+        @media (min-width:601px) {
+          .shml-internal-half {width: 50%; float: left;}
+          .shml-internal-third {width: 33.33333%; float: left;}
+          .shml-internal-two-third {width: 66.66666%; float: left;}
+          .shml-internal-quarter {width: 25%; float: left;}
+          .shml-internal-three-quarter {width: 75%; float: left;}
+        }
+      `);
+      document.adoptedStyleSheets = [...document.adoptedStyleSheets, stylesheet];
+    });
+  })();
   static parseInlineMarkup(str) {
     let result = {__proto__: null, toHTML: () => result._value, _value: ''}, code = false, escaped = false;
     str.split(/(`|\$\$)([\S\s]*?)(\1)/g).forEach(object => {
