@@ -125,7 +125,7 @@ The above example gets the HTML contents of the template element and parses them
 <strong>Hello <del>World</del> User!</strong><br><em>This is an example of inline formatting.</em>
 ```
 ##### Explanation
-The above code parses the string for inline formatting and writes the result to the document. Any inline formatting like bold or underlined text will be formatted, but properties, headers, and other sections will not be parsed (line breaks count as inline formatting in this case and are still parsed). If you want to use the default config, you do not have to pass anything in the second parameter.
+The above code parses the string for inline formatting and writes the result to the document. Any inline formatting like bold or underlined text will be formatted, but properties, headers, and other sections will not be parsed (line breaks count as inline formatting in this case and are still parsed).
 #### Example 3: Styling The Result
 ```html
 <style>
