@@ -78,7 +78,10 @@ class SHML {
     let push = object => data._value.push(object);
     let parseForHeader = (header, str) => str.replace(new RegExp('^\\s*?' + '#'.repeat(header) + '(.*)', 'g'), (str, match) => (push('<h' + header + '>' + SHML.parseInlineMarkup(match.trim()).toHTML() + '</h' + header + '>'), ''));
     let parseForSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + ':(.*)', 'g'), (str, match) => (push('<' + tag + '>' + SHML.parseInlineMarkup(match.trim()).toHTML() + '</' + tag + '>'), ''));
+    let escaped = false;
     markdown.split(/\n/g).forEach((object, index, array) => {
+      if(object.trim() === '$$') return void (escaped = !escaped);
+      if(escaped) return void push(object);
       if(object.trim().startsWith('<') && object.trim().endsWith('>')) push(object);
       else {
         for(let property of properties)
