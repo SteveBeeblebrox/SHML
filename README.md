@@ -55,12 +55,6 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Resulting HTML Tag: `<code>`
   * Example: ``` `Code` ```
   * Notes: Aside from a `` ` ``, all other formatting sequence are escaped.
-+ Escaped Characters
-  * Formatting sequence: `$$`
-  * Needs closing sequence: Yes
-  * Resulting HTML Tag: None
-  * Example: `$$**Not Bold**$$`
-  * Notes: Aside from a `$$`, all other formatting sequence are escaped. Unlike a code block, no additional formatting is applied.
 + [Links](https://www.youtube.com/watch?v=oHg5SJYRHA0) <!--¯\_(ツ)_/¯-->
   * Formatting sequence: `[<text to display>](<url>)` (Opens in current tab or frame [`target="_self"`]) or `+[<text to display>](<url>)` (Opens in new tab [`target="_blank"`])
   * Needs closing sequence: No
@@ -84,6 +78,12 @@ SHML can be given additional string keys to look for. This allows for the storag
   * Needs closing sequence: No
   * Actual HTML Tag: `<br>`
   * Example: `Hello%%World`
++ Escaped Characters
+  * Formatting sequence: `$$`
+  * Needs closing sequence: Yes
+  * Resulting HTML Tag: None
+  * Example: `$$**Not Bold**$$`
+  * Notes: Aside from a `$$`, all other formatting sequence are escaped. Unlike a code block, no additional formatting is applied.
 ## Usage
 ### Overview
 SHML does not modify the document in any way. It does not reformat any elements. SHML converts one string into another string. That is it. You must give it the string to parse and then do something with the result. **SHML is not XSS secure!** If you are going to use SHML to allow users to format text (in comments for example), make sure to sanitize the input **AFTER** it is sent through SHML.  
