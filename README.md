@@ -62,12 +62,12 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Example: `[Links](https://stevebeeblebrox.github.io)` (Opens in current tab or frame [`target="_self"`]) or `+[Links](https://stevebeeblebrox.github.io)` (Opens in new tab [`target="_blank"`])
   * Notes: A link's text &amp; title are set to the contents of the `[]`. There are no restrictions on link values. You can use `mailto` links, `http` links, `https` links, relative links, or any other link that is valid for an HTML anchor `href`.
 ### Section Formatting
-Header 1-6 - Start a line with `h<number here>: ` (for example `h1:`) or a number of `#` corresponding to the header size you want (`## Foo` is equalivet to `h2: Foo`)  
-Paragraph - Start a line with a `p: `  
-Horizontal Rule - Start a line with three or more `-`  
-Raw HTML - Any valid SHML is valid HTML and any HTML is also valid SHML. Any section starting with a `<` and ending with a `>` (ignoring whitespace) is treated as HTML and does not have any inline formatting applied  
-Comments - any line that is not a valid section (or a line break) is ignored  
-Images - to include a basic image, surround the link in square brackets on a new line. If you wish to add alternate text, put that text inside of square brackets followed by an image reference in parentheses like this `[alt text (image_url)]`. In both formats, including a space, then a number, an x, and one more number after the url (like `image_url 20x20`) will cause the image to use those values (in px) for its width and height respectively instead of its actual size (using a zero for one of the values makes that dimension use auto sizing)  
++ Header 1-6 - Start a line with `h<number here>: ` (for example `h1:`) or a number of `#` corresponding to the header size you want (`## Foo` is equalivet to `h2: Foo`)  
++ Paragraph - Start a line with a `p: `  
++ Horizontal Rule - Start a line with three or more `-`  
++ Raw HTML - Any valid SHML is valid HTML and any HTML is also valid SHML. Any section starting with a `<` and ending with a `>` (ignoring whitespace) is treated as HTML and does not have any inline formatting applied  
++ Comments - any line that is not a valid section (or a line break) is ignored  
++ Images - to include a basic image, surround the link in square brackets on a new line. If you wish to add alternate text, put that text inside of square brackets followed by an image reference in parentheses like this `[alt text (image_url)]`. In both formats, including a space, then a number, an x, and one more number after the url (like `image_url 20x20`) will cause the image to use those values (in px) for its width and height respectively instead of its actual size (using a zero for one of the values makes that dimension use auto sizing)  
   
 **Work in progress, expect major changes!**
 ### Properties
