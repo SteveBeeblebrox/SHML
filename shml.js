@@ -92,6 +92,7 @@ class SHML {
         for(let i = 1; i < 7; i++) object = parseForSection('h' + i, object);
         object = parseForSection('p', object);
         object = object
+        .replace(/^\s*?!!(.*)/g, (str, match) => '')
         .replace(/^\s*?>>(.*)/g, (str, match) => (push('<blockquote>' + SHML.parseInlineMarkup(match.trim()).toHTML() + '</blockquote>'), ''))
         .replace(/^\s*?(?:bull:|\+)(.*)/g, (str, match) => (push('<ul><li>' + SHML.parseInlineMarkup(match.trim()).toHTML() + '</li></ul>'), ''))
         .replace(/^\s*?\[(.*)\((.*?) ([0-9]*)[xX]([0-9]*)\)\]/g, (str, match1, match2, match3, match4) => (push('<img src="' + match2 + '" alt="' + match1.trim() + '" width="' + (parseInt(match3) === 0 ? 'auto' : match3) + '" height="' + (parseInt(match4) === 0 ? 'auto' : match4) + '">'), ''))
