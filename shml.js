@@ -23,7 +23,6 @@ SOFTWARE.
 */
 class SHML {
   constructor() {return {};}
-  static properties = [];
   static getStyleSheet() {
       return `<style>
         @media (min-width:601px) {
@@ -58,7 +57,7 @@ class SHML {
     });
     return result;
   }
-  static parseMarkup(markdown = '', properties = SHML.properties ?? []) {
+  static parseMarkup(markdown = '') {
     let data = {
       __proto__: null,
       _properties: {},
