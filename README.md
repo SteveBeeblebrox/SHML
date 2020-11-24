@@ -70,8 +70,22 @@ SHML is composed of two main types of styling: inline and sections. All sections
 + Images - to include a basic image, surround the link in square brackets on a new line. If you wish to add alternate text, put that text inside of square brackets followed by an image reference in parentheses like this `[alt text (image_url)]`. In both formats, including a space, then a number, an x, and one more number after the url (like `image_url 20x20`) will cause the image to use those values (in px) for its width and height respectively instead of its actual size (using a zero for one of the values makes that dimension use auto sizing)  
   
 **Work in progress, expect major changes!**
-### Properties
-SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are passed as an array of strings in the second argument to `parseMarkup`. If no properties are passed in the second argument, the parser will look at the global property `properties` of SHML. They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string. By default, SHML does not look for any properties. Properties are not supported in inline markup.
+<!--### Properties
+SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are passed as an array of strings in the second argument to `parseMarkup`. If no properties are passed in the second argument, the parser will look at the global property `properties` of SHML. They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string. By default, SHML does not look for any properties. Properties are not supported in inline markup.-->
+### Section Metadata
++ Single Line Comments
+  * Formatting sequence: `!!`
+  * Needs closing sequence: No
+  * Actual HTML Tag: None
+  * Example: `!!Work in progress`
+  * Retrieval: Comment metadata cannot be retrieved from the parsing result and is only avalible in the source.
++ Properties
+  * Formatting sequence: `!key:value`
+  * Needs closing sequence: No
+  * Actual HTML Tag: None
+  * Example: `!title: My Article`
+  * Notes: If a key already has a value, any new value is ignored.
+  * Retrieval: To retrieve a specific property, pass the key to retrieve to `getProperty` on the parsing result. To get an iterable list of all discovered properties, call `getProperties` on the parsing result. Although it is slower that `getProperty`, you can use bracket notation to get the value of a key from the list of all properties.
 ### Miscellaneous
 + Line Break
   * Formatting sequence: `%%`
