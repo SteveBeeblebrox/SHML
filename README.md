@@ -127,7 +127,7 @@ Ok, enough talk. I know what you are really looking for...
 <h1>Hello World</h1>;
 ```
 ##### Explanation
-The above example gets the HTML contents of the template element and parses them for sections such as headers as well as inline formatting like bold or underlined text. The parser is also told to look for a property called "title" by passing an object containing a string array, called properties, as the second argument. Next, the formatted text is inserted after the template, so it appears on the document. Finally, the document title is set to the title property of the markup that was requested earlier.
+The above example gets the HTML contents of the template element and parses them for sections such as headers as well as inline formatting like bold or underlined text. The parser also stores the value of the property "title" for later use. Next, the formatted text is inserted after the template, so it appears on the document. Finally, the document title is set to the "title" property from the markup.
 #### Example 2: Inline Formatting
 ##### Code
 ```html
