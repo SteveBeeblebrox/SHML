@@ -81,6 +81,15 @@ class SHML {
     markdown.split(/\n/g).forEach((object, index, array) => {
       if(object.trim() === '$$') return void (escaped = !escaped);
       if(escaped) return void push(object);
+      
+      if(object.trim() === '[[') return void (table = true, push('<table>'));
+      else if(object.trim() === ']]') return void (table = false, tableHeader = true, push('</table>'));
+      else if(table) {
+        let makeRow = (t) => SHML.parseInlineMarkup(('<tr><t'+t+'>'+object.trim().split(/(?<!\$),/).join('</t'+t+'><t'+t+'>')+'</t'+t+'></tr>').replace(/\$,/g, ',')).toHTML();
+        if(tableHeader) return void (tableHeader = false, push(makeRow('h')));
+        else return void push(makeRow('d'));
+      }
+      
       if(object.trim().startsWith('<') && object.trim().endsWith('>')) push(object);
       else {
         for(let i = 6; i > 0; i--) object = parseForHeader(i, object);
