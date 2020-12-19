@@ -49,7 +49,6 @@ class SHML {
           .replace(/(,,)(.*?)\1/gs, '<sub>$2</sub>')
           .replace(/(\|)(.*?)\1/gs, '<mark>$2</mark>')
           .replace(/(\S)--(\S)/g, '$1<wbr>$2')
-          .replace(/(`)(.*?)\1/g, '<code>$2</code>')
           .replace(/\+\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_blank">$1</a>')
           .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_self">$1</a>')
           .replace(/%%/g, '<br>')
