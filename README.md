@@ -69,6 +69,7 @@ SHML is composed of two main types of styling: inline and sections. All sections
 + Comments - any line that is not a valid section (or a line break) is ignored  
 + Blockquotes - any line starting with a `>>` becomes a blockquote
 + Images - to include a basic image, surround the link in square brackets on a new line. If you wish to add alternate text, put that text inside of square brackets followed by an image reference in parentheses like this `[alt text (image_url)]`. In both formats, including a space, then a number, an x, and one more number after the url (like `image_url 20x20`) will cause the image to use those values (in px) for its width and height respectively instead of its actual size (using a zero for one of the values makes that dimension use auto sizing)  
++ Tables - to create a table, start it with `[[` and close it with `]]`. Any new lines between these will be treated as rows. Columns are marked by splitting rows with commas. To escape commas (for use in numbers, subscript, etc...) use `$,` to escape the comma and not define a column
   
 **Work in progress, expect major changes!**
 <!--### Properties
