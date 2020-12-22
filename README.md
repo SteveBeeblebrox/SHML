@@ -164,3 +164,29 @@ The above code parses the string for inline formatting and writes the result to 
 ```
 ##### Explanation
 SHML does not provide a way to override the styles for the elements it generates, nor does it add any class that could be used to identify the output in the document. If you wish to apply styling to the output HTML, the easiest way to do this is to insert the result into an element with a class or id and then use a CSS selector to target specific types of elements within that wrapper element. In the above example, the HTML resulting from parsing `**World**` is put into a `<span>` element with the class `shml-result` (Note that the class name could also be `wasdf`. There is nothing special about including `shml` in the name.). Finally, a CSS selector is used to style all `<strong>` elements within a element that has the class `shml-result` which results in "World" being blue (but not "Hello-").
+### Example 4: Tables
+```html
+<script>
+ document.write(SHML.parseMarkup(`
+[[
+    First Name,  Last Name,  Age, Fav. Color
+    Steve,       Beeblebrox, 27,  Blue
+    Bob,         Smith,      32,  Green
+    Jill,        Smith,      29,  Red
+]]
+`).toHTML());
+</script>
+```
+#### Equivalent HTML
+```html
+<table>
+  <tbody>
+   <tr><th>First Name</th><th>Last Name</th><th>Age</th><th>Fav. Color</th></tr>
+   <tr><td>Steve</td><td>Beeblebrox</td><td>27</td><td>Blue</td></tr>
+   <tr><td>Bob</td><td>Smith</td><td>32</td><td>Green</td></tr>
+   <tr><td>Jill</td><td>Smith</td><td>29</td><td>Red</td></tr>
+ </tbody>
+</table>
+ ```
+##### Explanation
+SHML parses the given markup and converts it into a HTML table. Each new line is treated as a row (with the first row consisting of header cells) and each unsecaped comma in the row defines the boundary between cells. The parsing result is then written to the document.
