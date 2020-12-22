@@ -66,7 +66,6 @@ SHML is composed of two main types of styling: inline and sections. All sections
 + Paragraph - Start a line with a `p: `  
 + Horizontal Rule - Start a line with three or more `-`  
 + Raw HTML - Any valid SHML is valid HTML and any HTML is also valid SHML. Any section starting with a `<` and ending with a `>` (ignoring whitespace) is treated as HTML and does not have any inline formatting applied  
-+ Comments - any line that is not a valid section (or a line break) is ignored  
 + Blockquotes - any line starting with a `>>` becomes a blockquote
 + Images - to include a basic image, surround the link in square brackets on a new line. If you wish to add alternate text, put that text inside of square brackets followed by an image reference in parentheses like this `[alt text (image_url)]`. In both formats, including a space, then a number, an x, and one more number after the url (like `image_url 20x20`) will cause the image to use those values (in px) for its width and height respectively instead of its actual size (using a zero for one of the values makes that dimension use auto sizing)  
 + Tables - to create a table, start it with `[[` and close it with `]]`. Any new lines between these will be treated as rows. Columns are marked by splitting rows with commas. To escape commas (for use in numbers, subscript, etc...) use `$,` to escape the comma and not define a column
@@ -80,6 +79,7 @@ SHML can be given additional string keys to look for. This allows for the storag
   * Needs closing sequence: No
   * Actual HTML Tag: None
   * Example: `!!Work in progress`
+  * Notes: SHML has no multiline comments of its own; however, you can use HTML's `<!-- -->`.
   * Retrieval: Comment metadata cannot be retrieved from the parsing result and is only avalible in the source.
 + Properties
   * Formatting sequence: `!key:value`
