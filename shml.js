@@ -103,7 +103,7 @@ class SHML {
       .replace(/^\s*?\[(.*)\]/g, (str, match) => (push('<img src="' + match + '">'), ''))
       .replace(/\s*---+\s*/, () => (push('<hr>'), ''))
       .replace(/\s*%%\s*/, () => (push('<br>'), ''));
-      push(object);
+      push(SHML.parseInlineMarkup(object.trim()).toHTML());
     });
     return data;
   }
