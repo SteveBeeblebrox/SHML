@@ -77,6 +77,7 @@ class SHML {
     let parseForHeader = (header, str) => str.replace(new RegExp('^\\s*?' + '#'.repeat(header) + '(.*)', 'g'), (str, match) => (push('<h' + header + '>' + SHML.parseInlineMarkup(match.trim()).toHTML() + '</h' + header + '>'), ''));
     let parseForIdHeader = (header, str) => str.replace(new RegExp('^\\s*?' + '#'.repeat(header) + '\\[(.*?)\\]\\s*?(.*)', 'g'), (str, match1, match2) => (push('<a href="#h' + header + ':' + match1 + '"><h' + header + ' id="h' + header + ':' + match1 + '">' + SHML.parseInlineMarkup(match2.trim()).toHTML() + '</h' + header + '></a>'), ''));
     let parseForSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + ':(.*)', 'g'), (str, match) => (push('<' + tag + '>' + SHML.parseInlineMarkup(match.trim()).toHTML() + '</' + tag + '>'), ''));
+    let parseForIdSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + '\\[(.*?)\\]:(.*)', 'g'), (str, match1, match2) => (push('<a href="#' + tag + ':' + match1 + '"><' + tag + ' id="' + tag + ':' + match1 + '">' + SHML.parseInlineMarkup(match2.trim()).toHTML() + '</' + tag + '></a>'), ''));
     let escaped = false, table = false, tableHeader = true;
     markdown.split(/\n/g).forEach((object, index, array) => {
       if(object.trim() === '$$') return void (escaped = !escaped);
