@@ -61,6 +61,7 @@ class SHML {
       __proto__: null,
       _properties: {},
       _value: [],
+      _ids: [],
       toHTML: () => data._value.join(''),
       getProperty: (property) => data._properties[Symbol.for(property)],
       getProperties: () => new Proxy({__proto__: null, ...data._properties},
@@ -70,6 +71,15 @@ class SHML {
             for(let prop of Object.getOwnPropertySymbols(target).filter(object => object !== Symbol.iterator)) yield [prop, target[prop]]
           }).bind(target);
           else return target[Symbol.for(name)];
+        },
+        set: function() {
+            return false;
+        }
+      }),
+      getIds: () => new Proxy([...data._ids],
+      {
+        set: function() {
+            return false;
         }
       })
     };
