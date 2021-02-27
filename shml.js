@@ -91,6 +91,10 @@ class SHML {
         else return void push(makeRow('d'));
       }
       
+      
+      for(let i = 6; i > 0; i--) object = parseForIdHeader(i, object);
+      for(let i = 1; i < 7; i++) object = parseForIdSection('h' + i, object);
+      
       for(let i = 6; i > 0; i--) object = parseForHeader(i, object);
       for(let i = 1; i < 7; i++) object = parseForSection('h' + i, object);
       object = parseForSection('p', object);
