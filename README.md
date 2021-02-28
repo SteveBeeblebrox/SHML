@@ -66,14 +66,18 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Formatting sequence: `#` repeated n times or `h<n>:` as the first non-whitespace characters in a line where n is a number 1-6 inclusive and corresponds to the desired level header
   * Needs closing sequence: No
   * Resulting HTML Tag: `<h1>`, `<h2>`, `<h3>`, `<h4>`, `<h5>`, or `<h6>`
-  * Example: `##Hello World` or `h2:Hello World`
+  * Example: `##Header Two` or `h2:Header Two`
 + Headers With Ids - To give a header an id attribute, use the following format `h<number>[<id>]:...` or `#[<id>]...`
-+ Paragraph - Start a line with a `p: `  
++ Paragraph - Start a line with a `p: `
+  * Formatting sequence: `p:` as the first non-whitespace characters in a line
+  * Needs closing sequence: No
+  * Resulting HTML Tag: `<p>`
+  * Example: `p: Paragraph`
 + Horizontal Rule
   * Formatting sequence: `-` repeated 3 or more times as the only non-whitespace characters in a line
   * Needs closing sequence: No
   * Resulting HTML Tag: `<hr>`
-  * Example: `Hello\n---\nWorld`
+  * Example: `Part 1\n---\nPart 2`
 + Raw HTML - Any valid SHML is valid HTML and any HTML is also valid SHML. Any section starting with a `<` and ending with a `>` (ignoring whitespace) is treated as HTML and does not have any inline formatting applied  
 + Blockquotes - any line starting with a `>>` becomes a blockquote
 + Images - to include a basic image, surround the link in square brackets on a new line. If you wish to add alternate text, put that text inside of square brackets followed by an image reference in parentheses like this `[alt text (image_url)]`. In both formats, including a space, then a number, an x, and one more number after the url (like `image_url 20x20`) will cause the image to use those values (in px) for its width and height respectively instead of its actual size (using a zero for one of the values makes that dimension use auto sizing)  
