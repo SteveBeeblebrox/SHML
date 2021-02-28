@@ -90,14 +90,14 @@ SHML can be given additional string keys to look for. This allows for the storag
 + Single Line Comments
   * Formatting sequence: `!!`
   * Needs closing sequence: No
-  * Actual HTML Tag: None
+  * Resulting HTML Tag: None
   * Example: `!!Work in progress`
   * Notes: SHML has no multiline comments of its own; however, you can use HTML's `<!-- -->`.
   * Retrieval: Comment metadata cannot be retrieved from the parsing result and is only avalible in the source.
 + Properties
   * Formatting sequence: `!key:value`
   * Needs closing sequence: No
-  * Actual HTML Tag: None
+  * Resulting HTML Tag: None
   * Example: `!title: My Article`
   * Notes: If a key already has a value, any new value is ignored.
   * Retrieval: To retrieve a specific property, pass the key to retrieve to `getProperty` on the parsing result. To get an iterable list of all discovered properties, call `getProperties` on the parsing result. Although it is slower that `getProperty`, you can use bracket notation to get the value of a key from the list of all properties.
@@ -105,7 +105,7 @@ SHML can be given additional string keys to look for. This allows for the storag
 + Line Break
   * Formatting sequence: `%%`
   * Needs closing sequence: No
-  * Actual HTML Tag: `<br>`
+  * Resulting HTML Tag: `<br>`
   * Example: `Hello%%World`
   * Notes: Line breaks are valid in any context.
 + Escaped Characters
