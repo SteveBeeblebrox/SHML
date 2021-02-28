@@ -74,7 +74,6 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Needs closing sequence: No
   * Resulting HTML Tag: `<hr>`
   * Example: `Hello\n---\nWorld`
-
 + Raw HTML - Any valid SHML is valid HTML and any HTML is also valid SHML. Any section starting with a `<` and ending with a `>` (ignoring whitespace) is treated as HTML and does not have any inline formatting applied  
 + Blockquotes - any line starting with a `>>` becomes a blockquote
 + Images - to include a basic image, surround the link in square brackets on a new line. If you wish to add alternate text, put that text inside of square brackets followed by an image reference in parentheses like this `[alt text (image_url)]`. In both formats, including a space, then a number, an x, and one more number after the url (like `image_url 20x20`) will cause the image to use those values (in px) for its width and height respectively instead of its actual size (using a zero for one of the values makes that dimension use auto sizing)  
