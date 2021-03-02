@@ -67,7 +67,7 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Needs closing sequence: No
   * Resulting HTML Tag: `<h1>`, `<h2>`, `<h3>`, `<h4>`, `<h5>`, or `<h6>`
   * Example: `##Header Two` or `h2:Header Two`
-+ Headers With Ids - To give a header an id attribute, use the following format `h<number>[<id>]:...` or `#[<id>]...`
+  * Notes: See *Section Metadata* for more information on headers.
 + Paragraph - Start a line with a `p: `
   * Formatting sequence: `p:` as the first non-whitespace characters in a line
   * Needs closing sequence: No
