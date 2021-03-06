@@ -119,7 +119,7 @@ class SHML {
       .replace(/^\s*?\[(.*?) ([0-9]*)[xX]([0-9]*)\]/g, (str, match1, match2, match3) => (push('<br><img src="' + match1 + '" width="' + (parseInt(match2) === 0 ? 'auto' : match2) + '" height="' + (parseInt(match3) === 0 ? 'auto' : match3) + '"><br>'), ''))
       .replace(/^\s*?\[(.*)\]/g, (str, match) => (push('<br><img src="' + match + '"><br>'), ''))
       .replace(/\s*---+\s*/, () => (push('<hr>'), ''))
-      .replace(/\s*%%\s*/, () => (push('<br>'), ''));
+      .replace(/^\s*%%\s*/, () => (push('<br>'), ''));
       push(SHML.parseInlineMarkup(object.trim()).toHTML());
     });
     return data;
