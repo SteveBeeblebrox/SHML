@@ -21,7 +21,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
 class SHML {
   constructor() {return {};}
   static getStyleSheet() {
@@ -35,7 +34,7 @@ class SHML {
         }
       </style>`;
   }
-  static parseInlineMarkup(markup, handleCustomToken = token => `:${token}:`) {
+  static parseInlineMarkup(markup, customTokens = {}) {
     let result = {__proto__: null, toHTML: () => result._value, _value: ''}, code = false, escaped = false;
     markup.split(/(`|\$\$)([\S\s]*?)(\1)/g).forEach(object => {
       if(object === '`') code = !code, object = '';
@@ -49,7 +48,7 @@ class SHML {
           .replace(/(\^)(.*?)\1/gs, '<sup>$2</sup>')
           .replace(/(,,)(.*?)\1/gs, '<sub>$2</sub>')
           .replace(/(\|)(.*?)\1/gs, '<mark>$2</mark>')
-          .replace(/(:)(\S*?)\1/gs, (string, match1, match2) => handleCustomToken(match2) ?? '')
+          .replace(/(:)(\S*?)\1/gs, (string, match1, match2) => customTokens[match2] ?? (':' + match2 + ':'))
           .replace(/(\S)--(\S)/g, '$1<wbr>$2')
           .replace(/\+\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_blank">$1</a>')
           .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_self">$1</a>')
@@ -58,7 +57,7 @@ class SHML {
     });
     return result;
   }
-  static parseMarkup(markup = '', handleCustomToken = token => `:${token}:`) {
+  static parseMarkup(markup = '', customTokens = {}) {
     let data = {
       __proto__: null,
       _properties: {},
@@ -87,10 +86,10 @@ class SHML {
     };
     let push = object => data._value.push(object);
     let pushId = object => data._ids.push(object);
-    let parseForHeader = (header, str) => str.replace(new RegExp('^\\s*?' + '#'.repeat(header) + '(.*)', 'g'), (str, match) => (push('<h' + header + '>' + SHML.parseInlineMarkup(match.trim(), handleCustomToken).toHTML() + '</h' + header + '>'), ''));
-    let parseForIdHeader = (header, str) => str.replace(new RegExp('^\\s*?' + '#'.repeat(header) + '\\[(.*?)\\]\\s*?(.*)', 'g'), (str, match1, match2) => (pushId('h' + header + ':' + match1), push('<a href="#h' + header + ':' + match1 + '"><h' + header + ' id="h' + header + ':' + match1 + '">' + SHML.parseInlineMarkup(match2.trim(), handleCustomToken).toHTML() + '</h' + header + '></a>'), ''));
-    let parseForSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + ':(.*)', 'g'), (str, match) => (push('<' + tag + '>' + SHML.parseInlineMarkup(match.trim(), handleCustomToken).toHTML() + '</' + tag + '>'), ''));
-    let parseForIdSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + '\\[(.*?)\\]:(.*)', 'g'), (str, match1, match2) => (pushId(tag + ':' + match1), push('<a href="#' + tag + ':' + match1 + '"><' + tag + ' id="' + tag + ':' + match1 + '">' + SHML.parseInlineMarkup(match2.trim(), handleCustomToken).toHTML() + '</' + tag + '></a>'), ''));
+    let parseForHeader = (header, str) => str.replace(new RegExp('^\\s*?' + '#'.repeat(header) + '(.*)', 'g'), (str, match) => (push('<h' + header + '>' + SHML.parseInlineMarkup(match.trim(), customTokens).toHTML() + '</h' + header + '>'), ''));
+    let parseForIdHeader = (header, str) => str.replace(new RegExp('^\\s*?' + '#'.repeat(header) + '\\[(.*?)\\]\\s*?(.*)', 'g'), (str, match1, match2) => (pushId('h' + header + ':' + match1), push('<a href="#h' + header + ':' + match1 + '"><h' + header + ' id="h' + header + ':' + match1 + '">' + SHML.parseInlineMarkup(match2.trim(), customTokens).toHTML() + '</h' + header + '></a>'), ''));
+    let parseForSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + ':(.*)', 'g'), (str, match) => (push('<' + tag + '>' + SHML.parseInlineMarkup(match.trim(), customTokens).toHTML() + '</' + tag + '>'), ''));
+    let parseForIdSection = (tag, str, key = tag) => str.replace(new RegExp('^\\s*?' + key + '\\[(.*?)\\]:(.*)', 'g'), (str, match1, match2) => (pushId(tag + ':' + match1), push('<a href="#' + tag + ':' + match1 + '"><' + tag + ' id="' + tag + ':' + match1 + '">' + SHML.parseInlineMarkup(match2.trim(), customTokens).toHTML() + '</' + tag + '></a>'), ''));
     let escaped = false, table = false, tableHeader = true;
     markup.split(/\n/g).forEach((object, index, array) => {
       if(object.trim() === '$$') return void (escaped = !escaped);
@@ -99,7 +98,7 @@ class SHML {
       if(object.trim() === '[[') return void (table = true, push('<table>'));
       else if(object.trim() === ']]') return void (table = false, tableHeader = true, push('</table>'));
       else if(table) {
-        let makeRow = (t) => SHML.parseInlineMarkup(('<tr><t'+t+'>'+object.trim().split(/(?<!\$),/).join('</t'+t+'><t'+t+'>')+'</t'+t+'></tr>').replace(/\$,/g, ','), handleCustomToken).toHTML();
+        let makeRow = (t) => SHML.parseInlineMarkup(('<tr><t'+t+'>'+object.trim().split(/(?<!\$),/).join('</t'+t+'><t'+t+'>')+'</t'+t+'></tr>').replace(/\$,/g, ','), customTokens).toHTML();
         if(tableHeader) return void (tableHeader = false, push(makeRow('h')));
         else return void push(makeRow('d'));
       }
@@ -114,15 +113,15 @@ class SHML {
       object = object
       .replace(/^\s*?!!(.*)/g, (str, match) => '')
       .replace(/^\s*?!(.*?):(.*)/g, (str, match1, match2) => (data._properties[Symbol.for(match1)] ??= match2.trim(), ''))
-      .replace(/^\s*?>>(.*)/g, (str, match) => (push('<blockquote>' + SHML.parseInlineMarkup(match.trim(), handleCustomToken).toHTML() + '</blockquote>'), ''))
-      .replace(/^\s*?(?:bull:|\+)(.*)/g, (str, match) => (push('<ul><li>' + SHML.parseInlineMarkup(match.trim(), handleCustomToken).toHTML() + '</li></ul>'), ''))
+      .replace(/^\s*?>>(.*)/g, (str, match) => (push('<blockquote>' + SHML.parseInlineMarkup(match.trim(), customTokens).toHTML() + '</blockquote>'), ''))
+      .replace(/^\s*?(?:bull:|\+)(.*)/g, (str, match) => (push('<ul><li>' + SHML.parseInlineMarkup(match.trim(), customTokens).toHTML() + '</li></ul>'), ''))
       .replace(/^\s*?\[(.*)\((.*?) ([0-9]*)[xX]([0-9]*)\)\]/g, (str, match1, match2, match3, match4) => (push('<br><img src="' + match2 + '" alt="' + match1.trim() + '" width="' + (parseInt(match3) === 0 ? 'auto' : match3) + '" height="' + (parseInt(match4) === 0 ? 'auto' : match4) + '"><br>'), ''))
       .replace(/^\s*?\[(.*)\((.*)\)\]/g, (str, match1, match2) => (push('<br><img src="' + match2 + '" alt="' + match1.trim() + '"><br>'), ''))
       .replace(/^\s*?\[(.*?) ([0-9]*)[xX]([0-9]*)\]/g, (str, match1, match2, match3) => (push('<br><img src="' + match1 + '" width="' + (parseInt(match2) === 0 ? 'auto' : match2) + '" height="' + (parseInt(match3) === 0 ? 'auto' : match3) + '"><br>'), ''))
       .replace(/^\s*?\[(.*)\]/g, (str, match) => (push('<br><img src="' + match + '"><br>'), ''))
       .replace(/\s*---+\s*/, () => (push('<hr>'), ''))
       .replace(/^\s*%%\s*/, () => (push('<br>'), ''));
-      push(SHML.parseInlineMarkup(object.trim(), handleCustomToken).toHTML());
+      push(SHML.parseInlineMarkup(object.trim(), customTokens).toHTML());
     });
     return data;
   }
