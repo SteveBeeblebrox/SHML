@@ -34,7 +34,7 @@ class SHML {
         }
       </style>`;
   }
-  static parseInlineMarkup(str) {
+  static parseInlineMarkup(str, handleCustomToken = token => `:${token}:`) {
     let result = {__proto__: null, toHTML: () => result._value, _value: ''}, code = false, escaped = false;
     str.split(/(`|\$\$)([\S\s]*?)(\1)/g).forEach(object => {
       if(object === '`') code = !code, object = '';
@@ -48,6 +48,7 @@ class SHML {
           .replace(/(\^)(.*?)\1/gs, '<sup>$2</sup>')
           .replace(/(,,)(.*?)\1/gs, '<sub>$2</sub>')
           .replace(/(\|)(.*?)\1/gs, '<mark>$2</mark>')
+          .replace(/(:)(\S*?)\1/gs, (string, match1, match2) => handleCustomToken(match2) ?? '')
           .replace(/(\S)--(\S)/g, '$1<wbr>$2')
           .replace(/\+\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_blank">$1</a>')
           .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_self">$1</a>')
