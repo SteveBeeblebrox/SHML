@@ -113,7 +113,7 @@ class SHML {
       object = object
       .replace(/^\s*?!!(.*)/g, (str, match) => '')
       .replace(/^\s*?!(.*?):(.*)/g, (str, match1, match2) => (data._properties[Symbol.for(match1)] ??= match2.trim(), ''))
-      .replace(/^\s*?>>(.*)/g, (str, match) => (push('<blockquote>' + SHML.parseInlineMarkup(match.trim(), customTokens).toHTML() + '</blockquote>'), ''))
+      .replace(/^\s*?(?:>>|blockquote:)(.*)/g, (str, match) => (push('<blockquote>' + SHML.parseInlineMarkup(match.trim(), customTokens).toHTML() + '</blockquote>'), ''))
       .replace(/^\s*?(?:bull:|\+)(.*)/g, (str, match) => (push('<ul><li>' + SHML.parseInlineMarkup(match.trim(), customTokens).toHTML() + '</li></ul>'), ''))
       .replace(/^\s*?\[(.*)\((.*?) ([0-9]*)[xX]([0-9]*)\)\]/g, (str, match1, match2, match3, match4) => (push('<br><img src="' + match2 + '" alt="' + match1.trim() + '" width="' + (parseInt(match3) === 0 ? 'auto' : match3) + '" height="' + (parseInt(match4) === 0 ? 'auto' : match4) + '"><br>'), ''))
       .replace(/^\s*?\[(.*)\((.*)\)\]/g, (str, match1, match2) => (push('<br><img src="' + match2 + '" alt="' + match1.trim() + '"><br>'), ''))
