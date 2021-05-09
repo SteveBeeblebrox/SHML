@@ -61,6 +61,12 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Resulting HTML Tag: `<a>`
   * Example: `[Links](https://stevebeeblebrox.github.io)` (Opens in current tab or frame [`target="_self"`]) or `+[Links](https://stevebeeblebrox.github.io)` (Opens in new tab [`target="_blank"`])
   * Notes: A link's text &amp; title are set to the contents of the `[]`. There are no restrictions on link values. You can use `mailto` links, `http` links, `https` links, relative links, or any other link that is valid for an HTML anchor `href`.
++ Special Tokens
+  * Formating sequence: `:`
+  * Needs closing sequence: Yes
+  * Resulting HTML Tag: N/A
+  * Example: `:tableflip:`
+  * Notes: If no matching token is found, no changes are made. No tokens exist by default.
 ### Section Formatting
 + Headers (Levels 1-6)
   * Formatting sequence: `#` repeated n times or `h<n>:` as the first non-whitespace characters in a line where n is a number 1-6 inclusive and corresponds to the desired level header
