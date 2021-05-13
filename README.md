@@ -66,7 +66,7 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Needs closing sequence: Yes
   * Resulting HTML Tag: N/A
   * Example: `:tableflip:`
-  * Notes: If no matching token is found, no changes are made. No tokens exist by default.
+  * Notes: If no matching token is found, no changes are made. No tokens exist by default. To use tokens, pass an object as the second argument to `parseMarkup` or `parseInlineMarkup`. Any token that matches a key in the object (value is not undefined or null) will be replaced by the value represented by that key. If a simple map of values does not meet your needs, you can also use a Proxy with a trap on get to handle what is associated with each token.
 ### Section Formatting
 + Headers (Levels 1-6)
   * Formatting sequence: `#` repeated n times or `h<n>:` as the first non-whitespace characters in a line where n is a number 1-6 inclusive and corresponds to the desired level header
