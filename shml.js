@@ -35,6 +35,23 @@ class SHML {
       </style>`;
   }
   static parseInlineMarkup(markup, customTokens = {}) {
+    let characterVariants = {
+      '~': 'tilde',
+      ':': 'uml',
+      '\'': 'acute',
+      '"': 'dblac',
+      '`': 'grave',
+      '^': 'circ',
+      'o': 'ring',
+      '/': 'slash',
+      ',': 'cedil',
+      '-': 'macr',
+      'u': 'breve',
+      '.': 'dot',
+      '?': 'ogon',
+      'v': 'caron',
+      '_': 'stroke'
+    }
     let result = {__proto__: null, toHTML: () => result._value, _value: ''}, code = false, escaped = false;
     markup.split(/(`|\$\$)([\S\s]*?)(\1)/g).forEach(object => {
       if(object === '`') code = !code, object = '';
@@ -48,6 +65,9 @@ class SHML {
           .replace(/(\^)(.*?)\1/gs, '<sup>$2</sup>')
           .replace(/(,,)(.*?)\1/gs, '<sub>$2</sub>')
           .replace(/(\|)(.*?)\1/gs, '<mark>$2</mark>')
+          .replace(new RegExp('\\/([' + Object.keys(characterVariants).join('').replace(/[.*+?^${}()|[\]\\\-]/g, '\\$&') + '])([a-zA-Z])\\/', 'g'), (string, match1, match2) => '&' + match2 + characterVariants[match1] + ';')
+          .replace(/\/!\//g, '&iexcl;')
+          .replace(/\/\?\//g, '&iquest;')
           .replace(/(:)(\S*?)\1/gs, (string, match1, match2) => customTokens[match2] ?? (':' + match2 + ':'))
           .replace(/(\S)--(\S)/g, '$1<wbr>$2')
           .replace(/\+\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_blank">$1</a>')
