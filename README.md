@@ -62,11 +62,37 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Example: `[Links](https://stevebeeblebrox.github.io)` (Opens in current tab or frame [`target="_self"`]) or `+[Links](https://stevebeeblebrox.github.io)` (Opens in new tab [`target="_blank"`])
   * Notes: A link's text &amp; title are set to the contents of the `[]`. There are no restrictions on link values. You can use `mailto` links, `http` links, `https` links, relative links, or any other link that is valid for an HTML anchor `href`.
 + Special Tokens
-  * Formating sequence: `:`
-  * Needs closing sequence: Yes
+  * Formating sequence: `:key:`
+  * Needs closing sequence: No
   * Resulting HTML Tag: N/A
   * Example: `:tableflip:`
   * Notes: If no matching token is found, no changes are made. No tokens exist by default. To use tokens, pass an object as the second argument to `parseMarkup` or `parseInlineMarkup`. Any token that matches a key in the object (value is not undefined or null) will be replaced by the value represented by that key. If a simple map of values does not meet your needs, you can also use a Proxy with a trap on get to handle what is associated with each token.
++ Additional Characters
+  * Formatting sequence: `/<mark><base letter>/`
+  * Needs closing sequence: No
+  * Resulting HTML Tag: N/A
+  * Example: `/~n/`
+  * Notes: SHML tries to convert any recognized pattern into an equivalent HTML entity even if it is not actually a valid combination. See the below table for a list of possible marks. Case is respected when converting characters and mark type is case sensitive. In addition to the standard format for letters, `/!/` and `/?/` can also be used to create upside down exclamation and question marks respectively.
+  
+  <br>
+  
+   |   | Mark Type           |
+   | - | ------------------- |
+   | ~ | Tilde               |
+   | : | Umlaut or Diaeresis |
+   | ' | Acute Accent        |
+   | " | Dobule Acute Accent |
+   | ` | Grave Accent        |
+   | ^ | Circumflex          |
+   | o | Ring                |
+   | / | Slash               |
+   | , | Cedilla             |
+   | - | Macron              |
+   | u | Breve               |
+   | . | Dot                 |
+   | ? | Ogonek              |
+   | v | Caron               |
+   | _ | Stroke              |
 ### Section Formatting
 + Headers (Levels 1-6)
   * Formatting sequence: `#` repeated n times or `h<n>:` as the first non-whitespace characters in a line where n is a number 1-6 inclusive and corresponds to the desired level header
@@ -195,7 +221,7 @@ The above code parses the string for inline formatting and writes the result to 
 ```
 ##### Explanation
 SHML does not provide a way to override the styles for the elements it generates, nor does it add any class that could be used to identify the output in the document. If you wish to apply styling to the output HTML, the easiest way to do this is to insert the result into an element with a class or id and then use a CSS selector to target specific types of elements within that wrapper element. In the above example, the HTML resulting from parsing `**World**` is put into a `<span>` element with the class `shml-result` (Note that the class name could also be `wasdf`. There is nothing special about including `shml` in the name.). Finally, a CSS selector is used to style all `<strong>` elements within a element that has the class `shml-result` which results in "World" being blue (but not "Hello-").
-### Example 4: Tables
+#### Example 4: Tables
 ```html
 <script>
  document.write(SHML.parseMarkup(`
@@ -208,7 +234,7 @@ SHML does not provide a way to override the styles for the elements it generates
 `).toHTML());
 </script>
 ```
-#### Equivalent HTML
+##### Equivalent HTML
 ```html
 <table>
   <tbody>
@@ -221,3 +247,18 @@ SHML does not provide a way to override the styles for the elements it generates
  ```
 ##### Explanation
 SHML parses the given markup and converts it into a HTML table. Each new line is treated as a row (with the first row consisting of header cells) and each unsecaped comma in the row defines the boundary between cells. The parsing result is then written to the document.
+
+#### Example 5: Additional Characters
+```html
+<script>
+ document.write(SHML.parseMarkup(`
+p: /!/T/'u/ puedes escribir en espa/~n/ol!
+`).toHTML());
+</script>
+```
+##### Equivalent HTML
+```html
+<p>¡Tú puedes escribir en español!</p>
+ ```
+##### Explanation
+The special character format is used to create an upside down `!`, a `u` with an accent, and an `n` with a tilde.
