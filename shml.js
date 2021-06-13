@@ -57,6 +57,9 @@ class SHML {
       if(object === '`') code = !code, object = '';
       if(object === '$$') escaped = !escaped, object = '';
       result._value += !code && !escaped ? object
+          .replace(new RegExp('\\/([' + Object.keys(characterVariants).join('').replace(/[.*+?^${}()|[\]\\\-]/g, '\\$&') + '])([a-zA-Z])\\/', 'g'), (string, match1, match2) => '&' + match2 + characterVariants[match1] + ';')
+          .replace(/\/!\//g, '&iexcl;')
+          .replace(/\/\?\//g, '&iquest;')  
           .replace(/(\*\*\*)(.*?)\1/gs, '<strong><em>$2</em></strong>')
           .replace(/(\*\*)(.*?)\1/gs, '<strong>$2</strong>')
           .replace(/(\*)(.*?)\1/gs, '<em>$2</em>')
@@ -65,9 +68,6 @@ class SHML {
           .replace(/(\^)(.*?)\1/gs, '<sup>$2</sup>')
           .replace(/(,,)(.*?)\1/gs, '<sub>$2</sub>')
           .replace(/(\|)(.*?)\1/gs, '<mark>$2</mark>')
-          .replace(new RegExp('\\/([' + Object.keys(characterVariants).join('').replace(/[.*+?^${}()|[\]\\\-]/g, '\\$&') + '])([a-zA-Z])\\/', 'g'), (string, match1, match2) => '&' + match2 + characterVariants[match1] + ';')
-          .replace(/\/!\//g, '&iexcl;')
-          .replace(/\/\?\//g, '&iquest;')
           .replace(/(:)(\S*?)\1/gs, (string, match1, match2) => customTokens[match2] ?? (':' + match2 + ':'))
           .replace(/(\S)-\/-(\S)/g, '$1<wbr>$2')
           .replace(/\+\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_blank">$1</a>')
