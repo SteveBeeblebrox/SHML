@@ -69,7 +69,7 @@ class SHML {
           .replace(/\/!\//g, '&iexcl;')
           .replace(/\/\?\//g, '&iquest;')
           .replace(/(:)(\S*?)\1/gs, (string, match1, match2) => customTokens[match2] ?? (':' + match2 + ':'))
-          .replace(/(\S)--(\S)/g, '$1<wbr>$2')
+          .replace(/(\S)-\/-(\S)/g, '$1<wbr>$2')
           .replace(/\+\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_blank">$1</a>')
           .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_self">$1</a>')
           .replace(/%%/g, '<br>')
