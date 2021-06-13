@@ -45,10 +45,10 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Resulting HTML Tag: `<mark>`
   * Example: `|Highlighted|`
 + Word Break
-  * Formatting sequence: `--`
+  * Formatting sequence: `-/-`
   * Needs closing sequence: No
   * Resulting HTML Tag: `<wbr>`
-  * Example: `Pneumono--ultra--microscopic--silicovol--canoconiosis` (Yes that is a word. [Source](https://en.wikipedia.org/wiki/Longest_word_in_English#:~:text=Pneumonoultramicroscopicsilicovolcanoconiosis))
+  * Example: `Pneumono-/-ultra-/-microscopic-/-silicovol-/-canoconiosis` (Yes that is a word. [Source](https://en.wikipedia.org/wiki/Longest_word_in_English#:~:text=Pneumonoultramicroscopicsilicovolcanoconiosis))
 + `Code`
   * Formatting sequence: `` ` ``
   * Needs closing sequence: Yes
