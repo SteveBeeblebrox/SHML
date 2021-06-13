@@ -258,7 +258,7 @@ p: /!/T/'u/ puedes escribir en espa/~n/ol!
 ```
 ##### Equivalent HTML
 ```html
-<p>¡Tú puedes escribir en español!</p>
+<p>&iexcl;T&uacute; puedes escribir en espa&ntilde;ol!</p>
  ```
 ##### Explanation
 The special character format is used to create an upside down `!`, a `u` with an accent, and an `n` with a tilde.
