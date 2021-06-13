@@ -143,7 +143,7 @@ class SHML {
       .replace(/^\s*?(?:img|image):(.*)/g, (str, match) => (push('<br><img src="' + match.trim() + '"><br>'), ''))
       .replace(/\s*---+\s*/, () => (push('<hr>'), ''))
       .replace(/^\s*%%\s*/, () => (push('<br>'), ''));
-      push(SHML.parseInlineMarkup(object.trim(), customTokens).toHTML());
+      push(SHML.parseInlineMarkup(object.trim(), customTokens).toHTML() + (object.trim()  !== '' ? '<br>' : ''));
     });
     return data;
   }
