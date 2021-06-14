@@ -100,7 +100,7 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Resulting HTML Tag: `<h1>`, `<h2>`, `<h3>`, `<h4>`, `<h5>`, or `<h6>`
   * Example: `##Header Two` or `h2:Header Two`
   * Notes: See *Section Metadata* for more information on headers.
-+ Paragraph - Start a line with a `p: `
++ Paragraph
   * Formatting sequence: `p:` as the first non-whitespace characters in a line
   * Needs closing sequence: No
   * Resulting HTML Tag: `<p>`
@@ -113,7 +113,7 @@ SHML is composed of two main types of styling: inline and sections. All sections
 + Raw HTML
   * Notes: HTML can be included in SHML. The contents of HTML tags can still contain SHML markup (both inside of the tags and in attributes)
 + Blockquotes
-  * Formatting sequence: `>>`as the first non-whitespace characters in a line
+  * Formatting sequence: `>>` as the first non-whitespace characters in a line
   * Needs closing sequence: No
   * Resulting HTML Tag: `<blockquote>`
   * Example: `>> "Hello World"`
