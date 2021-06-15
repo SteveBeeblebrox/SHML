@@ -100,7 +100,7 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Resulting HTML Tag: `<h1>`, `<h2>`, `<h3>`, `<h4>`, `<h5>`, or `<h6>`
   * Example: `##Header Two` or `h2:Header Two`
   * Notes: See *Section Metadata* for more information on headers.
-+ Paragraph
++ Paragraphs
   * Formatting sequence: `p:` as the first non-whitespace characters in a line
   * Needs closing sequence: No
   * Resulting HTML Tag: `<p>`
@@ -262,3 +262,16 @@ p: /!/T/'u/ puedes escribir en espa/~n/ol!
  ```
 ##### Explanation
 The special character format is used to create an upside down `!`, a `u` with an accent, and an `n` with a tilde.
+
+#### Example 6: Custom Tokens
+```html
+<script>
+ document.write(SHML.parseInlineMarkup('**Support LGBT!** :rainbow-flag:', {'rainbow-flag': '🏳‍🌈'}).toHTML());
+</script>
+```
+##### Equivalent HTML
+```html
+<strong>Support LGBT!</strong> 🏳‍🌈
+ ```
+##### Explanation
+By passing a map of strings as the second argument, SHML will convert any occurances of the keys surrounded by `:` into their matching values.
