@@ -40,10 +40,10 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Resulting HTML Tag: `<sub>`
   * Example: `,,Subscript,,`
 + Highlighted
-  * Formatting sequence: `|`
-  * Needs closing sequence: Yes
+  * Formatting sequence: `|<text>|` or `|[#<hex color>] <text>|`
+  * Needs closing sequence: No
   * Resulting HTML Tag: `<mark>`
-  * Example: `|Highlighted|`
+  * Example: `|Highlighted|` or `|[#FF00FF] Colored Highlight|`
 + Word Break
   * Formatting sequence: `-/-`
   * Needs closing sequence: No
