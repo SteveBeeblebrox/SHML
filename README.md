@@ -44,6 +44,11 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Needs closing sequence: No
   * Resulting HTML Tag: `<mark>`
   * Example: `|Highlighted|` or `|[#FF00FF] Colored Highlight|`
++ Colored Text
+  * Formatting sequence: `&&[#<hex color>] <text>&&`
+  * Needs closing sequence: No
+  * Resulting HTML Tag: `<span>`
+  * Example: `&[#FF00FF] Colored Text&&`
 + Word Break
   * Formatting sequence: `-/-`
   * Needs closing sequence: No
