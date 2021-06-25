@@ -67,6 +67,7 @@ class SHML {
           .replace(/(~~)(.*?)\1/gs, '<del>$2</del>')
           .replace(/(\^)(.*?)\1/gs, '<sup>$2</sup>')
           .replace(/(,,)(.*?)\1/gs, '<sub>$2</sub>')
+          .replace(/(&&)\[(#[a-fA-F0-9]{6})\](.*?)\1/gs, '<span style="color: $2;">$3</span>')
           .replace(/(\|)\[(#[a-fA-F0-9]{6})\](.*?)\1/gs, '<mark style="background-color: $2;">$3</mark>')
           .replace(/(\|)(.*?)\1/gs, '<mark>$2</mark>')
           .replace(/(:)(\S*?)\1/gs, (string, match1, match2) => customTokens[match2] ?? (':' + match2 + ':'))
