@@ -5,38 +5,38 @@
 SHML is composed of two main types of styling: inline and sections. All sections must be on their own line. Inline formatting can be applied to any part of a section.
 ### Inline Formatting
 + *Italics*
-  * Formatting sequence: `*`
-  * Needs closing sequence: Yes
+  * Formatting sequence: `*<text>*`
+  * Needs closing sequence: No
   * Resulting HTML Tag: `<em>`
   * Example: `*Italics*`
 + **Bold**
-  * Formatting sequence: `**`
-  * Needs closing sequence: Yes
+  * Formatting sequence: `**<text>**`
+  * Needs closing sequence: No
   * Resulting HTML Tag: `<strong>`
   * Example: `**Bold**`
 + ***Bold & Italics***
-  * Formatting sequence: `***`
-  * Needs closing sequence: Yes
+  * Formatting sequence: `***<text>***`
+  * Needs closing sequence: No
   * Resulting HTML Tags: `<strong>` & `<em>`
   * Example: `***Bold and Italics***`
 + Underlined
-  * Formatting sequence: `__`
-  * Needs closing character: Yes
+  * Formatting sequence: `__<text>__`
+  * Needs closing character: No
   * Resulting HTML Tag: `<u>`
   * Example: `__Underlined__`
 + ~~Strikethrough~~
-  * Formatting sequence: `~~`
-  * Needs closing sequence: Yes
+  * Formatting sequence: `~~<text>~~`
+  * Needs closing sequence: No
   * Resulting HTML Tag: `<del>`
   * Example: `~~Strikethrough~~`
 + Superscript
-  * Formatting sequence: `^`
-  * Needs closing sequence: Yes
+  * Formatting sequence: `^<text>^`
+  * Needs closing sequence: No
   * Resulting HTML Tag: `<sup>`
   * Example: `^Superscript^`
 + Subscript
-  * Formatting sequence: `,,`
-  * Needs closing sequence: Yes
+  * Formatting sequence: `,,<text>,,`
+  * Needs closing sequence: No
   * Resulting HTML Tag: `<sub>`
   * Example: `,,Subscript,,`
 + Highlighted
@@ -55,19 +55,19 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Resulting HTML Tag: `<wbr>`
   * Example: `Pneumono-/-ultra-/-microscopic-/-silicovol-/-canoconiosis` (Yes that is a word. [Source](https://en.wikipedia.org/wiki/Longest_word_in_English#:~:text=Pneumonoultramicroscopicsilicovolcanoconiosis))
 + `Code`
-  * Formatting sequence: `` ` ``
-  * Needs closing sequence: Yes
+  * Formatting sequence: `` `<text>` ``
+  * Needs closing sequence: No
   * Resulting HTML Tag: `<code>`
   * Example: ``` `Code` ```
   * Notes: Aside from a `` ` ``, all other formatting sequence are escaped.
 + [Links](https://www.youtube.com/watch?v=oHg5SJYRHA0) <!--¯\_(ツ)_/¯-->
-  * Formatting sequence: `[<text to display>](<url>)` (Opens in current tab or frame [`target="_self"`]) or `+[<text to display>](<url>)` (Opens in new tab [`target="_blank"`])
+  * Formatting sequence: `[<text>](<url>)` (Opens in current tab or frame [`target="_self"`]) or `+[<text>](<url>)` (Opens in new tab [`target="_blank"`])
   * Needs closing sequence: No
   * Resulting HTML Tag: `<a>`
   * Example: `[Links](https://stevebeeblebrox.github.io)` (Opens in current tab or frame [`target="_self"`]) or `+[Links](https://stevebeeblebrox.github.io)` (Opens in new tab [`target="_blank"`])
   * Notes: A link's text &amp; title are set to the contents of the `[]`. There are no restrictions on link values. You can use `mailto` links, `http` links, `https` links, relative links, or any other link that is valid for an HTML anchor `href`.
 + Special Tokens
-  * Formating sequence: `:key:`
+  * Formating sequence: `:<key>:`
   * Needs closing sequence: No
   * Resulting HTML Tag: N/A
   * Example: `:tableflip:`
