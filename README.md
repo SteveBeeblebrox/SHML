@@ -6,75 +6,61 @@ SHML is composed of two main types of styling: inline and sections. All sections
 ### Inline Formatting
 + *Italics*
   * Formatting sequence: `*<text>*`
-  * Needs closing sequence: No
   * Resulting HTML Tag: `<em>`
   * Example: `*Italics*`
 + **Bold**
   * Formatting sequence: `**<text>**`
-  * Needs closing sequence: No
   * Resulting HTML Tag: `<strong>`
   * Example: `**Bold**`
 + ***Bold & Italics***
   * Formatting sequence: `***<text>***`
-  * Needs closing sequence: No
   * Resulting HTML Tags: `<strong>` & `<em>`
   * Example: `***Bold and Italics***`
 + Underlined
   * Formatting sequence: `__<text>__`
-  * Needs closing character: No
   * Resulting HTML Tag: `<u>`
   * Example: `__Underlined__`
 + ~~Strikethrough~~
   * Formatting sequence: `~~<text>~~`
-  * Needs closing sequence: No
   * Resulting HTML Tag: `<del>`
   * Example: `~~Strikethrough~~`
 + Superscript
   * Formatting sequence: `^<text>^`
-  * Needs closing sequence: No
   * Resulting HTML Tag: `<sup>`
   * Example: `^Superscript^`
 + Subscript
   * Formatting sequence: `,,<text>,,`
-  * Needs closing sequence: No
   * Resulting HTML Tag: `<sub>`
   * Example: `,,Subscript,,`
 + Highlighted
   * Formatting sequence: `|<text>|` or `|[#<hex color>] <text>|`
-  * Needs closing sequence: No
   * Resulting HTML Tag: `<mark>`
   * Example: `|Highlighted|` or `|[#FF00FF] Colored Highlight|`
 + Colored Text
   * Formatting sequence: `&&[#<hex color>] <text>&&`
-  * Needs closing sequence: No
   * Resulting HTML Tag: `<span>`
   * Example: `&[#FF00FF] Colored Text&&`
 + Word Break
   * Formatting sequence: `-/-`
-  * Needs closing sequence: No
   * Resulting HTML Tag: `<wbr>`
   * Example: `Pneumono-/-ultra-/-microscopic-/-silicovol-/-canoconiosis` (Yes that is a word. [Source](https://en.wikipedia.org/wiki/Longest_word_in_English#:~:text=Pneumonoultramicroscopicsilicovolcanoconiosis))
 + `Code`
   * Formatting sequence: `` `<text>` ``
-  * Needs closing sequence: No
   * Resulting HTML Tag: `<code>`
   * Example: ``` `Code` ```
   * Notes: Aside from a `` ` ``, all other formatting sequence are escaped.
 + [Links](https://www.youtube.com/watch?v=oHg5SJYRHA0) <!--¯\_(ツ)_/¯-->
   * Formatting sequence: `[<text>](<url>)` (Opens in current tab or frame [`target="_self"`]) or `+[<text>](<url>)` (Opens in new tab [`target="_blank"`])
-  * Needs closing sequence: No
   * Resulting HTML Tag: `<a>`
   * Example: `[Links](https://stevebeeblebrox.github.io)` (Opens in current tab or frame [`target="_self"`]) or `+[Links](https://stevebeeblebrox.github.io)` (Opens in new tab [`target="_blank"`])
   * Notes: A link's text &amp; title are set to the contents of the `[]`. There are no restrictions on link values. You can use `mailto` links, `http` links, `https` links, relative links, or any other link that is valid for an HTML anchor `href`.
 + Special Tokens
   * Formating sequence: `:<key>:`
-  * Needs closing sequence: No
   * Resulting HTML Tag: N/A
   * Example: `:tableflip:`
   * Notes: If no matching token is found, no changes are made. No tokens exist by default. To use tokens, pass an object as the second argument to `parseMarkup` or `parseInlineMarkup`. Any token that matches a key in the object (value is not undefined or null) will be replaced by the value represented by that key. If a simple map of values does not meet your needs, you can also use a Proxy with a trap on get to handle what is associated with each token.
 + Additional Characters
   * Formatting sequence: `/<mark><base letter>/`
-  * Needs closing sequence: No
   * Resulting HTML Tag: N/A
   * Example: `/~n/`
   * Notes: SHML tries to convert any recognized pattern into an equivalent HTML entity even if it is not actually a valid combination. See the below table for a list of possible marks. Case is respected when converting characters and mark type is case sensitive. In addition to the standard format for letters, `/!/` and `/?/` can also be used to create upside down exclamation and question marks respectively.
