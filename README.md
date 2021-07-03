@@ -63,7 +63,7 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Formatting sequence: `/<mark><base letter>/`
   * Resulting HTML Tag: N/A
   * Example: `/~n/`
-  * Notes: SHML tries to convert any recognized pattern into an equivalent HTML entity even if it is not actually a valid combination. See the below table for a list of possible marks. Case is respected when converting characters and mark type is case sensitive. In addition to the standard format for letters, `/!/` and `/?/` can also be used to create upside down exclamation and question marks respectively.
+  * Notes: Invalid combinations are ignored. See the below table for a list of possible marks. Case is respected when converting characters and mark type is case sensitive. In addition to the standard format for letters, `/!/` and `/?/` can also be used to create upside down exclamation and question marks respectively.
   
   <br>
   
