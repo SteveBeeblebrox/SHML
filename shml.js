@@ -66,11 +66,11 @@ class SHML {
     </style>`;
   }
   static parseInlineMarkup(markup, customTokens = {}) {
-    let result = {__proto__: null, toHTML: () => result._value, _value: ''}, code = false, escaped = false;
+    let value = '', result = {__proto__: null, toHTML: () => value}, code = false, escaped = false;
     markup.split(/(`|\$\$)([\S\s]*?)(\1)/g).forEach(object => {
       if(object === '`') code = !code, object = '';
       if(object === '$$') escaped = !escaped, object = '';
-      result._value += !code && !escaped ? object
+      value += !code && !escaped ? object
           .replace(new RegExp('\\/([' + Object.keys(SHML.#specialCharacters).join('').replace(/[.*+?^${}()|[\]\\\-]/g, '\\$&') + '])([a-zA-Z])\\/', 'g'), (string, match1, match2) => SHML.#specialCharacters[match1][match2] ?? '/' + match1 + match2 + '/')
           .replace(/\/!\//g, '&iexcl;')
           .replace(/\/\?\//g, '&iquest;')  
@@ -82,6 +82,7 @@ class SHML {
           .replace(/(\^)(.*?)\1/gs, '<sup>$2</sup>')
           .replace(/(,,)(.*?)\1/gs, '<sub>$2</sub>')
           .replace(/(&&)\[(#[a-fA-F0-9]{6})\](.*?)\1/gs, '<span style="color: $2;">$3</span>')
+          .replace(/(\|)(.*?)\1/gs, '<span style="color: red;">$2</span>')
           .replace(/(\|)\[(#[a-fA-F0-9]{6})\](.*?)\1/gs, '<mark style="background-color: $2;">$3</mark>')
           .replace(/(\|)(.*?)\1/gs, '<mark>$2</mark>')
           .replace(/(:)(\S*?)\1/gs, (string, match1, match2) => customTokens[match2] ?? (':' + match2 + ':'))
@@ -89,7 +90,7 @@ class SHML {
           .replace(/\+\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_blank">$1</a>')
           .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" title="$1" target="_self">$1</a>')
           .replace(/%%/g, '<br>')
-        : object === '' ? '' :  code ? '<code>'+object+'</code>' : object;
+        : object === '' ? '' : code ? '<code>' + object + '</code>' : object;
     });
     return result;
   }
