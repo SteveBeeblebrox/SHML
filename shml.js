@@ -66,29 +66,12 @@ class SHML {
     </style>`;
   }
   static parseInlineMarkup(markup, customTokens = {}) {
-    let characterVariants = {
-      '~': 'tilde',
-      ':': 'uml',
-      '\'': 'acute',
-      '"': 'dblac',
-      '`': 'grave',
-      '^': 'circ',
-      'o': 'ring',
-      '/': 'slash',
-      ',': 'cedil',
-      '-': 'macr',
-      'u': 'breve',
-      '.': 'dot',
-      '?': 'ogon',
-      'v': 'caron',
-      '_': 'stroke'
-    }
     let result = {__proto__: null, toHTML: () => result._value, _value: ''}, code = false, escaped = false;
     markup.split(/(`|\$\$)([\S\s]*?)(\1)/g).forEach(object => {
       if(object === '`') code = !code, object = '';
       if(object === '$$') escaped = !escaped, object = '';
       result._value += !code && !escaped ? object
-          .replace(new RegExp('\\/([' + Object.keys(characterVariants).join('').replace(/[.*+?^${}()|[\]\\\-]/g, '\\$&') + '])([a-zA-Z])\\/', 'g'), (string, match1, match2) => '&' + match2 + characterVariants[match1] + ';')
+          .replace(new RegExp('\\/([' + Object.keys(SHML.#specialCharacters).join('').replace(/[.*+?^${}()|[\]\\\-]/g, '\\$&') + '])([a-zA-Z])\\/', 'g'), (string, match1, match2) => SHML.#specialCharacters[match1][match2] ?? '/' + match1 + match2 + '/')
           .replace(/\/!\//g, '&iexcl;')
           .replace(/\/\?\//g, '&iquest;')  
           .replace(/(\*\*\*)(.*?)\1/gs, '<strong><em>$2</em></strong>')
