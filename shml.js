@@ -37,15 +37,15 @@ class SHML {
   }
 
   static getStyleSheet() {
-      return `<style>
-        @media (min-width:601px) {
-          .shml-internal-half {width: 50%; float: left;}
-          .shml-internal-third {width: 33.33333%; float: left;}
-          .shml-internal-two-third {width: 66.66666%; float: left;}
-          .shml-internal-quarter {width: 25%; float: left;}
-          .shml-internal-three-quarter {width: 75%; float: left;}
-        }
-      </style>`;
+    return `<style>
+      @media (min-width:601px) {
+        .shml-internal-half {width: 50%; float: left;}
+        .shml-internal-third {width: 33.33333%; float: left;}
+        .shml-internal-two-third {width: 66.66666%; float: left;}
+        .shml-internal-quarter {width: 25%; float: left;}
+        .shml-internal-three-quarter {width: 75%; float: left;}
+      }
+    </style>`;
   }
   static parseInlineMarkup(markup, customTokens = {}) {
     let characterVariants = {
