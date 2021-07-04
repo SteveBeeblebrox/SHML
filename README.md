@@ -36,10 +36,12 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Formatting sequence: `|<text>|` or `|[#<hex color>] <text>|`
   * Resulting HTML Tag: `<mark>`
   * Example: `|Highlighted|` or `|[#FF00FF] Colored Highlight|`
+  * Notes: If no color is given, the the default color for a `<mark>` element is used.
 + Colored Text
-  * Formatting sequence: `&&[#<hex color>] <text>&&`
+  * Formatting sequence: `&&<text>&&` or `&&[#<hex color>] <text>&&`
   * Resulting HTML Tag: `<span>`
   * Example: `&[#FF00FF] Colored Text&&`
+  * Notes: If no color is given, the default color is red.
 + Word Break
   * Formatting sequence: `-/-`
   * Resulting HTML Tag: `<wbr>`
