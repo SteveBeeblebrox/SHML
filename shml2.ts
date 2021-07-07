@@ -100,10 +100,43 @@ class SimpleSHMLNodeParser {
          root.descendants.push(fin)
 
       }
+
+      const r = new RegExp(`(?<a>.*)${this.#marker}(?<b>.*)`)
+
+      let f = (node: ASTNode): ASTNode[] => {
+         let targets = []
+         let found = false
+         for(const child of root.descendants) {
+            if(child.contents.match(r)) {
+               found = !found
+               if(!found) targets.push(child)
+            }
+            if(found) targets.push(child)
+         }
+         if(targets.length < 2) return [];
+         let parents = targets.map(n => findParent(root, n))
+         let lastParents = [...parents]
+         while(!parents.every(n => n === parents[0])) {
+            lastParents = [...parents]
+            parents = parents.map(n => findParent(root, n))
+         }
+         let parent = parents[0]
+         //console.log(parent)
+         //console.log(parent.children.indexOf(indexTarget))
+         parent.children.splice(parent.children.indexOf(lastParents[0]), targets.length, new ASTTagNode(this.#tag, '', lastParents))
+
+         return []
+      }
+      f(root.first)
+
       return root;
    }
 }
 
-let root = new SimpleSHMLNodeParser('\\|', 'mark').parse(new SimpleSHMLNodeParser('\\*', 'strong').parse(new ASTRoot(new ASTNode('This is *wow*! |I| *l|ov|e* it', []))))
-console.log(root)
+function findParent(root: ASTRoot, node: ASTNode): ASTNode {
+   return root.descendants.find(decendant => decendant.children.includes(node)) ?? root.first
+}
+
+let root = new SimpleSHMLNodeParser('\\|', 'mark').parse(new SimpleSHMLNodeParser('\\*', 'strong').parse(new ASTRoot(new ASTNode('This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work?', []))))
+console.log(root.first)
 console.log(root.toSourceString())
