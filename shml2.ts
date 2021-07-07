@@ -60,12 +60,6 @@ class ASTRoot {
 }
 
 class SimpleSHMLNodeParser {
-   readonly #marker: string
-   readonly #tag: string
-   constructor(marker: string, tag: string) {
-      this.#marker = marker
-      this.#tag = tag
-   }
    parse(root: ASTRoot) : any {
       let k = 0;
       for(let node of root.descendants) {
@@ -75,7 +69,9 @@ class SimpleSHMLNodeParser {
          let source = node.contents
          node.contents = ''
 
-         const regex = new RegExp(`(?<rest>.*?)${this.#marker}(?<target>.*?)${this.#marker}`)
+//         const regex = new RegExp(`(?<rest>.*?)(?<what>\\*)(?<target>.*?)\k<what>`)
+
+         const regex = new RegExp(`(?<rest>.*?)(?<what>\\*|\\|)(?<target>.*?)\\2`)
          let i = 0;
          let previous = source
          const func = (...args: any[]) => {
@@ -87,7 +83,16 @@ class SimpleSHMLNodeParser {
             node.children.push(rest)
             root.descendants.push(rest)
 
-            const target = new ASTTagNode(this.#tag, map.target, [])
+
+            let tags: any = {
+               '*': 'strong',
+               '|': 'mark'
+            }
+            let tag: string = tags[map.what] ?? 'span'
+
+            
+
+            const target = new ASTTagNode(tag, map.target, [])
             node.children.push(target)
             root.descendants.push(target)
 
@@ -101,33 +106,6 @@ class SimpleSHMLNodeParser {
 
       }
 
-      const r = new RegExp(`(?<a>.*)${this.#marker}(?<b>.*)`)
-
-      let f = (node: ASTNode): ASTNode[] => {
-         let targets = []
-         let found = false
-         for(const child of root.descendants) {
-            if(child.contents.match(r)) {
-               found = !found
-               if(!found) targets.push(child)
-            }
-            if(found) targets.push(child)
-         }
-         if(targets.length < 2) return [];
-         let parents = targets.map(n => findParent(root, n))
-         let lastParents = [...parents]
-         while(!parents.every(n => n === parents[0])) {
-            lastParents = [...parents]
-            parents = parents.map(n => findParent(root, n))
-         }
-         let parent = parents[0]
-         //console.log(parent)
-         //console.log(parent.children.indexOf(indexTarget))
-         parent.children.splice(parent.children.indexOf(lastParents[0]), targets.length, new ASTTagNode(this.#tag, '', lastParents))
-
-         return []
-      }
-      f(root.first)
 
       return root;
    }
@@ -137,6 +115,7 @@ function findParent(root: ASTRoot, node: ASTNode): ASTNode {
    return root.descendants.find(decendant => decendant.children.includes(node)) ?? root.first
 }
 
-let root = new SimpleSHMLNodeParser('\\|', 'mark').parse(new SimpleSHMLNodeParser('\\*', 'strong').parse(new ASTRoot(new ASTNode('This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work?', []))))
-console.log(root.first)
+let parser = new SimpleSHMLNodeParser()
+let root = parser.parse(parser.parse(new ASTRoot(new ASTNode('This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work?', []))))
+//console.log(root.first)
 console.log(root.toSourceString())
