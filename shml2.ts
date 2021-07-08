@@ -59,7 +59,15 @@ class ASTRoot {
    }
 }
 
+type StringObjectCollection = {
+  [key: string]: string;
+};
+
 class SimpleSHMLNodeParser {
+   readonly #config: StringObjectCollection
+   constructor(config: StringObjectCollection) {
+      this.#config = config
+   }
    parse(root: ASTRoot) : any {
       let k = 0;
       for(let node of root.descendants) {
@@ -69,9 +77,9 @@ class SimpleSHMLNodeParser {
          let source = node.contents
          node.contents = ''
 
-//         const regex = new RegExp(`(?<rest>.*?)(?<what>\\*)(?<target>.*?)\k<what>`)
+         const regex = new RegExp(`(?<rest>.*?)(?<what>\\*|\\|)(?<target>.*?)\\k<what>`)
 
-         const regex = new RegExp(`(?<rest>.*?)(?<what>\\*|\\|)(?<target>.*?)\\2`)
+//         const regex = new RegExp(`(?<rest>.*?)(?<what>\\*|\\|)(?<target>.*?)\\2`)
          let i = 0;
          let previous = source
          const func = (...args: any[]) => {
@@ -117,5 +125,5 @@ function findParent(root: ASTRoot, node: ASTNode): ASTNode {
 
 let parser = new SimpleSHMLNodeParser()
 let root = parser.parse(parser.parse(new ASTRoot(new ASTNode('This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work?', []))))
-//console.log(root.first)
+console.log(root.first)
 console.log(root.toSourceString())
