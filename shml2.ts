@@ -72,41 +72,42 @@ class SimpleSHMLNodeParser {
    }
    parse(root: ASTRoot) : any {
       let k = 0;
-      for(let node of root.descendants) {
+      for(let pass = 0; pass <= Object.keys(this.config).length; pass++)
+         for(let node of root.descendants) {
 
-         if(k++ > 25) break;
+            if(k++ > 25) break;
 
-         let source = node.contents
-         node.contents = ''
+            let source = node.contents
+            node.contents = ''
 
-         const regex = new RegExp(`(?<rest>.*?)(?<what>${Object.keys(this.config).map(escapeRegExpLiteral).join('|')})(?<target>.*?)\\k<what>`)
+            const regex = new RegExp(`(?<rest>.*?)(?<what>${Object.keys(this.config).map(escapeRegExpLiteral).join('|')})(?<target>.*?)\\k<what>`)
 
-         let i = 0;
-         let previous = source
-         const func = (...args: any[]) => {
-            const map = args.pop();
+            let i = 0;
+            let previous = source
+            const func = (...args: any[]) => {
+               const map = args.pop();
 
-            root.descendants = root.descendants.filter(o => o !== node)
+               root.descendants = root.descendants.filter(o => o !== node)
 
-            const rest = new ASTNode(map.rest, [])
-            node.children.push(rest)
-            root.descendants.push(rest)
+               const rest = new ASTNode(map.rest, [])
+               node.children.push(rest)
+               root.descendants.push(rest)
 
-            let tag: string = this.config[map.what] ?? 'span'
+               let tag: string = this.config[map.what] ?? 'span'
 
-            const target = new ASTTagNode(tag, map.target, [])
-            node.children.push(target)
-            root.descendants.push(target)
+               const target = new ASTTagNode(tag, map.target, [])
+               node.children.push(target)
+               root.descendants.push(target)
 
-            return ''
+               return ''
+            }
+            while ((source = source.replace(regex, func)) !== previous && i++ < 10) previous = source
+
+            const fin = new ASTNode(source, [])
+            node.children.push(fin)
+            root.descendants.push(fin)
+
          }
-         while ((source = source.replace(regex, func)) !== previous && i++ < 10) previous = source
-
-         const fin = new ASTNode(source, [])
-         node.children.push(fin)
-         root.descendants.push(fin)
-
-      }
 
       return root;
    }
@@ -124,6 +125,6 @@ let parser = new SimpleSHMLNodeParser({
    ',,': 'sub',
    '^^': 'sup'
 })
-let root = parser.parse(parser.parse(new ASTRoot(new ASTNode('This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work? __o|O|o__ ~~bye~~ H,,2,,O x^^*2*^^', []))))
+let root = /*parser.parse(*/parser.parse(new ASTRoot(new ASTNode('This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work? __o|O|o__ ~~bye~~ H,,2,,O x^^*2*^^', [])))//)
 console.log(root.first)
 console.log(root.toSourceString())
