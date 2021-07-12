@@ -35,7 +35,6 @@ class ASTNode {
    }
 }
 
-
 class ASTTagNode extends ASTNode {
    tag: string
    constructor(tag: string, contents: string, children: ASTNode[]) {
@@ -61,12 +60,15 @@ class ASTRoot {
 
 type StringObjectCollection = {
   [key: string]: string;
-};
+}
+
+function escapeRegExpLiteral(literal: string): string {
+    return literal.replace(/[\\[\]{}()^$.?+*|]/g, '\\$&').replace(/-/g, '\\x2d')
+}
 
 class SimpleSHMLNodeParser {
-   readonly #config: StringObjectCollection
-   constructor(config: StringObjectCollection) {
-      this.#config = config
+   constructor(private readonly config: StringObjectCollection) {
+
    }
    parse(root: ASTRoot) : any {
       let k = 0;
@@ -77,13 +79,12 @@ class SimpleSHMLNodeParser {
          let source = node.contents
          node.contents = ''
 
-         const regex = new RegExp(`(?<rest>.*?)(?<what>\\*|\\|)(?<target>.*?)\\k<what>`)
+         const regex = new RegExp(`(?<rest>.*?)(?<what>${Object.keys(this.config).map(escapeRegExpLiteral).join('|')})(?<target>.*?)\\k<what>`)
 
-//         const regex = new RegExp(`(?<rest>.*?)(?<what>\\*|\\|)(?<target>.*?)\\2`)
          let i = 0;
          let previous = source
          const func = (...args: any[]) => {
-            let map = args.pop();
+            const map = args.pop();
 
             root.descendants = root.descendants.filter(o => o !== node)
 
@@ -91,14 +92,7 @@ class SimpleSHMLNodeParser {
             node.children.push(rest)
             root.descendants.push(rest)
 
-
-            let tags: any = {
-               '*': 'strong',
-               '|': 'mark'
-            }
-            let tag: string = tags[map.what] ?? 'span'
-
-            
+            let tag: string = this.config[map.what] ?? 'span'
 
             const target = new ASTTagNode(tag, map.target, [])
             node.children.push(target)
@@ -114,7 +108,6 @@ class SimpleSHMLNodeParser {
 
       }
 
-
       return root;
    }
 }
@@ -123,7 +116,14 @@ function findParent(root: ASTRoot, node: ASTNode): ASTNode {
    return root.descendants.find(decendant => decendant.children.includes(node)) ?? root.first
 }
 
-let parser = new SimpleSHMLNodeParser()
-let root = parser.parse(parser.parse(new ASTRoot(new ASTNode('This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work?', []))))
+let parser = new SimpleSHMLNodeParser({
+   '*': 'strong',
+   '|': 'mark',
+   '__': 'u',
+   '~~': 'del',
+   ',,': 'sub',
+   '^^': 'sup'
+})
+let root = parser.parse(parser.parse(new ASTRoot(new ASTNode('This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work? __o|O|o__ ~~bye~~ H,,2,,O x^^*2*^^', []))))
 console.log(root.first)
 console.log(root.toSourceString())
