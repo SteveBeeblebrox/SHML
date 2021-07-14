@@ -118,7 +118,8 @@ function findParent(root: ASTRoot, node: ASTNode): ASTNode {
 }
 
 let parser = new SimpleSHMLNodeParser({
-   '*': 'strong',
+   '**': 'strong',
+   '*': 'em',
    '|': 'mark',
    '__': 'u',
    '~~': 'del',
