@@ -78,6 +78,7 @@ class SimpleSHMLNodeParser {
             if(k++ > 25) break;
 
             let source = node.contents
+
             node.contents = ''
 
             const regex = new RegExp(`(?<rest>.*?)(?<what>${Object.keys(this.config).map(escapeRegExpLiteral).join('|')})(?<target>.*?)\\k<what>`)
@@ -103,6 +104,8 @@ class SimpleSHMLNodeParser {
             }
             while ((source = source.replace(regex, func)) !== previous && i++ < 10) previous = source
 
+            if(source === '') continue
+
             const fin = new ASTNode(source, [])
             node.children.push(fin)
             root.descendants.push(fin)
@@ -126,6 +129,7 @@ let parser = new SimpleSHMLNodeParser({
    ',,': 'sub',
    '^^': 'sup'
 })
-let root = /*parser.parse(*/parser.parse(new ASTRoot(new ASTNode('This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work? __o|O|o__ ~~bye~~ H,,2,,O x^^*2*^^', [])))//)
+let root = /*parser.parse(*/parser.parse(new ASTRoot(new ASTNode('|~~__o__~~| __o|~~O~~|o__ **Test** This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work? __o|O|o__ ~~bye~~ H,,2,,O x^^*2*^^', [])))//)
 console.log(root.first)
 console.log(root.toSourceString())
+console.log('Source Length: ' + root.descendants.length)
