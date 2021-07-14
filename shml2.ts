@@ -90,9 +90,11 @@ class SimpleSHMLNodeParser {
 
                root.descendants = root.descendants.filter(o => o !== node)
 
-               const rest = new ASTNode(map.rest, [])
-               node.children.push(rest)
-               root.descendants.push(rest)
+               if(map.rest !== '') {
+                  const rest = new ASTNode(map.rest, [])
+                  node.children.push(rest)
+                  root.descendants.push(rest)
+               }
 
                let tag: string = this.config[map.what] ?? 'span'
 
@@ -132,4 +134,5 @@ let parser = new SimpleSHMLNodeParser({
 let root = /*parser.parse(*/parser.parse(new ASTRoot(new ASTNode('|~~__o__~~| __o|~~O~~|o__ **Test** This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work? __o|O|o__ ~~bye~~ H,,2,,O x^^*2*^^', [])))//)
 console.log(root.first)
 console.log(root.toSourceString())
+console.log(root.descendants.filter((n: ASTNode) => n.children.length == 0 && n.contents === ''))
 console.log('Source Length: ' + root.descendants.length)
