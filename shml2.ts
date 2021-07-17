@@ -83,7 +83,6 @@ class SimpleSHMLNodeParser {
 
             const regex = new RegExp(`(?<rest>.*?)(?<what>${Object.keys(this.config).map(escapeRegExpLiteral).join('|')})(?<target>.*?)\\k<what>`)
 
-            let i = 0;
             let previous = source
             const func = (...args: any[]) => {
                const map = args.pop();
@@ -104,7 +103,7 @@ class SimpleSHMLNodeParser {
 
                return ''
             }
-            while ((source = source.replace(regex, func)) !== previous && i++ < 10) previous = source
+            while ((source = source.replace(regex, func)) !== previous) previous = source
 
             if(source === '') continue
 
