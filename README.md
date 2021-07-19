@@ -124,7 +124,7 @@ SHML can be given additional string keys to look for. This allows for the storag
   * Formatting sequence: `!<key>:<value>`
   * Resulting HTML Tag: None
   * Example: `!title: My Article`
-  * Notes: If a key already has a value, any new value is ignored.
+  * Notes: If a key already has a value, any new value is ignored. See the Templates formatting in the Miscellaneous section for more uses of properties.
   * Retrieval: To retrieve a specific property, pass the key to retrieve to `getProperty` on the parsing result. To get an iterable list of all discovered properties, call `getProperties` on the parsing result. Although it is slower that `getProperty`, you can use bracket notation to get the value of a key from the list of all properties.
 + Headers With Ids (Levels 1-6)
   * Formatting sequence: `<# repeated n times>[<id>]<text>` or `h<n>[<id>]:` as the first non-whitespace characters in a line where n is a number 1-6 inclusive and corresponds to the desired level header and id the the desired identifier
@@ -143,6 +143,16 @@ SHML can be given additional string keys to look for. This allows for the storag
   * Resulting HTML Tag: None
   * Example: `$$**Not Bold**$$`
   * Notes: Aside from a `$$`, all other formatting sequence are escaped. Unlike a code block, no additional formatting is applied. Escaped characters are valid in any context.
++ Templates
+  * Formatting sequence: `?<[<id>]>`
+  * Resulting HTML Tag: Not Applicable
+  * Example:
+  ```
+  !name: Aim/'e/e 
+  # Meaning of the Name ?<[name]>
+  ?<[name]> is a French name meaning "beloved"
+  ```
+  * Notes: Templates look for a matching property previously defined in the document. If a property is found, the template reference is replaced with the value of the property. The value may contain inline and section formatting; however, since section escape sequences are processed before templates, escape sequences contained in the value are only applied to inline formatting. If no mathing property is found, the template reference is left as is and will appear in the output.
 ## Usage
 ### Overview
 SHML does not modify the document in any way. It does not reformat any elements. SHML converts one string into another string. That is it. You must give it the string to parse and then do something with the result. **SHML is not XSS secure!** If you are going to use SHML to allow users to format text (in comments for example), make sure to sanitize the input **AFTER** it is sent through SHML.  
