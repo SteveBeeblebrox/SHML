@@ -132,6 +132,8 @@ class SHML {
       if(object.trim() === '$$') return void (escaped = !escaped);
       if(escaped) return void push(object);
       
+      object = object.replace(/\?<\[(.*?)\]>/g, (str, match) => data._properties[Symbol.for(match)] ?? str)
+      
       if(object.trim() === '[[') return void (table = true, push('<table>'));
       else if(object.trim() === ']]') return void (table = false, tableHeader = true, push('</table>'));
       else if(table) {
