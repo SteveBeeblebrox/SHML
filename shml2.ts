@@ -66,6 +66,74 @@ function escapeRegExpLiteral(literal: string): string {
     return literal.replace(/[\\[\]{}()^$.?+*|]/g, '\\$&').replace(/-/g, '\\x2d')
 }
 
+type Supplier<T> = {
+    (): T
+}
+
+class Parser {
+    private readonly getRegex: Supplier<string | RegExp>
+    private readonly getPasses: Supplier<number>
+    constructor(regex: string | RegExp | Supplier<string | RegExp>, private readonly accept: {(map: StringObjectCollection): ASTNode}, passes: number | Supplier<number> = () => 1) {
+        this.getRegex = Parser.asSupplier(regex, value => typeof value === 'string' || value instanceof RegExp)
+        this.getPasses = Parser.asSupplier(passes, value => typeof value === 'number')
+    }
+    
+    private static asSupplier<T>(value: Supplier<T> | T, isValue: {(value: Supplier<T> | T): boolean}): Supplier<T> {
+        return isValue(value) ? () => value as T : value as Supplier<T>
+    }
+
+    private static asString(regex: RegExp | string): string {
+        if(typeof regex === 'string') return regex
+
+        const str = regex.toString()
+        return str.substring(1, str.length - 1 - regex.flags.length)
+    }
+
+    parse(root: ASTRoot): ASTRoot {
+        const regex = new RegExp(`(?<front>.*?)${Parser.asString(this.getRegex())}`)
+        for(const pass of Array(this.getPasses()).keys())
+            for(let node of root.descendants) {
+
+                let source = node.contents
+                
+                if(!regex.test(source)) continue
+
+                node.contents = ''
+                
+                let previous = source
+
+                const replacer = (...args: any[]) => {
+                    const map = args.pop();
+
+                    root.descendants = root.descendants.filter(o => o !== node)
+
+                    if(map.front !== '') {
+                        const frontNode = new ASTNode(map.front, [])
+                        node.children.push(frontNode)
+                        root.descendants.push(frontNode)
+                    }
+
+                    delete map.front
+
+                    const targetNode = this.accept(map)
+                    node.children.push(targetNode)
+                    root.descendants.push(targetNode)
+                    
+                    return ''
+                }
+
+                while ((source = source.replace(regex, replacer)) !== previous) previous = source
+
+                if(source === '') continue
+
+                const backNode = new ASTNode(source, [])
+                node.children.push(backNode)
+                root.descendants.push(backNode)
+            }
+        return root
+    }
+}
+
 class SimpleSHMLNodeParser {
    constructor(private readonly config: StringObjectCollection) {
 
@@ -121,6 +189,8 @@ function findParent(root: ASTRoot, node: ASTNode): ASTNode {
    return root.descendants.find(decendant => decendant.children.includes(node)) ?? root.first
 }
 
+
+
 let parser = new SimpleSHMLNodeParser({
    '**': 'strong',
    '*': 'em',
@@ -130,8 +200,18 @@ let parser = new SimpleSHMLNodeParser({
    ',,': 'sub',
    '^^': 'sup'
 })
-let root = /*parser.parse(*/parser.parse(new ASTRoot(new ASTNode('|~~__o__~~| __o|~~**O**~~|o__ **Test** This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work? __o|O|o__ ~~bye~~ H,,2,,O x^^*2*^^', [])))//)
-console.log(root.first)
-console.log(root.toSourceString())
-console.log(root.descendants.filter((n: ASTNode) => n.children.length == 0 && n.contents === ''))
-console.log('Source Length: ' + root.descendants.length)
+//let root = /*parser.parse(*/parser.parse(new ASTRoot(new ASTNode('|~~__o__~~| __o|~~**O**~~|o__ **Test** This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work? __o|O|o__ ~~bye~~ H,,2,,O x^^*2*^^', [])))//)
+//console.log(root.first)
+//console.log(root.toSourceString())
+//console.log(root.descendants.filter((n: ASTNode) => n.children.length == 0 && n.contents === ''))
+//console.log('Source Length: ' + root.descendants.length)
+
+let root = new Parser(/(?<what>#{1,6})\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
+    return new ASTTagNode('h' + map.what.length, map.contents, [])
+}).parse(new ASTRoot(new ASTNode(
+`
+# wow
+## a w|o|w
+`, [])))
+
+console.log(parser.parse(root).toSourceString())
