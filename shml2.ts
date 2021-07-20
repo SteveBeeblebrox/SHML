@@ -75,14 +75,14 @@ class SimpleSHMLNodeParser {
       for(let pass = 0; pass <= Object.keys(this.config).length; pass++)
          for(let node of root.descendants) {
 
-            if(k++ > 25) break;
-
             let source = node.contents
+            
+            const regex = new RegExp(`(?<rest>.*?)(?<what>${Object.keys(this.config).map(escapeRegExpLiteral).join('|')})(?<target>.*?)\\k<what>`)
+            if(!regex.test(source)) continue
 
             node.contents = ''
 
-            const regex = new RegExp(`(?<rest>.*?)(?<what>${Object.keys(this.config).map(escapeRegExpLiteral).join('|')})(?<target>.*?)\\k<what>`)
-
+            
             let previous = source
             const func = (...args: any[]) => {
                const map = args.pop();
@@ -100,7 +100,7 @@ class SimpleSHMLNodeParser {
                const target = new ASTTagNode(tag, map.target, [])
                node.children.push(target)
                root.descendants.push(target)
-
+               
                return ''
             }
             while ((source = source.replace(regex, func)) !== previous) previous = source
@@ -130,7 +130,7 @@ let parser = new SimpleSHMLNodeParser({
    ',,': 'sub',
    '^^': 'sup'
 })
-let root = /*parser.parse(*/parser.parse(new ASTRoot(new ASTNode('|~~__o__~~| __o|~~O~~|o__ **Test** This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work? __o|O|o__ ~~bye~~ H,,2,,O x^^*2*^^', [])))//)
+let root = /*parser.parse(*/parser.parse(new ASTRoot(new ASTNode('|~~__o__~~| __o|~~**O**~~|o__ **Test** This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work? __o|O|o__ ~~bye~~ H,,2,,O x^^*2*^^', [])))//)
 console.log(root.first)
 console.log(root.toSourceString())
 console.log(root.descendants.filter((n: ASTNode) => n.children.length == 0 && n.contents === ''))
