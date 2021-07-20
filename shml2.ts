@@ -66,16 +66,24 @@ function escapeRegExpLiteral(literal: string): string {
     return literal.replace(/[\\[\]{}()^$.?+*|]/g, '\\$&').replace(/-/g, '\\x2d')
 }
 
+function attriutesToString(properties: {[key: string]: string | object}) {
+	properties = {...properties}
+	if('style' in properties && typeof properties.style === 'object')
+  	   properties.style = Object.entries(properties.style).map(([key, value]) => `${key.replace(/[A-Z]/g, match => `-${match.toLowerCase()}`)}:${value};`).join('')
+  
+   return ' ' + Object.entries(properties).map(([key, value]) => `${key}="${value.toString().replace(/"/g, "&quot;")}"`).join(' ')
+}
+
 type Supplier<T> = {
     (): T
 }
 
-class Parser {
+class SimpleSHMLParser {
     private readonly getRegex: Supplier<string | RegExp>
     private readonly getPasses: Supplier<number>
     constructor(regex: string | RegExp | Supplier<string | RegExp>, private readonly accept: {(map: StringObjectCollection): ASTNode}, passes: number | Supplier<number> = () => 1) {
-        this.getRegex = Parser.asSupplier(regex, value => typeof value === 'string' || value instanceof RegExp)
-        this.getPasses = Parser.asSupplier(passes, value => typeof value === 'number')
+        this.getRegex = SimpleSHMLParser.asSupplier(regex, value => typeof value === 'string' || value instanceof RegExp)
+        this.getPasses = SimpleSHMLParser.asSupplier(passes, value => typeof value === 'number')
     }
     
     private static asSupplier<T>(value: Supplier<T> | T, isValue: {(value: Supplier<T> | T): boolean}): Supplier<T> {
@@ -90,7 +98,7 @@ class Parser {
     }
 
     parse(root: ASTRoot): ASTRoot {
-        const regex = new RegExp(`(?<front>.*?)${Parser.asString(this.getRegex())}`)
+        const regex = new RegExp(`(?<front>.*?)${SimpleSHMLParser.asString(this.getRegex())}`)
         for(const pass of Array(this.getPasses()).keys())
             for(let node of root.descendants) {
 
@@ -189,7 +197,26 @@ function findParent(root: ASTRoot, node: ASTNode): ASTNode {
    return root.descendants.find(decendant => decendant.children.includes(node)) ?? root.first
 }
 
+class SHML {
+   private static readonly instance = new SHML({
+      headerParser: new SimpleSHMLParser(/(?<what>#{1,6})\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
+         return new ASTTagNode('h' + map.what.length, map.contents, [])
+      })
+   })
+   constructor(private readonly parsers: {[key: string]: SimpleSHMLParser}) {
 
+   }
+   
+   static parseMarkup(markup: string) {
+      SHML.instance.parseMarkup(markup)
+   }
+
+   parseMarkup(markup: string) {
+      return new SimpleSHMLParser(/(?<what>#{1,6})\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
+         return new ASTTagNode('h' + map.what.length, map.contents, [])
+      }).parse(new ASTRoot(new ASTNode(markup, [])))
+   }
+}
 
 let parser = new SimpleSHMLNodeParser({
    '**': 'strong',
@@ -206,7 +233,7 @@ let parser = new SimpleSHMLNodeParser({
 //console.log(root.descendants.filter((n: ASTNode) => n.children.length == 0 && n.contents === ''))
 //console.log('Source Length: ' + root.descendants.length)
 
-let root = new Parser(/(?<what>#{1,6})\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
+let root = new SimpleSHMLParser(/(?<what>#{1,6})\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
     return new ASTTagNode('h' + map.what.length, map.contents, [])
 }).parse(new ASTRoot(new ASTNode(
 `
