@@ -1,5 +1,6 @@
 # SHML2
-WIP, some things may not work yet
+WIP, some things may not work yet  
+SHML2 allows for easier configuration, but it still works out of the box like the original SHML. Version 2 applies formatting in different "passes". Passes can be created from scratch, created using helpers, or referenced from a collection of predefined options. SHML parsers can be created with a different list of passes to go through for each input. Earlier passes have higher priority. Most different formatting features are applied in their own passes; however, many simple formats like italics, bold, underlines, et al are applied in the same pass.
 ## Syntax
 | Format        | Pattern      | HTML Tag(s) | Example                                      |
 | ------------- | ------------ | ----------- | -------------------------------------------- |
