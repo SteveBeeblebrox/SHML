@@ -56,6 +56,35 @@ class ASTRoot {
    toSourceString(): string {
       return this.first.toSourceString()
    }
+   static from(source: string) {
+       return new ASTRoot(new ASTNode(source, []))
+   }
+}
+
+class SHMLResult {
+    constructor(private readonly root: ASTRoot) {
+
+    }
+
+    getProperties(): StringObjectCollection {
+        throw new Error("Method not implemented.")
+    }
+
+    getProperty(): StringObjectCollection {
+        throw new Error("Method not implemented.")
+    }
+
+    getIds():  string[] {
+        throw new Error("Method not implemented.")
+    }
+
+    toString(): string {
+        return this.root.toSourceString()
+    }
+
+    toHTML(): any {
+        throw new Error("Method not implemented.")
+    }
 }
 
 type StringObjectCollection = {
@@ -78,12 +107,16 @@ type Supplier<T> = {
     (): T
 }
 
-class SimpleSHMLParser {
+export interface SHMLPass {
+    parse(root: ASTRoot): ASTRoot
+}
+
+export class SectionPass implements SHMLPass {
     private readonly getRegex: Supplier<string | RegExp>
     private readonly getPasses: Supplier<number>
     constructor(regex: string | RegExp | Supplier<string | RegExp>, private readonly accept: {(map: StringObjectCollection): ASTNode}, passes: number | Supplier<number> = () => 1) {
-        this.getRegex = SimpleSHMLParser.asSupplier(regex, value => typeof value === 'string' || value instanceof RegExp)
-        this.getPasses = SimpleSHMLParser.asSupplier(passes, value => typeof value === 'number')
+        this.getRegex = SectionPass.asSupplier(regex, value => typeof value === 'string' || value instanceof RegExp)
+        this.getPasses = SectionPass.asSupplier(passes, value => typeof value === 'number')
     }
     
     private static asSupplier<T>(value: Supplier<T> | T, isValue: {(value: Supplier<T> | T): boolean}): Supplier<T> {
@@ -98,7 +131,7 @@ class SimpleSHMLParser {
     }
 
     parse(root: ASTRoot): ASTRoot {
-        const regex = new RegExp(`(?<front>.*?)${SimpleSHMLParser.asString(this.getRegex())}`)
+        const regex = new RegExp(`(?<front>.*?)${SectionPass.asString(this.getRegex())}`)
         for(const pass of Array(this.getPasses()).keys())
             for(let node of root.descendants) {
 
@@ -142,7 +175,7 @@ class SimpleSHMLParser {
     }
 }
 
-class SimpleSHMLNodeParser {
+export class InlineNodePass {
    constructor(private readonly config: StringObjectCollection) {
 
    }
@@ -193,52 +226,68 @@ class SimpleSHMLNodeParser {
    }
 }
 
-function findParent(root: ASTRoot, node: ASTNode): ASTNode {
-   return root.descendants.find(decendant => decendant.children.includes(node)) ?? root.first
+export class SHMLInstance {
+    private readonly passes: SHMLPass[]
+    constructor(...passes: SHMLPass[]) {
+        this.passes = passes
+    }
+
+    parse(source: string) : SHMLResult {
+        let root = ASTRoot.from(source)
+        for(const pass of this.passes)
+            root = pass.parse(root)
+        return new SHMLResult(root)
+
+    }
 }
 
-class SHML {
-   private static readonly instance = new SHML({
-      headerParser: new SimpleSHMLParser(/(?<what>#{1,6})\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
-         return new ASTTagNode('h' + map.what.length, map.contents, [])
-      })
-   })
-   constructor(private readonly parsers: {[key: string]: SimpleSHMLParser}) {
-
-   }
-   
-   static parseMarkup(markup: string) {
-      SHML.instance.parseMarkup(markup)
-   }
-
-   parseMarkup(markup: string) {
-      return new SimpleSHMLParser(/(?<what>#{1,6})\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
-         return new ASTTagNode('h' + map.what.length, map.contents, [])
-      }).parse(new ASTRoot(new ASTNode(markup, [])))
-   }
+export class PassCollection implements SHMLPass {
+    private readonly passes: SHMLPass[]
+    constructor(...passes: SHMLPass[]) {
+        this.passes = passes
+    }
+    parse(root: ASTRoot): ASTRoot {
+        for(const pass of this.passes) root = pass.parse(root)
+        return root
+    }
 }
 
-let parser = new SimpleSHMLNodeParser({
-   '**': 'strong',
-   '*': 'em',
-   '|': 'mark',
-   '__': 'u',
-   '~~': 'del',
-   ',,': 'sub',
-   '^^': 'sup'
-})
-//let root = /*parser.parse(*/parser.parse(new ASTRoot(new ASTNode('|~~__o__~~| __o|~~**O**~~|o__ **Test** This is *wow*! |I| *l|ov|e* it. Does |th*i*s| work? __o|O|o__ ~~bye~~ H,,2,,O x^^*2*^^', [])))//)
-//console.log(root.first)
-//console.log(root.toSourceString())
-//console.log(root.descendants.filter((n: ASTNode) => n.children.length == 0 && n.contents === ''))
-//console.log('Source Length: ' + root.descendants.length)
+export class Passes {
+    static readonly HASHTAG_HEADERS = new SectionPass(/(?<what>#{1,6})\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
+        return new ASTTagNode('h' + map.what.length, map.contents, [])
+    })
 
-let root = new SimpleSHMLParser(/(?<what>#{1,6})\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
-    return new ASTTagNode('h' + map.what.length, map.contents, [])
-}).parse(new ASTRoot(new ASTNode(
-`
-# wow
-## a w|o|w
-`, [])))
+    static readonly BASIC_HEADERS = new SectionPass(/h(?<what>[1-6]):\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
+        return new ASTTagNode('h' + map.what, map.contents, [])
+    })
 
-console.log(parser.parse(root).toSourceString())
+    static readonly HEADERS = new PassCollection(Passes.HASHTAG_HEADERS, Passes.BASIC_HEADERS)
+
+    static readonly PARAGRAPH = new SectionPass(/p:\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
+        return new ASTTagNode('p', map.contents, [])
+    })
+
+    static readonly INLINE = new InlineNodePass({
+        '**': 'strong',
+        '*': 'em',
+        '|': 'mark',
+        '__': 'u',
+        '~~': 'del',
+        ',,': 'sub',
+        '^^': 'sup'
+    })
+}
+
+export function parse(source: string): SHMLResult {
+    return new SHMLInstance(Passes.HEADERS, Passes.PARAGRAPH, Passes.INLINE).parse(source)
+}
+
+console.log(new SHMLInstance(
+    Passes.HEADERS,
+    Passes.PARAGRAPH,
+    Passes.INLINE
+).parse(
+`# Hello World
+h2: H2
+p: |w**o**w|`
+))
