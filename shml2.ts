@@ -24,11 +24,7 @@ SOFTWARE.
 */
 
 class ASTNode {
-   contents: string
-   children: ASTNode[]
-   constructor(contents: string, children: ASTNode[]) {
-      this.contents = contents
-      this.children = children
+   constructor(public contents: string, public children: ASTNode[]) {
    }
    toSourceString(): string {
       return this.children.length === 0 ? this.contents : this.children.map(node => node.toSourceString()).join('')
@@ -36,14 +32,21 @@ class ASTNode {
 }
 
 class ASTTagNode extends ASTNode {
-   tag: string
-   constructor(tag: string, contents: string, children: ASTNode[]) {
+   constructor(public tag: string, contents: string, children: ASTNode[]) {
       super(contents, children)
-      this.tag = tag
    }
    toSourceString(): string {
       return `<${this.tag}>${super.toSourceString()}</${this.tag}>`
    }
+}
+
+class ASTCommentNode extends ASTNode {
+    constructor(public readonly comment: string) {
+        super('', [])
+    }
+    toSourceString(): string {
+        return `<!-- ${this.comment} -->`
+    }
 }
 
 class ASTRoot {
@@ -276,6 +279,16 @@ export class Passes {
         ',,': 'sub',
         '^^': 'sup'
     })
+
+    static readonly SOURCE_COMMENTS = new SectionPass(/!!!\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
+        return new ASTNode('', [])
+    })
+
+    static readonly STANDARD_COMMENTS = new SectionPass(/!!\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
+        return new ASTCommentNode(map.contents)
+    })
+
+    static readonly COMMENTS = new PassCollection(Passes.SOURCE_COMMENTS, Passes.STANDARD_COMMENTS)
 }
 
 export function parse(source: string): SHMLResult {
@@ -283,11 +296,13 @@ export function parse(source: string): SHMLResult {
 }
 
 console.log(new SHMLInstance(
+    Passes.COMMENTS,
     Passes.HEADERS,
     Passes.PARAGRAPH,
     Passes.INLINE
 ).parse(
 `# Hello World
+!! Comment
 h2: H2
 p: |w**o**w|`
-))
+).toString())
