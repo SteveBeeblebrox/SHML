@@ -11,3 +11,6 @@ SHML2 allows for easier configuration, but it still works out of the box like th
 | Strikethrough | `~~<text>~~` | `<del>`     | `~~Striked~~` → `<del>Striked</del>`         |
 | Subscript     | `,,<text>,,` | `<sub>`     | `,,Subscript,,` → `<sub>Subscript</sub>`     |
 | Superscript   | `^^<text>^^` | `<sup>`     | `^^Superscript^^` → `<sup>Superscript</sup>` |
+
+## Comments
+Source comments (`!!! comment`) are completely ignored while parsing SHML while standard comments (`!! comment`) are converted to HTML style comments in the output.
