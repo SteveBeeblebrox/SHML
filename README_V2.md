@@ -15,4 +15,4 @@ SHML2 allows for easier configuration, but it still works out of the box like th
 ## Comments
 Source comments (`!!! comment`) are completely ignored while parsing SHML while standard comments (`!! comment`) are converted to HTML style comments in the output.
 ### Paragraphs
-Any lines starting with `p: ` will be converted to HTML paragraphs. An additional pass is available to make any text blocks not already contained in a block node be wrapped in paragraph tags.
+Any lines starting with `p: <text>` will be converted to HTML paragraphs. An additional pass is available to make any text blocks not already contained in a block node be wrapped in paragraph tags.
