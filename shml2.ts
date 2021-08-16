@@ -50,17 +50,19 @@ class ASTCommentNode extends ASTNode {
 }
 
 class ASTRoot {
-   first: ASTNode
-   descendants: ASTNode[]
-   constructor(first: ASTNode) {
-      this.first = first
-      this.descendants = [first]
+    first: ASTNode
+    descendants: ASTNode[]
+    properties: Map<string,string>
+    constructor(first: ASTNode) {
+        this.first = first
+        this.descendants = [first]
+        this.properties = new Map<string, string>();
    }
    toSourceString(): string {
-      return this.first.toSourceString()
+        return this.first.toSourceString()
    }
    static from(source: string) {
-       return new ASTRoot(new ASTNode(source, []))
+        return new ASTRoot(new ASTNode(source, []))
    }
 }
 
