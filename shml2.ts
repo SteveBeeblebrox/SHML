@@ -24,7 +24,12 @@ SOFTWARE.
 */
 
 class ASTNode {
+    parent?: ASTNode
    constructor(public contents: string, public children: ASTNode[]) {
+   }
+   appendChild(child: ASTNode) {
+       child.parent = this
+       this.children.push(child)
    }
    toSourceString(): string {
       return this.children.length === 0 ? this.contents : this.children.map(node => node.toSourceString()).join('')
@@ -181,57 +186,6 @@ export class SectionPass implements SHMLPass {
     }
 }
 
-export class InlineNodePass {
-   constructor(private readonly config: StringObjectCollection) {
-
-   }
-   parse(root: ASTRoot) : any {
-      let k = 0;
-      for(let pass = 0; pass <= Object.keys(this.config).length; pass++)
-         for(let node of root.descendants) {
-
-            let source = node.contents
-            
-            const regex = new RegExp(`(?<rest>.*?)(?<what>${Object.keys(this.config).map(escapeRegExpLiteral).join('|')})(?<target>.*?)\\k<what>`)
-            if(!regex.test(source)) continue
-
-            node.contents = ''
-
-            
-            let previous = source
-            const func = (...args: any[]) => {
-               const map = args.pop();
-
-               root.descendants = root.descendants.filter(o => o !== node)
-
-               if(map.rest !== '') {
-                  const rest = new ASTNode(map.rest, [])
-                  node.children.push(rest)
-                  root.descendants.push(rest)
-               }
-
-               let tag: string = this.config[map.what] ?? 'span'
-
-               const target = new ASTTagNode(tag, map.target, [])
-               node.children.push(target)
-               root.descendants.push(target)
-               
-               return ''
-            }
-            while ((source = source.replace(regex, func)) !== previous) previous = source
-
-            if(source === '') continue
-
-            const fin = new ASTNode(source, [])
-            node.children.push(fin)
-            root.descendants.push(fin)
-
-         }
-
-      return root;
-   }
-}
-
 export class SHMLInstance {
     private readonly passes: SHMLPass[]
     constructor(...passes: SHMLPass[]) {
@@ -273,7 +227,18 @@ export class Passes {
         return new ASTTagNode('p', map.contents, [])
     })
 
-    static readonly INLINE = new InlineNodePass({
+    static readonly INLINE_SUBSET = (args: {[key: string]: string | {(contents: string): ASTTagNode}}) =>
+        new SectionPass(new RegExp(`(?<what>${Object.keys(args).map(escapeRegExpLiteral).join('|')})(?<contents>.*?)\\k<what>`), function(map: StringObjectCollection) {
+            const tag = args[map.what] ?? 'span'
+            return typeof tag === 'string' ? new ASTTagNode(tag, map.contents, []) : tag(map.contents)
+        }, Object.keys(args).length)
+    
+    static readonly INLINE = Passes.INLINE_SUBSET({
+        '***': (contents: string) => {
+            const node = new ASTTagNode('strong', '', [])
+            node.appendChild(new ASTTagNode('em', contents, []))
+            return node
+        },
         '**': 'strong',
         '*': 'em',
         '|': 'mark',
@@ -307,5 +272,5 @@ console.log(new SHMLInstance(
 `# Hello World
 !!! Comment
 h2: H2
-p: |w**o**w|`
+p: |w**o**w| *** oOo ***`
 ).toString())
