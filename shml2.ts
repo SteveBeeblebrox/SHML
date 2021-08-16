@@ -117,7 +117,7 @@ export interface SHMLPass {
 export class SectionPass implements SHMLPass {
     private readonly getRegex: Supplier<string | RegExp>
     private readonly getPasses: Supplier<number>
-    constructor(regex: string | RegExp | Supplier<string | RegExp>, private readonly accept: {(map: StringObjectCollection): ASTNode}, passes: number | Supplier<number> = () => 1) {
+    constructor(regex: string | RegExp | Supplier<string | RegExp>, private readonly accept: {(map: StringObjectCollection): ASTNode | null}, passes: number | Supplier<number> = () => 1) {
         this.getRegex = SectionPass.asSupplier(regex, value => typeof value === 'string' || value instanceof RegExp)
         this.getPasses = SectionPass.asSupplier(passes, value => typeof value === 'number')
     }
@@ -160,9 +160,10 @@ export class SectionPass implements SHMLPass {
                     delete map.front
 
                     const targetNode = this.accept(map)
-                    node.children.push(targetNode)
-                    root.descendants.push(targetNode)
-                    
+                    if(targetNode) {
+                        node.children.push(targetNode)
+                        root.descendants.push(targetNode)
+                    }
                     return ''
                 }
 
@@ -281,7 +282,7 @@ export class Passes {
     })
 
     static readonly SOURCE_COMMENTS = new SectionPass(/!!!\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
-        return new ASTNode('', [])
+        return null
     })
 
     static readonly STANDARD_COMMENTS = new SectionPass(/!!\s(?<contents>.*?)\n/, function(map: StringObjectCollection) {
@@ -302,7 +303,7 @@ console.log(new SHMLInstance(
     Passes.INLINE
 ).parse(
 `# Hello World
-!! Comment
+!!! Comment
 h2: H2
 p: |w**o**w|`
 ).toString())
