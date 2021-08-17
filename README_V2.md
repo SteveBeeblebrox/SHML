@@ -15,6 +15,6 @@ SHML2 allows for easier configuration, but it still works out of the box like th
 ## Comments
 Source comments (`!!! comment`) are completely ignored while parsing SHML while standard comments (`!! comment`) are converted to HTML style comments in the output.
 ### Properties
-Properties are defined with the following format `!key: value`. Only the first instance of each key is stored, all others are skipped. Values can be interpolated using `?[key]`. This interpolation takes place after all parsing so keys may be referenced before they are defined. If no value for a key is found when interpolating, no change to the text is made.
+Properties are defined with the following format `!key: value`. Only the first instance of each key is stored, all others are skipped. Values can be interpolated using `?[key]`. This interpolation takes place after all parsing so keys may be referenced before they are defined. If no value for a key is found when interpolating, no change to the text is made. Properties of the result can be modified with the `setProperties(key, value)` and changes will be reflected in any interpolation. Properties can be accessed with `getProperty(key)` and `getProperties()`. `hasProperty(key)` can be used to check if a property exists. 
 ### Paragraphs
 Any lines starting with `p: <text>` will be converted to HTML paragraphs. An additional pass is available to make any text blocks not already contained in a block node be wrapped in paragraph tags.
