@@ -1,5 +1,5 @@
 type SHMLResult = any
-type EncryptionTransform = {(source: string, password: string): Promise<string> | string}
+type Supplier<T> = {(): T}
 type Transform<T> = {(t: T): Promise<T> | T}
 
 type TransformerMap<T extends Function> = {
@@ -16,47 +16,66 @@ class SHMLFileInfo {
         public contents: string,
         public compression: string = SHMLManager.NONE,
         public encryption: string = SHMLManager.NONE,
-        public hashbang?: string,
-    ) {}
+        public hashbang?: string
+    ) {
+        const word = /^[A-Z-]*$/
+        if(!word.test(flavor)) throw 'Invalid flavor.'
+
+
+        if(!word.test(compression)) throw 'Invalid compression type.'
+        if(!word.test(encryption)) throw 'Invalid encryption type.'
+        if(hashbang && !/^#!.*?\n$/.test(hashbang)) throw 'Invalid hashbang.'
+    }
 }
 
-class ParseableSHMLFileInfo extends SHMLFileInfo{
+class ParseableSHMLFileInfo extends SHMLFileInfo {
     constructor(
-        private parse: (data: SHMLFileInfo) => SHMLResult,
+        private readonly manager: SHMLManager,
         flavor: string,
         version: Version,
         contents: string,
         compression?: string,
         encryption?: string,
-        hashbang?: string,
+        hashbang?: string
     ) {
         super(flavor, version, contents, compression, encryption, hashbang)
     }
 
     toSHML() {
-        return this.parse(this)
+        const parse = this.manager.getParser(this.flavor, this.version)
+        if(!parse) throw `Unsupported flavor ${this.flavor} ${this.version.toString()}`
+        return parse(this.contents)
     }
 }
 
-type Supplier<T> = {
-    (): T
-}
-
-type SHMLSupplier = {
-    (flavor: string, version: Version): {
-        (source: string): SHMLResult
-    } | null
-}
-
 class Version {
+    public readonly major: number
+    public readonly minor: number
+    public readonly patch: number
     constructor(
-        public readonly major: number,
-        public readonly minor: number,
-        public readonly patch: number,
+        major: number | string,
+        minor: number | string,
+        patch: number | string,
         public readonly prerelease?: string,
         public readonly buildmetadata?: string
-    ) {}
+    ) {
+        this.major = this.asNumber(major, 'major')
+        this.minor = this.asNumber(minor, 'minor')
+        this.patch = this.asNumber(patch, 'patch')
 
+        if(prerelease && !/^(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*$/.test(prerelease)) throw 'Invalid prerelease version number.'
+        if(buildmetadata && !/^[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*$/.test(buildmetadata)) throw 'Invalid build metadata version number.'
+    }
+
+    private asNumber(value: number | string, type: string) {
+        if(typeof value === 'string')
+            if(/^0|[1-9]\d*$/.test(value))
+                value = parseInt(value, 10)
+            else
+                throw `Invalid ${type} version number.`
+        return value
+    }
+    
     toString() {
         let result = `${this.major}.${this.minor}.${this.patch}`
         if(this.prerelease) result += `-${this.prerelease}`
@@ -76,7 +95,7 @@ class SHMLManager {
     static readonly NONE = 'NONE'
     static readonly NO_TRANSFORM = ((a: any) => a) as Transform<any>
 
-    constructor(private readonly getParser: SHMLSupplier, private readonly compression: TransformerMap<Transform<string>> = {}, private readonly encryption: TransformerMap<EncryptionTransform> = {}) {
+    constructor(public readonly getParser: {(flavor: string, version: Version): {(source: string): SHMLResult} | null}, private readonly compression: TransformerMap<Transform<string>> = {}, private readonly encryption: TransformerMap<{(source: string, password: string): Promise<string> | string}> = {}) {
         this.compression[SHMLManager.NONE] = this.encryption[SHMLManager.NONE] = {
             transform: SHMLManager.NO_TRANSFORM,
             detransform: SHMLManager.NO_TRANSFORM
@@ -102,7 +121,7 @@ class SHMLManager {
         }
 
         const flavor: string = match.groups!.flavor!
-        const version = Version.fromStrings(
+        const version = new Version(
             match.groups.major,
             match.groups.minor,
             match.groups.patch,
@@ -124,11 +143,7 @@ class SHMLManager {
                 password!
             )
 
-        return new ParseableSHMLFileInfo((data) => {
-            const parse = this.getParser(data.flavor, data.version)
-            if(!parse) throw `Unsupported flavor ${flavor} ${version.toString()}`
-            return parse(data.contents)
-        }, flavor, version, contents, compressionType, encryptionType, match.groups.hashbang)
+        return new ParseableSHMLFileInfo(this, flavor, version, contents, compressionType, encryptionType, match.groups.hashbang)
     }
 
     async write(source: SHMLFileInfo, passwordSupplier?: Supplier<Promise<string | undefined | null> | string | undefined | null> | string): Promise<string> {
