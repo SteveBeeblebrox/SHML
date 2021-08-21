@@ -32,11 +32,10 @@ type TransformerMap<T extends Function> = {
     }
 }
 
-class SHMLFileInfo {
+class SHMLFileInfoBase {
     constructor(
         public flavor: string,
         public version: Version,
-        public contents: string,
         public compression: string = SHMLManager.NONE,
         public encryption: string = SHMLManager.NONE,
         public hashbang?: string
@@ -48,6 +47,19 @@ class SHMLFileInfo {
         if(!word.test(compression)) throw 'Invalid compression type.'
         if(!word.test(encryption)) throw 'Invalid encryption type.'
         if(hashbang && !/^#!.*?\n$/.test(hashbang)) throw 'Invalid hashbang.'
+    }
+}
+
+class SHMLFileInfo extends SHMLFileInfoBase{
+    constructor(
+        flavor: string,
+        version: Version,
+        public contents: string,
+        compression: string,
+        encryption?: string,
+        hashbang?: string
+    ) {
+        super(flavor, version, compression, encryption, hashbang)
     }
 }
 
@@ -123,6 +135,26 @@ class SHMLManager {
             transform: SHMLManager.NO_TRANSFORM,
             detransform: SHMLManager.NO_TRANSFORM
         }
+    }
+
+    getInfo(source: string): SHMLFileInfoBase {
+        const match: any = SHMLManager.PATTERN.exec(source)
+
+        if(match === null) throw 'Invalid file.'
+
+        const compressionType: string = match.groups!.compression ?? SHMLManager.NONE 
+        const encryptionType: string = match.groups!.encryption ?? SHMLManager.NONE
+
+        const flavor: string = match.groups!.flavor!
+        const version = new Version(
+            match.groups.major,
+            match.groups.minor,
+            match.groups.patch,
+            match.groups.prerelease,
+            match.groups.buildmetadata
+        )
+
+        return new SHMLFileInfoBase(flavor, version, compressionType, encryptionType, match.groups.hashbang)
     }
 
     async read(source: string, passwordSupplier?: Supplier<Promise<string | undefined | null> | string | undefined | null> | string): Promise<ParseableSHMLFileInfo> {
