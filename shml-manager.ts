@@ -55,7 +55,7 @@ class SHMLFileInfo extends SHMLFileInfoBase{
         flavor: string,
         version: Version,
         public contents: string,
-        compression: string,
+        compression?: string,
         encryption?: string,
         hashbang?: string
     ) {
