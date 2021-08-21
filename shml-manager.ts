@@ -18,7 +18,7 @@ class SHMLFileInfo {
         public encryption: string = SHMLManager.NONE,
         public hashbang?: string
     ) {
-        const word = /^[A-Z-]*$/
+        const word = /^[A-Z0-9-]*$/
         if(!word.test(flavor)) throw 'Invalid flavor.'
 
 
@@ -91,7 +91,7 @@ class Version {
 }
 
 class SHMLManager {
-    static readonly PATTERN = /^(?<hashbang>#!.*?\n)?:(?<flavor>[A-Z-]*?):(?:(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?):(?:(?<compression>[A-Z-]*?):)?(?:(?<encryption>[A-Z-]*?):)?\n(?<contents>[\s\S]*)/
+    static readonly PATTERN = /^(?<hashbang>#!.*?\n)?:(?<flavor>[A-Z0-9-]*?):(?:(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?):(?:(?<compression>[A-Z0-9-]*?):)?(?:(?<encryption>[A-Z0-9-]*?):)?\n(?<contents>[\s\S]*)/
     static readonly NONE = 'NONE'
     static readonly NO_TRANSFORM = ((a: any) => a) as Transform<any>
 
