@@ -20,3 +20,9 @@ Properties are defined with the following format `!key: value`. Only the first i
 Any lines starting with `p: <text>` will be converted to HTML paragraphs. An additional pass is available to make any text blocks not already contained in a block node be wrapped in paragraph tags.
 ### Quotes
 Start a line with `>> <text>`, `"<text>"`, or `blockquote: <text>` to embed a quote. If the next line starts with `- <text>`, the given text will be displayed as the author.
+If using the second form, newlines are preserved:
+```
+"Hello
+World"
+- Bob Smith
+```
