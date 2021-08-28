@@ -26,3 +26,5 @@ If using the second form, newlines are preserved:
 World"
 - Bob Smith
 ```
+### Text Alignment
+Text can be aligned using one of the following `@center`, `@left`, `@right`, `@justify`, or `@reset`. All content following one of these markers well be aligned the given way until another market or the end of the source is found.
