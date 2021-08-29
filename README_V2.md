@@ -31,3 +31,7 @@ Text can be aligned using one of the following `@center`, `@left`, `@right`, `@j
 
 ### Raw HTML
 Unlike the first version of SHML, version two provides some XXS protection. If using string methods, it is still higly encouraged to use a dedicated sanitation tool, but if using only the HTML element methods, SHML will prevent most raw HTML and JavaScript. When getting the HTML element representation of SHML instead of the string version, only the following HTML is allowed:
++ `style` tags and their contents
++ `h1`, `h2`, `h3`, `h4`, `h5`, `h6`, `p`, `strong`, `b`, `em`, `i`, `mark`, `del`, `ins`, `blockquote`, `dd`, `dl`, `dt`, `hr`, `br`, `li`, `ul`, `ol`, `abbr`, `bdi`, `bdo`, `cite`, `figure`, `figcaption`, `code`, `data`, `dfn`, `pre`, `kbd`, `q`, `s`, `ruby`, `rp`, `rt`, `samp`, `small`, `time`, `var`, `wbr`, `math` (and all related elements), `caption`, `col`, `colgroup`, `table`, `tbody`, `td`, `tfoot`, `th`, `thead`, `tr`, `details`, `dialog`, `summary`, `menu`, `sub`, and `sup` tags with no attributes
++ `a`, `audio`, and `img` with limited attributes
++ `div` and `span` with style attributes
