@@ -1,5 +1,6 @@
 # SHML2
 WIP, some things may not work yet  
+While SHML itself needs a relatively new version of JavaScript to run, the resulting HTML (obviously only the string output) should be backwards compatible and responsive with any reasonable browser and device. This means that SHML only works on newer browsers, but when used on the backend to generate pages, those pages should be useable everywhere.  
 SHML2 allows for easier configuration, but it still works out of the box like the original SHML. Version 2 applies formatting in different "passes". Passes can be created from scratch, created using helpers, or referenced from a collection of predefined options. SHML parsers can be created with a different list of passes to go through for each input. Earlier passes have higher priority. Most different formatting features are applied in their own passes; however, many simple formats like italics, bold, underlines, et al are applied in the same pass.
 ## Syntax
 | Format        | Pattern      | HTML Tag(s) | Example                                      |
@@ -33,7 +34,8 @@ Text can be aligned using one of the following `@center`, `@left`, `@right`, `@j
 Unlike the first version of SHML, version two provides some XXS protection. If using string methods, it is still higly encouraged to use a dedicated sanitation tool, but if using only the HTML element methods, SHML will prevent most raw HTML and JavaScript. When getting the HTML element representation of SHML instead of the string version, only the following HTML is allowed:
 + `style` tags and their contents
 + `h1`, `h2`, `h3`, `h4`, `h5`, `h6`, `p`, `strong`, `b`, `em`, `i`, `mark`, `del`, `ins`, `blockquote`, `dd`, `dl`, `dt`, `hr`, `br`, `li`, `ul`, `ol`, `abbr`, `bdi`, `bdo`, `cite`, `figure`, `figcaption`, `code`, `data`, `dfn`, `pre`, `kbd`, `q`, `s`, `ruby`, `rp`, `rt`, `samp`, `small`, `time`, `var`, `wbr`, `math` (and all related elements), `caption`, `col`, `colgroup`, `table`, `tbody`, `td`, `tfoot`, `th`, `thead`, `tr`, `details`, `dialog`, `summary`, `menu`, `sub`, and `sup` tags with no attributes
-+ `a` with `href`, `title`, and `target` attributes
++ `a` with `href`, `title`, and `target` attributes  
+The following may be enabled with a separate pass:
 + `img` tags with `src`, `width`, and `height`, and `style` attributes
 + `audio` (and `source`) tags with `src`, `loop`, `muted`, and `controls` attributes
 + `video` tags with `src`, `loop`, `muted`, `controls`, `height`, and `width` attributes
