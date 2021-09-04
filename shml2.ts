@@ -186,6 +186,80 @@ export class SectionPass implements SHMLPass {
     }
 }
 
+export class SimplePass implements SHMLPass {
+    private readonly getRegex: Supplier<string | RegExp>
+    private readonly getPasses: Supplier<number>
+    constructor(regex: string | RegExp | Supplier<string | RegExp>, private readonly accept: {(map: StringObjectCollection): ASTNode | null}, passes: number | Supplier<number> = () => 1) {
+        this.getRegex = SimplePass.asSupplier(regex, value => typeof value === 'string' || value instanceof RegExp)
+        this.getPasses = SimplePass.asSupplier(passes, value => typeof value === 'number')
+    }
+    
+    private static asSupplier<T>(value: Supplier<T> | T, isValue: {(value: Supplier<T> | T): boolean}): Supplier<T> {
+        return isValue(value) ? () => value as T : value as Supplier<T>
+    }
+
+    private static asString(regex: RegExp | string): string {
+        if(typeof regex === 'string') return regex
+
+        const str = regex.toString()
+        return str.substring(1, str.length - 1 - regex.flags.length)
+    }
+
+    private static asRegex(regex: RegExp | string) : RegExp {
+        return typeof regex === 'string' ? new RegExp(regex) : regex
+    }
+
+    private static splitOnFirst(source: string, seperator: RegExp): RegExpMatchArray & { groups?: StringObjectCollection} {
+        const match = source.match(seperator)
+        match?.push(source.slice(match.shift()!.length + match.index!, source.length))
+        match?.unshift(source.slice(0, match.index))
+        return match ?? ['', source];
+    }
+
+    parse(root: ASTRoot): ASTRoot {
+        const regex = SimplePass.asRegex(this.getRegex())
+        
+        for(const pass of Array(this.getPasses()).keys())
+            for(let node of root.descendants) {
+
+                let contents = node.contents
+
+                if(!regex.test(contents)) continue
+
+                node.contents = ''
+                
+                let array;
+                console.log(contents)
+                while((array = SimplePass.splitOnFirst(contents, regex))[array.length-1] !== contents) {
+                    const front = array.shift()
+                    contents = array.pop()!
+                    
+                    root.descendants = root.descendants.filter(o => o !== node)
+                    
+                    if(front) {
+                        const frontNode = new ASTNode(front, [])
+                        node.children.push(frontNode)
+                        root.descendants.push(frontNode)
+                    }
+
+                    const targetNode = this.accept(array.groups as StringObjectCollection)
+                    if(targetNode) {
+                        node.children.push(targetNode)
+                        root.descendants.push(targetNode)
+                    }
+                }
+                if(contents) {
+                    const frontNode = new ASTNode(contents, [])
+                    node.children.push(frontNode)
+                    root.descendants.push(frontNode)
+                }
+            }
+
+        console.log(root.descendants)
+        return root
+    }
+}
+
 export class SHMLInstance {
     private readonly passes: SHMLPass[]
     constructor(...passes: SHMLPass[]) {
