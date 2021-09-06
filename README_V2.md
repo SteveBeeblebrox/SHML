@@ -1,5 +1,8 @@
 # SHML2
 WIP, some things may not work yet  
+  
+Version 2 of SHML uses PCRE instead of the built-in Regex engine. Because of this, it is only compatible with browsers that support WASM. (Note that it can still be used on the backend to generate files since modern Node.js supports WASM).
+  
 While SHML itself needs a relatively new version of JavaScript to run, the resulting HTML (obviously only the string output) should be backwards compatible and responsive with any reasonable browser and device. This means that SHML only works on newer browsers, but when used on the backend to generate pages, those pages should be useable everywhere.  
 SHML2 allows for easier configuration, but it still works out of the box like the original SHML. Version 2 applies formatting in different "passes". Passes can be created from scratch, created using helpers, or referenced from a collection of predefined options. SHML parsers can be created with a different list of passes to go through for each input. Earlier passes have higher priority. Most different formatting features are applied in their own passes; however, many simple formats like italics, bold, underlines, et al are applied in the same pass.
 ## Syntax
