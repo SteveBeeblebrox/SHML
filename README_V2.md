@@ -21,7 +21,7 @@ Source comments (`!!! comment`) are completely ignored while parsing SHML while 
 ### Properties
 Properties are defined with the following format `!key: value`. Only the first instance of each key is stored, all others are skipped. Values can be interpolated using `?[key]`. This interpolation takes place after all parsing so keys may be referenced before they are defined. If no value for a key is found when interpolating, no change to the text is made. Properties of the result can be modified with the `setProperties(key, value)` and changes will be reflected in any interpolation. Properties can be accessed with `getProperty(key)` and `getProperties()`. `hasProperty(key)` can be used to check if a property exists. If a property is defined as `!key` and has no value, it is assigned a default value of `"true"` (`!key:` has a value of `""`).
 ### Paragraphs
-Any lines starting with `p: <text>` will be converted to HTML paragraphs. An additional pass is available to make any text blocks not already contained in a block node be wrapped in paragraph tags.
+Any lines starting with `p: <text>` and any following lines that do not start off another block will be converted to HTML paragraphs. An additional pass is available to make any text blocks not already contained in a block node be wrapped in paragraph tags.
 ### Headers
 Text following a `#` is displayed as a header. The number of pound signs present controls what size header is used where the hover the heater number, the smaller it becomes (up to level 6). Headsets may also be defined as `hn:` where n is an integer between 1 and 6 inclusive that represents the heater level. All the text after these markers up until the end of the line is part of the header. Headers are also given ids stop that they may be linked to. A cryb64 hash algorithm is used too generate unique ids for each unique header. If there are multiple headers that have the same text and same level that would then result in the same id, a trailing counter number is appended too tell them apart. It is possible to override the detail is by using `hn[custom_id]:` or `#[custom_id]`. To help limit id collisions, all ids are prefixed with `hn:` where n is the header level.
 ### Quotes
@@ -32,6 +32,10 @@ If using the second form, newlines are preserved:
 World"
 - Bob Smith
 ```
+### Line Breaks
+Some formats like paragraphs can spam multiple lines, but others don't. If a meeting is really needed in one of the formats that doesn't, the string `%%` can be used to insert a line break.
+### Horizontal Rules
+A horizontal bar can be inserted with 3 or more `-` or `=`. The number used does not matter and it's only variable to make source files easier to read and format.
 ### Text Alignment
 Text can be aligned using one of the following `@center`, `@left`, `@right`, `@justify`, or `@reset`. All content following one of these markers well be aligned the given way until another market or the end of the source is found.
 
