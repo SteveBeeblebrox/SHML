@@ -33,7 +33,7 @@ World"
 - Bob Smith
 ```
 ### Line Breaks
-Some formats like paragraphs can spam multiple lines, but others don't. If a meeting is really needed in one of the formats that doesn't, the string `%%` can be used to insert a line break.
+Some formats like paragraphs can span multiple lines, but others don't. If a meeting is really needed in one of the formats that doesn't, the string `%%` can be used to insert a line break.
 ### Horizontal Rules
 A horizontal bar can be inserted with 3 or more `-` or `=`. The number used does not matter and it's only variable to make source files easier to read and format.
 ### Text Alignment
