@@ -41,6 +41,9 @@ Text can be aligned using one of the following `@center`, `@left`, `@right`, `@j
 
 ### Bulletpoints
 Unordered lists may be created by starting a series of lines with a `+` or with `bull: `.
+
+### Custom Symbols
+Custom symbols may be created by passing a map of ids and values when creating the pass. No symbols are added by default. To combine a symbol password the default passes, use a pass collection. Symbols are referenced in markup using `:<id>:`.
 ### Raw HTML
 Unlike the first version of SHML, version two provides some XXS protection. If using string methods, it is still higly encouraged to use a dedicated sanitation tool, but if using only the HTML element methods, SHML will prevent most raw HTML and JavaScript. When getting the HTML element representation of SHML instead of the string version, only the following HTML is allowed:
 + `style` tags and their contents
