@@ -1,6 +1,8 @@
 # SHML2
 WIP, some things may not work yet  
   
+To get access to any useful functions or classes, call the async function `SHML.int()`. After this, all the other members of SHML will be available. This step is needer to load the WebAssembly.
+  
 Version 2 of SHML uses PCRE instead of the built-in Regex engine. Because of this, it is only compatible with browsers that support WASM. (Note that it can still be used on the backend to generate files since modern Node.js supports WASM).
   
 While SHML itself needs a relatively new version of JavaScript to run, the resulting HTML (obviously only the string output) should be backwards compatible and responsive with any reasonable browser and device. This means that SHML only works on newer browsers, but when used on the backend to generate pages, those pages should be useable everywhere.  
