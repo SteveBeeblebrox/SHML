@@ -5,6 +5,13 @@ Version 2 of SHML uses PCRE instead of the built-in Regex engine for some passes
   
 To get access to any functions or classes not available out of the box, call the async function `SHML.int()`. After this, all the other PCRE dependant members of SHML will be available. This step is needer to load the WebAssembly.
   
+Some formats accept additional parameters. Usually, these are included in square brackets immediately after the start of the format and separated by commas. Values may be passed in order or by name. When passing in order, default parameters my be skipped by omitting a value and putting two commas next two each other.  
+For example, supposed format X is used by wrapping text in two capital xs. If it has the properties, a, b, and c wh we re b defaults to 1 and c defaults to 2, consider the following:
+```
+XX[3] foo XX == XX[a=3] foo XX (a is 3, b is 2, and c is 2)
+XX[3,,7] foo XX == XX[a=3,c=7] foo XX == XX[c=7,a=3] foo XX (a is 3, b is 2, and c is 7)
+```
+  
 While SHML itself needs a relatively new version of JavaScript to run, the resulting HTML (obviously only the string output) should be backwards compatible and responsive with any reasonable browser and device. This means that SHML only works on newer browsers, but when used on the backend to generate pages, those pages should be useable everywhere.  
 SHML2 allows for easier configuration, but it still works out of the box like the original SHML. Version 2 applies formatting in different "passes". Passes can be created from scratch, created using helpers, or referenced from a collection of predefined options. SHML parsers can be created with a different list of passes to go through for each input. Earlier passes have higher priority. Most different formatting features are applied in their own passes; however, many simple formats like italics, bold, underlines, et al are applied in the same pass.
 ## Syntax
