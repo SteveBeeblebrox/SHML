@@ -9,7 +9,7 @@ Some formats accept additional parameters. Usually, these are included in square
 For example, supposed format X is used by wrapping text in two capital xs. If it has the properties, a, b, and c wh we re b defaults to 1 and c defaults to 2, consider the following:
 ```
 XX[3] foo XX == XX[a=3] foo XX (a is 3, b is 2, and c is 2)
-XX[3,,7] foo XX == XX[a=3,c=7] foo XX == XX[c=7,a=3] foo XX (a is 3, b is 2, and c is 7)
+XX[3;;7] foo XX == XX[a=3;c=7] foo XX == XX[c=7;a=3] foo XX (a is 3, b is 2, and c is 7)
 ```
   
 While SHML itself needs a relatively new version of JavaScript to run, the resulting HTML (obviously only the string output) should be backwards compatible and responsive with any reasonable browser and device. This means that SHML only works on newer browsers, but when used on the backend to generate pages, those pages should be useable everywhere.  
