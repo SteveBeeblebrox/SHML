@@ -49,7 +49,19 @@ Some formats like paragraphs can span multiple lines, but others don't. If a mee
 A horizontal bar can be inserted with 3 or more `-` or `=`. The number used does not matter and it's only variable to make source files easier to read and format.
 ### Text Alignment
 Text can be aligned using one of the following `@center`, `@left`, `@right`, `@justify`, or `@reset`. All content following one of these markers well be aligned the given way until another market or the end of the source is found.
-
+### Horizontal Structure
+It is possible to split parts of the page into columns using `@column[<amount>]` where `amount` is a decimal or a fraction such as `1/2`. Everything up until another column marker will be included in that column. Columns are automatically packed as well as possible. Once the next column would not fit on the same line, a new row is created. If there is extra space at the end of a line, it is assigned to the party column.
+For example:
+```
+@column[1/4]
+p: Hello
+@column[1/2]
+p: World
+@column[1/2]
+p: Foo
+```
+world creature two rows. One with Hello and World and the second with Foo.
+On small screens, columns will display one after another as if no column was specified.
 ### Bulletpoints
 Unordered lists may be created by starting a series of lines with a `+` or with `bull: `.
 
