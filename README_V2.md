@@ -60,7 +60,7 @@ p: World
 @column[1/2]
 p: Foo
 ```
-world create two rows. One with Hello and World and the second with Foo. **Note that there is a dedicated way to make tables, this format is mostly meant to put an image or other information alongside text.
+world create two rows. One with Hello and World and the second with Foo. **Note that there is a dedicated way to make tables, this format is mostly meant to put an image or other information alongside text.**
 On small screens, columns will display one after another as if no column was specified.
 ### Bulletpoints
 Unordered lists may be created by starting a series of lines with a `+` or with `bull: `.
