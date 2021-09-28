@@ -66,6 +66,8 @@ world create two rows. One with Hello and World and the second with Foo. **Note 
 On small screens, columns will display one after another as if no column was specified.
 ### Bulletpoints
 Unordered lists may be created by starting a series of lines with a `+` or with `bull: `.
+### Escaping
+To escape formatting, use a backsplash or HTML escape codes. When using backslashes, the parser is ables to identify an escaped backslash that should be included in the output.
 
 ### Custom Symbols
 Custom symbols may be created by passing a map of ids and values when creating the pass. No symbols are added by default. To combine a symbol password the default passes, use a pass collection. Symbols are referenced in markup using `:<id>:`.
