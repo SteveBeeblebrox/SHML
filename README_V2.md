@@ -3,7 +3,7 @@ WIP, some things may not work yet
 
 Version 2 of SHML uses PCRE instead of the built-in Regex engine for some passes. Because of this, it is only compatible with browsers that support WASM. (Note that it can still be used on the backend to generate files since modern Node.js supports WASM).
   
-To get access to any functions or classes not available out of the box, call the async function `SHML.int()`. After this, all the other PCRE dependant members of SHML will be available. This step is needer to load the WebAssembly.
+To get access to any functions or classes not available out of the box, call the async function `SHML.int()`. After this, all the other PCRE dependant members of SHML will be available. This step is needed to load the WebAssembly.
   
 When creating an HTML source string from SHML, passing `true` (or any truthy value) to the `toSourceString` method will cause the result to include a full page with a doc type, html, head, and body elements with standard boilerplate code included. If present, the page is named after the `title` property or the beginning of the largest first header. If neither of these are available, the page is called "Untitled".
   
@@ -47,6 +47,10 @@ World"
 ```
 ### Line Breaks
 Some formats like paragraphs can span multiple lines, but others don't. If a meeting is really needed in one of the formats that doesn't, the string `%%` can be used to insert a line break.
+### Code Blocks
+Surround text with backticks to make it display in a monospace font. Additionally, nothing but backticks need to be escaped when inside code blocks. Using three backticks creates a block of code sperate from the rest of the text. As single backticks displays the code inline. When using standalone code blocks, one parameter is accepted to control display. The`language` parameter can be used too provide basic syntax highlighting on the code. When creating the code blocks pass, it is possible to add support for new languages. If the language is "shml+" or "html+" then an iframe showing the contents is placed next to the code. If the language is "javascript+" then a button and output console is added to run the code (note that this uses eval).
+
+
 ### Horizontal Rules
 A horizontal bar can be inserted with 3 or more `-` or `=`. The number used does not matter and it's only variable to make source files easier to read and format.
 ### Text Alignment
