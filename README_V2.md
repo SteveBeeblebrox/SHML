@@ -72,7 +72,8 @@ On small screens, columns will display one after another as if no column was spe
 Unordered lists may be created by starting a series of lines with a `+` or with `bull: `.
 ### Escaping
 To escape formatting, use a backsplash or HTML escape codes. When using backslashes, the parser is ables to identify an escaped backslash that should be included in the output. Any character can be escaped even if it makes no impact on the result.  
-To make markup easier to read, it is also possible to escape newlines with a backslash similar to C++ macros. This causes the newline to be ignored by the parser. This can be used to split up things like headers or paragraphs to make them easier to view without sideways scrolling. Note that this does not produce a newline in the output like the lin we break formatting does.
+To make markup easier to read, it is also possible to escape newlines with a backslash similar to C++ macros. This causes the newline to be ignored by the parser. This can be used to split up things like headers or paragraphs to make them easier to view without sideways scrolling. Note that this does not produce a newline in the output like the line break formatting does.  
+**If writing markup in a JavaScript string, make sure to double escape characters or use the `String.raw` tag or its alias `SHML.raw`.**
 ### Custom Symbols
 Custom symbols may be created by passing a map of ids and values when creating the pass. No symbols are added by default. To combine a symbol password the default passes, use a pass collection. Symbols are referenced in markup using `:<id>:`.
 ### Raw HTML
