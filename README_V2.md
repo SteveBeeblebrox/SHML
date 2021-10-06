@@ -3,7 +3,7 @@ WIP, some things may not work yet
 
 Version 2 of SHML uses PCRE instead of the built-in Regex engine for some passes. Because of this, it is only compatible with browsers that support WASM. (Note that it can still be used on the backend to generate files since modern Node.js supports WASM).
   
-To get access to any functions or classes not available out of the box, call the async function `SHML.int()`. After this, all the other PCRE dependant members of SHML will be available. This step is needed to load the WebAssembly.
+To get access to any functions or classes not available out of the box, call the async function `SHML.int()`. After this, all the other PCRE dependant members of SHML will be available. This step is needed to load the WebAssembly. If using these features, make sure to include the WASM file along with the JavaScript module.
   
 When creating an HTML source string from SHML, passing `true` (or any truthy value) to the `toSourceString` method will cause the result to include a full page with a doc type, html, head, and body elements with standard boilerplate code included. If present, the page is named after the `title` property or the beginning of the largest first header. If neither of these are available, the page is called "Untitled".
   
