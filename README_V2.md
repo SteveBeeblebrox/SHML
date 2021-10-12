@@ -5,6 +5,8 @@ Version 2 of SHML uses Oniguruma instead of the built-in Regex engine for some p
   
 When creating an HTML source string from SHML, passing `true` (or any truthy value) to the `toSourceString` method will cause the result to include a full page with a doc type, html, head, and body elements with standard boilerplate code included. If present, the page is named after the `title` property or the beginning of the largest first header. If neither of these are available, the page is called "Untitled".
   
+The AST builder can export a JSON map of the tree which can turn be converted into HTML boss or a string later on. This can be used to cache results, improve speed on browsers, allow server parsed SHML to be converted into HTML nodes, or to render pre parsed markup using a more backwards compatible converter.
+  
 Some formats accept additional parameters. Usually, these are included in square brackets immediately after the start of the format and separated by commas. Values may be passed in order or by name. When passing in order, default parameters my be skipped by omitting a value and putting two commas next two each other.  
 For example, supposed format X is used by wrapping text in two capital xs. If it has the properties, a, b, and c wh we re b defaults to 1 and c defaults to 2, consider the following:
 ```
