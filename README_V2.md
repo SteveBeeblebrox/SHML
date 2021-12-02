@@ -1,6 +1,8 @@
 # SHML2
 WIP, some things may not work yet  
 
+V2 works on a AST tree and supports more complex formats
+
 Version 2 of SHML uses Oniguruma instead of the built-in Regex engine for some passes. Because of this, it is only compatible with browsers that support WASM. (Note that it can still be used on the backend to generate files since modern Node.js supports WASM). If using Oniguruma dependant features, make sure to include the WASM file along with the JavaScript module. If the WASM filter is not found, SHML will continue working with a subset of it's features.
   
 When creating an HTML source string from SHML, passing `true` (or any truthy value) to the `toSourceString` method will cause the result to include a full page with a doc type, html, head, and body elements with standard boilerplate code included. If present, the page is named after the `title` property or the beginning of the largest first header. If neither of these are available, the page is called "Untitled".
