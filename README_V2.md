@@ -2,7 +2,7 @@
 WIP, some things may not work yet  
 
 V2 works on a AST tree and supports more complex formats
-
+<!--
 Version 2 of SHML uses Oniguruma instead of the built-in Regex engine for some passes. Because of this, it is only compatible with browsers that support WASM. (Note that it can still be used on the backend to generate files since modern Node.js supports WASM). If using Oniguruma dependant features, make sure to include the WASM file along with the JavaScript module. If the WASM filter is not found, SHML will continue working with a subset of it's features.
   
 When creating an HTML source string from SHML, passing `true` (or any truthy value) to the `toSourceString` method will cause the result to include a full page with a doc type, html, head, and body elements with standard boilerplate code included. If present, the page is named after the `title` property or the beginning of the largest first header. If neither of these are available, the page is called "Untitled".
@@ -89,4 +89,4 @@ The following may be enabled with a separate pass:
 + `video` tags with `src`, `loop`, `muted`, `controls`, `height`, and `width` attributes
 + `div` and `span` tags with `style` attributes  
 `src` and `href` attributes must only include the characters `a-zA-Z0-9_-./:?=&%#+@`. They may only contain `:` right after `http` or `https` or alternatively after `mailto` if a `href`. `sytle` attributes may only contain the characters `a-zA-Z0-9(),.%+-/*#:;!' `. All other attributes are limited to `a-zA-Z0-9_- `. Html escape characters using `&` are not permitted. Any legitimate need to escape something can be done with url encoding instead. Any remaining triangle brackets that do not form a whitelisted tag are escaped.  
-Any CSS styles defined in a `style` tag are scoped to the resulting HTML.
+Any CSS styles defined in a `style` tag are scoped to the resulting HTML.-->
