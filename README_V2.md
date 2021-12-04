@@ -1,7 +1,9 @@
 # SHML2
 WIP, some things may not work yet  
 
-V2 works on a AST tree and supports more complex formats
+V2 works on a AST tree and supports more complex formats.
+
+Nodes can either match on text or on other nodes allowing for inner elements with higher priority (ex code blocks).
 <!--
 Version 2 of SHML uses Oniguruma instead of the built-in Regex engine for some passes. Because of this, it is only compatible with browsers that support WASM. (Note that it can still be used on the backend to generate files since modern Node.js supports WASM). If using Oniguruma dependant features, make sure to include the WASM file along with the JavaScript module. If the WASM filter is not found, SHML will continue working with a subset of it's features.
   
