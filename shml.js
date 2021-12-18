@@ -118,7 +118,7 @@ var SHML;
             'v': { 'C': 'Č', 'D': 'Ď', 'E': 'Ě', 'L': 'Ľ', 'N': 'Ň', 'R': 'Ř', 'S': 'Š', 'T': 'Ť', 'Z': 'Ž', 'c': 'č', 'd': 'ď', 'e': 'ě', 'l': 'ľ', 'n': 'ň', 'r': 'ř', 's': 'š', 't': 'ť', 'z': 'ž' },
             '_': { 'D': 'Đ', 'H': 'Ħ', 'L': 'Ł', 'T': 'Ŧ', 'd': 'đ', 'h': 'ħ', 'l': 'ł', 't': 'ŧ' }
         };
-        function inline(customTokens = {}) {
+        function inline(customTokens = new Map()) {
             const args = new Map();
             args.set('raw', { pattern: /&lt;&lt;\/(?<text>[\s\S]*?)\/&gt;&gt;/g, reviver({ groups }) {
                     return groups.text;
@@ -148,7 +148,7 @@ var SHML;
             args.set('span', { pattern: /(&amp;&amp;)(\[(?:color=)?(?<color>[^"]*?)\])?(?<TEXT>.*?)\1/, reviver({ groups }) {
                     return `<span style="color:${groups.color ?? 'red'}">${groups.TEXT}</span>`;
                 } });
-            args.set('custom_token', { pattern: /:(?<what>.*?):/g, isInline: true, reviver({ groups }) { return customTokens?.[groups.what] ?? `:${groups.what}:`; } });
+            args.set('custom_token', { pattern: /:(?<what>.*?):/g, isInline: true, reviver({ groups }) { return customTokens.get(groups.what) ?? `:${groups.what}:`; } });
             args.set('linebreak', { pattern: /\\n/g, reviver() { return '<br>'; } });
             args.set('wordbreak', { pattern: /(?<=\S)-\/-(?=\S)/g, reviver() { return '<wbr>'; } });
             args.set('src_comment', { pattern: /&lt;!!--(?<text>.*?)--&gt;/g, reviver() { return ''; } });
@@ -164,17 +164,17 @@ var SHML;
             return args;
         }
         Formats.inline = inline;
-        function block(customTokens = {}, properties = {}) {
+        function block(customTokens = new Map(), properties = new Map()) {
             const args = new Map();
             args.set('code_block', { pattern: /(```)(?<text>[\s\S]*?)\1/g, isInline: false, reviver({ groups }) {
                     return `<pre><code>${groups.text}</code></pre>`;
                 } });
             args.set('property', { pattern: /^\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({ groups }) {
-                    properties[groups.key] ??= groups.value.trim();
+                    properties.set(groups.key, properties.get(groups.key) ?? groups.value.trim());
                     return '';
                 } });
             args.set('template', { pattern: /\${(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)\}/g, isInline: true, reviver({ groups }) {
-                    return properties[groups.key] ?? `\${${groups.key}}`;
+                    return properties.get(groups.key) ?? `\${${groups.key}}`;
                 } });
             for (const entry of inline(customTokens).entries())
                 args.set(...entry);
@@ -201,7 +201,7 @@ var SHML;
     }
     SHML.parseInlineMarkup = parseInlineMarkup;
     function parseMarkup(text, customTokens, properties) {
-        const value = { ...properties ?? {} };
+        const value = new Map((properties?.entries() ?? []));
         const result = new String(abstractParse(text, Formats.block(customTokens, value)));
         Object.defineProperty(result, 'properties', { value });
         return result;
