@@ -71,7 +71,6 @@ namespace SHML {
     }
 
     type Block = {blockType: string, text: string, groups?: any}
-    type ObjectMap<V> = {[key: string]: V}
     type FormatArgs = Map<string, {pattern: RegExp, isInline?: boolean, reviver?: {(block: Block): string}}>
 
     export function abstractParse(text: string, args: FormatArgs) {
@@ -123,7 +122,7 @@ namespace SHML {
     }
 
     export namespace Formats {
-        export const SYMBOLS: {[key: string]: ObjectMap<string>} = {
+        export const SYMBOLS: {[key: string]: {[key: string]: string}} = {
             '~': {'A': 'Ã', 'I': 'Ĩ', 'N': 'Ñ', 'O': 'Õ', 'U': 'Ũ', 'a': 'ã', 'i': 'ĩ', 'n': 'ñ', 'o': 'õ', 'u': 'ũ'},
             ':': {'A': 'Ä', 'E': 'Ë', 'I': 'Ï', 'O': 'Ö', 'U': 'Ü', 'Y': 'Ÿ', 'a': 'ä', 'e': 'ë', 'i': 'ï', 'o': 'ö', 'u': 'ü', 'y': 'ÿ'},
             '\'': {'A': 'Á', 'C': 'Ć', 'E': 'É', 'I': 'Í', 'L': 'Ĺ', 'N': 'Ń', 'O': 'Ó', 'R': 'Ŕ', 'S': 'Ś', 'U': 'Ú', 'Y': 'Ý', 'Z': 'Ź', 'a': 'á', 'c': 'ć', 'e': 'é', 'g': 'ǵ', 'i': 'í', 'l': 'ĺ', 'n': 'ń', 'o': 'ó', 'r': 'ŕ', 's': 'ś', 'u': 'ú', 'y': 'ý', 'z': 'ź'},
@@ -141,7 +140,7 @@ namespace SHML {
             '_': {'D': 'Đ', 'H': 'Ħ', 'L': 'Ł', 'T': 'Ŧ', 'd': 'đ', 'h': 'ħ', 'l': 'ł', 't': 'ŧ'}
         }
 
-        export function inline(customTokens: ObjectMap<string> = {}) {
+        export function inline(customTokens: Map<string,string> = new Map()) {
             const args: FormatArgs = new Map();       
 
             args.set('raw', {pattern: /&lt;&lt;\/(?<text>[\s\S]*?)\/&gt;&gt;/g, reviver({groups}) {
@@ -177,7 +176,7 @@ namespace SHML {
                 return  `<span style="color:${groups.color ?? 'red'}">${groups.TEXT}</span>`
             }});
 
-            args.set('custom_token', {pattern: /:(?<what>.*?):/g, isInline: true, reviver({groups}) {return customTokens?.[groups.what] ?? `:${groups.what}:`}});
+            args.set('custom_token', {pattern: /:(?<what>.*?):/g, isInline: true, reviver({groups}) {return customTokens.get(groups.what) ?? `:${groups.what}:`}});
 
             args.set('linebreak', {pattern: /\\n/g, reviver() {return '<br>'}});
             args.set('wordbreak', {pattern: /(?<=\S)-\/-(?=\S)/g, reviver() {return '<wbr>'}});
@@ -195,7 +194,7 @@ namespace SHML {
             return args
         }
 
-        export function block(customTokens: ObjectMap<string> = {}, properties: ObjectMap<string> = {}) {
+        export function block(customTokens: Map<string,string> = new Map(), properties: Map<string,string> = new Map()) {
             const args: FormatArgs = new Map();
 
             args.set('code_block', {pattern: /(```)(?<text>[\s\S]*?)\1/g, isInline: false, reviver({groups}) {
@@ -203,11 +202,11 @@ namespace SHML {
             }});
 
             args.set('property', {pattern: /^\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({groups}) {
-                properties[groups.key] ??= groups.value.trim()
+                properties.set(groups.key, properties.get(groups.key) ?? groups.value.trim())
                 return ''
             }});
             args.set('template', {pattern: /\${(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)\}/g, isInline: true, reviver({groups}) {
-                return properties[groups.key] ?? `\${${groups.key}}`
+                return properties.get(groups.key) ?? `\${${groups.key}}`
             }});
 
             for(const entry of inline(customTokens).entries())
@@ -236,14 +235,14 @@ namespace SHML {
         }
     }
 
-    export function parseInlineMarkup(text: string, customTokens?: ObjectMap<string>) {
+    export function parseInlineMarkup(text: string, customTokens?: Map<string,string>) {
         return abstractParse(text, Formats.inline(customTokens))
     }
 
-    export function parseMarkup(text: string, customTokens?: ObjectMap<string>, properties?: ObjectMap<string>): String & {properties: ObjectMap<string>} {
-        const value: ObjectMap<string> = {...properties ?? {}};
+    export function parseMarkup(text: string, customTokens?: Map<string,string>, properties?: Map<string,string>): String & {properties: Map<string,string>} {
+        const value: Map<string,string> = new Map((properties?.entries() ?? []))
         const result = new String(abstractParse(text, Formats.block(customTokens, value)))
         Object.defineProperty(result, 'properties', {value})
-        return result as String & {properties: {[key:string]:string}}
+        return result as String & {properties: Map<string,string>}
     }
 }
