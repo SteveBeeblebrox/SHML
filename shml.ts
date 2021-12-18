@@ -185,9 +185,19 @@ namespace SHML {
             args.set('comment', {pattern: /&lt;!--(?<text>.*?)--&gt;/g, isInline: true, reviver({groups}) {
                 return `<!--${groups.text}-->`
             }});
+            
             args.set('a', {pattern: /(?<newtab>\+)?\[(?<href>.*?)\]\((?<TEXT>.*?)\)/, isInline: true, reviver({blockType, text, groups}) {
                 return `<a href="${groups.href}"${groups.newtab ? ' target="_blank"':''}>${groups.TEXT}</a>`
             }});
+
+            args.set('autolink', {pattern:/(?<text>(?:(?<protocol>https?:\/\/)|(?<www>www\.))(?<link>.+?\..+?)(?=\s|$))/g, reviver({groups}) {
+                return `<a href="${groups.protocol ?? 'https://'}${groups.www ?? ''}${groups.link}">${groups.text}</a>`
+            }})
+
+            args.set('autolink_email', {pattern:/(?<text>.*?@.*?\..*?(?=\s|$))/g, reviver({groups}) {
+                return `<a href="mailto:${groups.text}">${groups.text}</a>`
+            }})
+
             args.set('html', {pattern: /&lt;(?<what>\/?(?:code|em|i|strong|b|ul|del|sub|sup|mark|span|wbr|br))&gt;/g, isInline: true, reviver({blockType, text, groups}) {
                 return `<${groups.what}>`
             }});
@@ -201,7 +211,7 @@ namespace SHML {
                 return `<pre><code>${groups.text}</code></pre>`
             }});
 
-            args.set('property', {pattern: /^\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({groups}) {
+            args.set('property', {pattern: /^\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({groups}) {
                 properties.set(groups.key, properties.get(groups.key) ?? groups.value.trim())
                 return ''
             }});
@@ -212,18 +222,24 @@ namespace SHML {
             for(const entry of inline(customTokens).entries())
                 args.set(...entry)
 
-            // TODO id headers
-            args.set('numbered_header', {pattern: /^\s*?(?<count>#{1,6})\s?(?<TEXT>[^\uffff]*?)(?=\n)/gm, isInline: false, reviver({groups}) {
-                return `<h${groups.count.length}>${groups.TEXT}</h${groups.count.length}>`
+            args.set('numbered_header', {pattern: /^\s*?(?<count>#{1,6})(?:\[(?<id>[a-zA-Z_][a-zA-Z_0-9]*?)\])?\s?(?<TEXT>[^\uffff]*?)(?=\n)/gm, isInline: false, reviver({groups}) {
+                groups.id ??= cyrb64(groups.TEXT)
+                return `<h${groups.count.length} id="h${groups.count.length}:${groups.id}"><a href="#h${groups.count.length}:${groups.id}" title="Link to section">${groups.TEXT}</a></h${groups.count.length}>`
             }});
 
             args.set('hr', {pattern: /===+/g, isInline: false, reviver() {return '<hr>'}});
-
-            // TODO bull        `<ul><li>${groups.TEXT}</li></ul>`
-            // TODO blockquote
             
             // TODO images
+
             // TODO tables
+
+            args.set('bull', {pattern: /(?<text>(?:\+.*?(?:\n|$))+)/g, isInline: false, reviver({groups}) {
+                return `<ul>\n<li>${groups.text.split('\n').filter((line:string)=>line.trim()).join('</li>\n<li>')}</li>\n</ul>`
+            }})
+
+            args.set('blockquote', {pattern: /(?<text>(?:(?:&gt;){3}[\s\S]*?(?:-\s*?(?<citation>.*?))?(?:\n|$))+)/g, isInline: false, reviver({groups}) {
+                return `<figure><blockquote>${groups.text.replace(/(?:&gt;){3}/g, '').replace(new RegExp(String.raw`-\s*?${groups.citation?.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}\s*?$`),'')}</blockquote>${groups.citation && `<figcaption><cite>- ${groups.citation}</cite></figcaption>` || ''}</figure>`
+            }})
 
             args.set('block_html', {pattern: /&lt;(?<what>\/(?:h[123456]|hr|blockquote|ul|ol|li))&gt;/g, isInline: false, reviver({groups}) {
                 return `<${groups.what}>`
