@@ -52,7 +52,8 @@ var SHML;
                 yield noncharacter;
         })();
         function nextNoncharacter() {
-            return noncharacterIterator.next().value ?? throws('No more noncharacters');
+            var _a;
+            return (_a = noncharacterIterator.next().value) !== null && _a !== void 0 ? _a : throws('No more noncharacters');
         }
         UnicodeHelper.nextNoncharacter = nextNoncharacter;
         function isInvalid(text) {
@@ -78,8 +79,8 @@ var SHML;
         function parseLevel(text, args) {
             for (const [blockType, { pattern, isInline }] of args.entries())
                 text = text.replace(pattern, (...strings) => {
-                    const text = strings[0], lastArg = strings[strings.length - 1], groups = typeof lastArg === 'object' ? lastArg : undefined, marker = (isInline ?? true) && UnicodeHelper.INLINE_MARKER || UnicodeHelper.BLOCK_MARKER, hash = `${marker}${cyrb64(text).split('').map(o => UnicodeHelper.HEXADECIMAL_MAPPING[o]).join('')}${marker}`;
-                    for (const [key, value] of Object.entries(groups ?? {})) {
+                    const text = strings[0], lastArg = strings[strings.length - 1], groups = typeof lastArg === 'object' ? lastArg : undefined, marker = (isInline !== null && isInline !== void 0 ? isInline : true) && UnicodeHelper.INLINE_MARKER || UnicodeHelper.BLOCK_MARKER, hash = `${marker}${cyrb64(text).split('').map(o => UnicodeHelper.HEXADECIMAL_MAPPING[o]).join('')}${marker}`;
+                    for (const [key, value] of Object.entries(groups !== null && groups !== void 0 ? groups : {})) {
                         if (key.toUpperCase() === key)
                             groups[key] = parseLevel(value, new Map([...args.entries()].filter(([argBlockType]) => argBlockType !== blockType)));
                     }
@@ -91,8 +92,9 @@ var SHML;
         function decode(text) {
             while (text.includes(UnicodeHelper.INLINE_MARKER) || text.includes(UnicodeHelper.BLOCK_MARKER))
                 text = text.replace(/([\ufffe\uffff]).*?\1/, hash => {
+                    var _a;
                     const block = hashmap.get(hash);
-                    return (args.get(block.blockType).reviver ?? (({ blockType, groups }) => `<${blockType}>${groups.TEXT}</${blockType}>`))(block);
+                    return ((_a = args.get(block.blockType).reviver) !== null && _a !== void 0 ? _a : (({ blockType, groups }) => `<${blockType}>${groups.TEXT}</${blockType}>`))(block);
                 });
             return text;
         }
@@ -127,10 +129,11 @@ var SHML;
                     return `<code>${groups.text}</code>`;
                 } });
             args.set('symbol', { pattern: /\/(?<what>..|\?|!)\//g, reviver({ groups }) {
+                    var _a, _b;
                     switch (groups.what) {
                         case '!': return '&iexcl;';
                         case '?': return '&iquest;';
-                        default: return SHML.Formats.SYMBOLS[groups.what[0]]?.[groups.what[1]] ?? `/${groups.what}/`;
+                        default: return (_b = (_a = SHML.Formats.SYMBOLS[groups.what[0]]) === null || _a === void 0 ? void 0 : _a[groups.what[1]]) !== null && _b !== void 0 ? _b : `/${groups.what}/`;
                     }
                 } });
             args.set('strong', { pattern: /(\*\*)(?=[^*])(?<TEXT>.*?)\1/g });
@@ -146,9 +149,10 @@ var SHML;
                     return `<mark${groups.color ? ` style="color:${groups.color}"` : ''}>${groups.TEXT}</mark>`;
                 } });
             args.set('span', { pattern: /(&amp;&amp;)(\[(?:color=)?(?<color>[^"]*?)\])?(?<TEXT>.*?)\1/, reviver({ groups }) {
-                    return `<span style="color:${groups.color ?? 'red'}">${groups.TEXT}</span>`;
+                    var _a;
+                    return `<span style="color:${(_a = groups.color) !== null && _a !== void 0 ? _a : 'red'}">${groups.TEXT}</span>`;
                 } });
-            args.set('custom_token', { pattern: /:(?<what>.*?):/g, isInline: true, reviver({ groups }) { return customTokens.get(groups.what) ?? `:${groups.what}:`; } });
+            args.set('custom_token', { pattern: /:(?<what>.*?):/g, isInline: true, reviver({ groups }) { var _a; return (_a = customTokens.get(groups.what)) !== null && _a !== void 0 ? _a : `:${groups.what}:`; } });
             args.set('linebreak', { pattern: /\\n/g, reviver() { return '<br>'; } });
             args.set('wordbreak', { pattern: /(?<=\S)-\/-(?=\S)/g, reviver() { return '<wbr>'; } });
             args.set('src_comment', { pattern: /&lt;!!--(?<text>.*?)--&gt;/g, reviver() { return ''; } });
@@ -157,6 +161,13 @@ var SHML;
                 } });
             args.set('a', { pattern: /(?<newtab>\+)?\[(?<href>.*?)\]\((?<TEXT>.*?)\)/, isInline: true, reviver({ blockType, text, groups }) {
                     return `<a href="${groups.href}"${groups.newtab ? ' target="_blank"' : ''}>${groups.TEXT}</a>`;
+                } });
+            args.set('autolink', { pattern: /(?<text>(?:(?<protocol>https?:\/\/)|(?<www>www\.))(?<link>.+?\..+?)(?=\s|$))/g, reviver({ groups }) {
+                    var _a, _b;
+                    return `<a href="${(_a = groups.protocol) !== null && _a !== void 0 ? _a : 'https://'}${(_b = groups.www) !== null && _b !== void 0 ? _b : ''}${groups.link}">${groups.text}</a>`;
+                } });
+            args.set('autolink_email', { pattern: /(?<text>.*?@.*?\..*?(?=\s|$))/g, reviver({ groups }) {
+                    return `<a href="mailto:${groups.text}">${groups.text}</a>`;
                 } });
             args.set('html', { pattern: /&lt;(?<what>\/?(?:code|em|i|strong|b|ul|del|sub|sup|mark|span|wbr|br))&gt;/g, isInline: true, reviver({ blockType, text, groups }) {
                     return `<${groups.what}>`;
@@ -169,23 +180,32 @@ var SHML;
             args.set('code_block', { pattern: /(```)(?<text>[\s\S]*?)\1/g, isInline: false, reviver({ groups }) {
                     return `<pre><code>${groups.text}</code></pre>`;
                 } });
-            args.set('property', { pattern: /^\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({ groups }) {
-                    properties.set(groups.key, properties.get(groups.key) ?? groups.value.trim());
+            args.set('property', { pattern: /^\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({ groups }) {
+                    var _a;
+                    properties.set(groups.key, (_a = properties.get(groups.key)) !== null && _a !== void 0 ? _a : groups.value.trim());
                     return '';
                 } });
             args.set('template', { pattern: /\${(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)\}/g, isInline: true, reviver({ groups }) {
-                    return properties.get(groups.key) ?? `\${${groups.key}}`;
+                    var _a;
+                    return (_a = properties.get(groups.key)) !== null && _a !== void 0 ? _a : `\${${groups.key}}`;
                 } });
             for (const entry of inline(customTokens).entries())
                 args.set(...entry);
-            // TODO id headers
-            args.set('numbered_header', { pattern: /^\s*?(?<count>#{1,6})\s?(?<TEXT>[^\uffff]*?)(?=\n)/gm, isInline: false, reviver({ groups }) {
-                    return `<h${groups.count.length}>${groups.TEXT}</h${groups.count.length}>`;
+            args.set('numbered_header', { pattern: /^\s*?(?<count>#{1,6})(?:\[(?<id>[a-zA-Z_][a-zA-Z_0-9]*?)\])?\s?(?<TEXT>[^\uffff]*?)(?=\n)/gm, isInline: false, reviver({ groups }) {
+                    var _a;
+                    (_a = groups.id) !== null && _a !== void 0 ? _a : (groups.id = cyrb64(groups.TEXT));
+                    return `<h${groups.count.length} id="h${groups.count.length}:${groups.id}"><a href="#h${groups.count.length}:${groups.id}" title="Link to section">${groups.TEXT}</a></h${groups.count.length}>`;
                 } });
             args.set('hr', { pattern: /===+/g, isInline: false, reviver() { return '<hr>'; } });
-            // TODO bull        `<ul><li>${groups.TEXT}</li></ul>`
-            // TODO blockquote
             // TODO images
+            // TODO tables
+            args.set('bull', { pattern: /(?<text>(?:\+.*?(?:\n|$))+)/g, isInline: false, reviver({ groups }) {
+                    return `<ul>\n<li>${groups.text.split('\n').filter((line) => line.trim()).join('</li>\n<li>')}</li>\n</ul>`;
+                } });
+            args.set('blockquote', { pattern: /(?<text>(?:(?:&gt;){3}[\s\S]*?(?:-\s*?(?<citation>.*?))?(?:\n|$))+)/g, isInline: false, reviver({ groups }) {
+                    var _a;
+                    return `<figure><blockquote>${groups.text.replace(/(?:&gt;){3}/g, '').replace(new RegExp(String.raw `-\s*?${(_a = groups.citation) === null || _a === void 0 ? void 0 : _a.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}\s*?$`), '')}</blockquote>${groups.citation && `<figcaption><cite>- ${groups.citation}</cite></figcaption>` || ''}</figure>`;
+                } });
             args.set('block_html', { pattern: /&lt;(?<what>\/(?:h[123456]|hr|blockquote|ul|ol|li))&gt;/g, isInline: false, reviver({ groups }) {
                     return `<${groups.what}>`;
                 } });
@@ -201,7 +221,8 @@ var SHML;
     }
     SHML.parseInlineMarkup = parseInlineMarkup;
     function parseMarkup(text, customTokens, properties) {
-        const value = new Map((properties?.entries() ?? []));
+        var _a;
+        const value = new Map(((_a = properties === null || properties === void 0 ? void 0 : properties.entries()) !== null && _a !== void 0 ? _a : []));
         const result = new String(abstractParse(text, Formats.block(customTokens, value)));
         Object.defineProperty(result, 'properties', { value });
         return result;
