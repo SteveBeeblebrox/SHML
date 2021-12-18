@@ -223,6 +223,7 @@ namespace SHML {
             // TODO blockquote
             
             // TODO images
+            // TODO tables
 
             args.set('block_html', {pattern: /&lt;(?<what>\/(?:h[123456]|hr|blockquote|ul|ol|li))&gt;/g, isInline: false, reviver({groups}) {
                 return `<${groups.what}>`
