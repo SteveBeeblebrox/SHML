@@ -141,7 +141,7 @@ var SHML;
             function SimpleInlineRegExp(marker) {
                 return new RegExp(String.raw `(${marker.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')})(?<TEXT>.*?)\1`, 'g');
             }
-            args.set('ul', { pattern: SimpleInlineRegExp('__') });
+            args.set('u', { pattern: SimpleInlineRegExp('__') });
             args.set('del', { pattern: SimpleInlineRegExp('~~') });
             args.set('sup', { pattern: SimpleInlineRegExp('^^') });
             args.set('sub', { pattern: SimpleInlineRegExp(',,') });
@@ -169,7 +169,7 @@ var SHML;
             args.set('autolink_email', { pattern: /(?<text>.*?@.*?\..*?(?=\s|$))/g, reviver({ groups }) {
                     return `<a href="mailto:${groups.text}">${groups.text}</a>`;
                 } });
-            args.set('html', { pattern: /&lt;(?<what>\/?(?:code|em|i|strong|b|ul|del|sub|sup|mark|span|wbr|br))&gt;/g, isInline: true, reviver({ blockType, text, groups }) {
+            args.set('html', { pattern: /&lt;(?<what>\/?(?:code|em|i|strong|b|u|del|sub|sup|mark|span|wbr|br))&gt;/g, isInline: true, reviver({ blockType, text, groups }) {
                     return `<${groups.what}>`;
                 } });
             return args;
