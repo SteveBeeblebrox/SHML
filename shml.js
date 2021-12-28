@@ -160,7 +160,7 @@ var SHML;
                     return `<!--${groups.text}-->`;
                 } });
             args.set('a', { pattern: /(?<newtab>\+)?\[(?<href>.*?)\]\((?<TEXT>.*?)\)/, isInline: true, reviver({ blockType, text, groups }) {
-                    return `<a href="${groups.href}"${groups.newtab ? ' target="_blank"' : ''}>${groups.TEXT}</a>`;
+                    return `<a href="${/^[^:]*?(?:(?:(?<=mailto|https|http):|\/.*:).*)?$/g.test(groups.href) ? groups.href : 'about:blank#blocked'}"${groups.newtab ? ' target="_blank"' : ''}>${groups.TEXT}</a>`;
                 } });
             args.set('autolink', { pattern: /(?<text>(?:(?<protocol>https?:\/\/)|(?<www>www\.))(?<link>.+?\..+?)(?=\s|$))/g, reviver({ groups }) {
                     var _a, _b;
