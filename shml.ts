@@ -219,6 +219,11 @@ namespace SHML {
                 return properties.get(groups.key) ?? `\${${groups.key}}`
             }});
 
+            args.set('image', {pattern: /!\[(?<src>\S*?)(?:\s*?(?<height>auto|\d*)(?:[xX](?<width>auto|\d*))?)?\](?:\((?<alt>.*?)\))?/g, reviver({groups}) {
+                groups.width ??= groups.height
+                return `<img src="${groups.src}${groups.alt ? ` alt="${groups.alt}"`: ''}${groups.height ? ` height="${groups.height}"` : ''}${groups.width ? ` width="${groups.width}"` : ''}">`
+            }})
+
             for(const entry of inline(customTokens).entries())
                 args.set(...entry)
 
@@ -228,8 +233,6 @@ namespace SHML {
             }});
 
             args.set('hr', {pattern: /===+/g, isInline: false, reviver() {return '<hr>'}});
-            
-            // TODO images
             
             args.set('table', {pattern: /\[\[(?:\n\s*(?:title=)?(?<title>[^,\n]*)\n)?(?<contents>[\s\S]*?)\]\]/g, isInline: false, reviver({groups}) {
                 const rows = groups.contents.trim().split('\n').map((row: string, index:number) => `\n<tr>${row.split(',').map((column: string) => `<t${index && 'd' || 'h'}>${column.trim()}</t${index && 'd' || 'h'}>`).join('')}</tr>`)
