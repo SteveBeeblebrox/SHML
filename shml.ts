@@ -230,8 +230,11 @@ namespace SHML {
             args.set('hr', {pattern: /===+/g, isInline: false, reviver() {return '<hr>'}});
             
             // TODO images
-
-            // TODO tables
+            
+            args.set('table', {pattern: /\[\[(?:\n\s*(?:title=)?(?<title>[^,\n]*)\n)?(?<contents>[\s\S]*?)\]\]/g, isInline: false, reviver({groups}) {
+                const rows = groups.contents.trim().split('\n').map((row: string, index:number) => `\n<tr>${row.split(',').map((column: string) => `<t${index && 'd' || 'h'}>${column.trim()}</t${index && 'd' || 'h'}>`).join('')}</tr>`)
+                return `<table>${groups.title ? `\n<caption>${groups.title.trim()}</caption>`: ''}\n<thead>${rows.shift()}\n<thead>\n<tbody>${rows.join('')}\n<tbody>\n</table>`
+            }})
 
             args.set('bull', {pattern: /(?<text>(?:\+.*?(?:\n|$))+)/g, isInline: false, reviver({groups}) {
                 return `<ul>\n<li>${groups.text.split('\n').filter((line:string)=>line.trim()).join('</li>\n<li>')}</li>\n</ul>`
