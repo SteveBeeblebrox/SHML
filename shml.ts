@@ -181,8 +181,8 @@ namespace SHML {
             args.set('linebreak', {pattern: /\\n/g, reviver() {return '<br>'}});
             args.set('wordbreak', {pattern: /(?<=\S)-\/-(?=\S)/g, reviver() {return '<wbr>'}});
 
-            args.set('src_comment', {pattern: /&lt;!!--(?<text>.*?)--&gt;/g, reviver() {return ''}});
-            args.set('comment', {pattern: /&lt;!--(?<text>.*?)--&gt;/g, isInline: true, reviver({groups}) {
+            args.set('src_comment', {pattern: /&lt;!!--(?<text>[\s\S]*?)--&gt;/g, reviver() {return ''}});
+            args.set('comment', {pattern: /&lt;!--(?<text>[\s\S]*?)--&gt;/g, isInline: true, reviver({groups}) {
                 return `<!--${groups.text}-->`
             }});
             
