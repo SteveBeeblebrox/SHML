@@ -1,6 +1,8 @@
 # SHML ![GitHub](https://img.shields.io/github/license/SteveBeeblebrox/SHML?style=flat-square) ![GitHub last commit](https://img.shields.io/github/last-commit/SteveBeeblebrox/SHML?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues-raw/SteveBeeblebrox/SHML?style=flat-square) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/SteveBeeblebrox/SHML?style=flat-square) ![GitHub contributors](https://img.shields.io/github/contributors/SteveBeeblebrox/SHML?color=007EC6&style=flat-square) ![GitHub Repo stars](https://img.shields.io/github/stars/SteveBeeblebrox/SHML?style=flat-square)
 ***Simplified HTML Markup Language (Or Simplified Hypertext Markup Language Markup Language)*** is a lightweight markup language parser built in JavaScript. The syntax is similar to that of Markdown, but with changes to make some things more intuitive. This software is distributed under the MIT license. A demo of SHML can be found [here](https://stevebeeblebrox.github.io/apps/shml).
 
+**This README is out of date, changes coming soon!**
+
 ## Syntax
 SHML is composed of two main types of styling: inline and sections. All sections must be on their own line. Inline formatting can be applied to any part of a section.
 ### Inline Formatting
