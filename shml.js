@@ -155,8 +155,8 @@ var SHML;
             args.set('custom_token', { pattern: /:(?<what>.*?):/g, isInline: true, reviver({ groups }) { var _a; return (_a = customTokens.get(groups.what)) !== null && _a !== void 0 ? _a : `:${groups.what}:`; } });
             args.set('linebreak', { pattern: /\\n/g, reviver() { return '<br>'; } });
             args.set('wordbreak', { pattern: /(?<=\S)-\/-(?=\S)/g, reviver() { return '<wbr>'; } });
-            args.set('src_comment', { pattern: /&lt;!!--(?<text>.*?)--&gt;/g, reviver() { return ''; } });
-            args.set('comment', { pattern: /&lt;!--(?<text>.*?)--&gt;/g, isInline: true, reviver({ groups }) {
+            args.set('src_comment', { pattern: /&lt;!!--(?<text>[\s\S]*?)--&gt;/g, reviver() { return ''; } });
+            args.set('comment', { pattern: /&lt;!--(?<text>[\s\S]*?)--&gt;/g, isInline: true, reviver({ groups }) {
                     return `<!--${groups.text}-->`;
                 } });
             args.set('a', { pattern: /(?<newtab>\+)?\[(?<href>.*?)\]\((?<TEXT>.*?)\)/, isInline: true, reviver({ blockType, text, groups }) {
