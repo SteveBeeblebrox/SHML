@@ -227,6 +227,11 @@ namespace SHML {
             for(const entry of inline(customTokens).entries())
                 args.set(...entry)
 
+            args.set('text-align', {pattern: /(?<=\n|^)[^\S\n]*?@@\s*?(?<what>center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)\s*?(?<TEXT>[\s\S]*?)(?:$|(?:(?<=\n)[^\S\n]*?@@\s*?reset)|(?=\n[^\S\n]*?@@\s*?(?:center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)))/g, isInline: false, reviver({groups}) {
+                const overrides: {[match: string]: string} = { centered: 'center', justified: 'justify', 'justified-all': 'justify-all' }
+                return `<div style="${overrides[groups.what] ?? groups.what}">${groups.TEXT}</div>`
+            }})
+
             args.set('numbered_header', {pattern: /^\s*?(?<count>#{1,6})(?:\[(?<id>[a-zA-Z_][a-zA-Z_0-9]*?)\])?\s?(?<TEXT>[^\uffff]*?)(?=\n)/gm, isInline: false, reviver({groups}) {
                 groups.id ??= cyrb64(groups.TEXT)
                 return `<h${groups.count.length} id="h${groups.count.length}:${groups.id}"><a href="#h${groups.count.length}:${groups.id}" title="Link to section">${groups.TEXT}</a></h${groups.count.length}>`
@@ -250,6 +255,7 @@ namespace SHML {
             args.set('block_html', {pattern: /&lt;(?<what>\/(?:h[123456]|hr|blockquote|ul|ol|li))&gt;/g, isInline: false, reviver({groups}) {
                 return `<${groups.what}>`
             }});
+
             args.set('text', {pattern: /(?<=\n)\n?(?<TEXT>[^\uffff]+?)(?=  |\n\n|\uffff|$)/g, isInline: false, reviver({blockType, text, groups}) {
                 return groups.TEXT.trim() ? `<p>${groups.TEXT.trim()}</p>\n` : ''
             }});
