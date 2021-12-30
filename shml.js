@@ -196,6 +196,11 @@ var SHML;
                 } });
             for (const entry of inline(customTokens).entries())
                 args.set(...entry);
+            args.set('text-align', { pattern: /(?<=\n|^)[^\S\n]*?@@\s*?(?<what>center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)\s*?(?<TEXT>[\s\S]*?)(?:$|(?:(?<=\n)[^\S\n]*?@@\s*?reset)|(?=\n[^\S\n]*?@@\s*?(?:center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)))/g, isInline: false, reviver({ groups }) {
+                    var _a;
+                    const overrides = { centered: 'center', justified: 'justify', 'justified-all': 'justify-all' };
+                    return `<div style="${(_a = overrides[groups.what]) !== null && _a !== void 0 ? _a : groups.what}">${groups.TEXT}</div>`;
+                } });
             args.set('numbered_header', { pattern: /^\s*?(?<count>#{1,6})(?:\[(?<id>[a-zA-Z_][a-zA-Z_0-9]*?)\])?\s?(?<TEXT>[^\uffff]*?)(?=\n)/gm, isInline: false, reviver({ groups }) {
                     var _a;
                     (_a = groups.id) !== null && _a !== void 0 ? _a : (groups.id = cyrb64(groups.TEXT));
