@@ -156,6 +156,20 @@ namespace SHML {
                     default: return SHML.Formats.SYMBOLS[groups.what[0]]?.[groups.what[1]] ?? `/${groups.what}/`
             }
             }});
+
+            args.set('unicode_shortcut', {pattern: /(?<=\b)(?:TM|SS)(?=\b)|\([cCrR]\)/g, reviver({text}) {
+                switch(text) {
+                    case 'SS': return '&section;'
+                    case 'PG': return '&para;'
+                    case 'TM': return '&trade;';
+                    case '(C)':
+                    case '(c)': return '&copy';
+                    case '(R)':
+                    case '(r)': return '&reg;'
+                    default: return text;
+                }
+            }})
+
             args.set('strong', {pattern: /(\*\*)(?=[^*])(?<TEXT>.*?)\1/g});
             args.set('em', {pattern: /(\*)(?=[^*])(?<TEXT>.*?)\1/g});
 
@@ -275,3 +289,6 @@ namespace SHML {
         return result as String & {properties: Map<string,string>}
     }
 }
+
+console.clear()
+console.log(SHML.parseInlineMarkup(String.raw`***Hello*** (R) (c)`))
