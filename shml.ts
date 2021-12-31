@@ -259,7 +259,11 @@ namespace SHML {
             }})
 
             args.set('bull', {pattern: /(?<text>(?:\+.*?(?:\n|$))+)/g, isInline: false, reviver({groups}) {
-                return `<ul>\n<li>${groups.text.split('\n').filter((line:string)=>line.trim()).join('</li>\n<li>')}</li>\n</ul>`
+                return `<ul>\n${groups.text.split('\n').filter((line:string)=>line.trim()).map((line:string)=>`<li>${line.replace(/^\s*?\+\s*/, '')}</li>`).join('\n')}\n</ul>`
+            }})
+
+            args.set('list', {pattern: /(?<text>(?:\d+[).].*?(?:\n|$))+)/g, isInline: false, reviver({groups}) {
+                return `<ol>\n${groups.text.split('\n').filter((line:string)=>line.trim()).map((line:string)=>`<li>${line.replace(/^\s*?\d+[).]\s*/, '')}</li>`).join('\n')}\n</ol>`
             }})
 
             args.set('blockquote', {pattern: /(?<text>(?:(?:&gt;){3}[\s\S]*?(?:-\s*?(?<citation>.*?))?(?:\n|$))+)/g, isInline: false, reviver({groups}) {
