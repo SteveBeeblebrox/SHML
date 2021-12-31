@@ -23,6 +23,8 @@
 
 namespace SHML {
 
+    export const VERSION = '1.0.0'
+
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -73,7 +75,7 @@ namespace SHML {
     type Block = {blockType: string, text: string, groups?: any}
     type FormatArgs = Map<string, {pattern: RegExp, isInline?: boolean, reviver?: {(block: Block): string}}>
 
-    export function abstractParse(text: string, args: FormatArgs) {
+    function abstractParse(text: string, args: FormatArgs) {
         if(UnicodeHelper.isInvalid(text)) throw 'Invalid Unicode Noncharacters present in text'
         
         text = text.replace(/[<>&]/g, match => {
@@ -121,7 +123,7 @@ namespace SHML {
         return decode(parseLevel(text, args));
     }
 
-    export namespace Formats {
+    namespace Resources {
         export const SYMBOLS: {[key: string]: {[key: string]: string}} = {
             '~': {'A': 'Ã', 'I': 'Ĩ', 'N': 'Ñ', 'O': 'Õ', 'U': 'Ũ', 'a': 'ã', 'i': 'ĩ', 'n': 'ñ', 'o': 'õ', 'u': 'ũ'},
             ':': {'A': 'Ä', 'E': 'Ë', 'I': 'Ï', 'O': 'Ö', 'U': 'Ü', 'Y': 'Ÿ', 'a': 'ä', 'e': 'ë', 'i': 'ï', 'o': 'ö', 'u': 'ü', 'y': 'ÿ'},
@@ -153,7 +155,7 @@ namespace SHML {
                 switch(groups.what) {
                     case '!': return '&iexcl;'
                     case '?': return '&iquest;'
-                    default: return SHML.Formats.SYMBOLS[groups.what[0]]?.[groups.what[1]] ?? `/${groups.what}/`
+                    default: return Resources.SYMBOLS[groups.what[0]]?.[groups.what[1]] ?? `/${groups.what}/`
             }
             }});
 
@@ -283,12 +285,12 @@ namespace SHML {
     }
 
     export function parseInlineMarkup(text: string, customTokens?: Map<string,string>) {
-        return abstractParse(text, Formats.inline(customTokens))
+        return abstractParse(text, Resources.inline(customTokens))
     }
 
     export function parseMarkup(text: string, customTokens?: Map<string,string>, properties?: Map<string,string>): String & {properties: Map<string,string>} {
         const value: Map<string,string> = new Map((properties?.entries() ?? []))
-        const result = new String(abstractParse(text, Formats.block(customTokens, value)))
+        const result = new String(abstractParse(text, Resources.block(customTokens, value)))
         Object.defineProperty(result, 'properties', {value})
         return result as String & {properties: Map<string,string>}
     }
