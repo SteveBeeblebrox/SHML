@@ -136,6 +136,18 @@ var SHML;
                         default: return (_b = (_a = SHML.Formats.SYMBOLS[groups.what[0]]) === null || _a === void 0 ? void 0 : _a[groups.what[1]]) !== null && _b !== void 0 ? _b : `/${groups.what}/`;
                     }
                 } });
+            args.set('unicode_shortcut', { pattern: /(?<=\b)(?:TM|SS)(?=\b)|\([cCrR]\)/g, reviver({ text }) {
+                    switch (text) {
+                        case 'SS': return '&section;';
+                        case 'PG': return '&para;';
+                        case 'TM': return '&trade;';
+                        case '(C)':
+                        case '(c)': return '&copy';
+                        case '(R)':
+                        case '(r)': return '&reg;';
+                        default: return text;
+                    }
+                } });
             args.set('strong', { pattern: /(\*\*)(?=[^*])(?<TEXT>.*?)\1/g });
             args.set('em', { pattern: /(\*)(?=[^*])(?<TEXT>.*?)\1/g });
             function SimpleInlineRegExp(marker) {
