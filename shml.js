@@ -218,7 +218,7 @@ var SHML;
                     var _a;
                     return `<figure><blockquote>${groups.text.replace(/(?:&gt;){3}/g, '').replace(new RegExp(String.raw `-\s*?${(_a = groups.citation) === null || _a === void 0 ? void 0 : _a.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}\s*?$`), '')}</blockquote>${groups.citation && `<figcaption><cite>- ${groups.citation}</cite></figcaption>` || ''}</figure>`;
                 } });
-            args.set('block_html', { pattern: /&lt;(?<what>\/(?:h[123456]|hr|blockquote|ul|ol|li))&gt;/g, isInline: false, reviver({ groups }) {
+            args.set('block_html', { pattern: /&lt;(?<what>\/?(?:h[123456]|hr|blockquote|ul|ol|li))&gt;/g, isInline: false, reviver({ groups }) {
                     return `<${groups.what}>`;
                 } });
             args.set('text', { pattern: /(?<=\n)\n?(?<TEXT>[^\uffff]+?)(?=  |\n\n|\uffff|$)/g, isInline: false, reviver({ blockType, text, groups }) {
