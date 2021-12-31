@@ -289,6 +289,3 @@ namespace SHML {
         return result as String & {properties: Map<string,string>}
     }
 }
-
-console.clear()
-console.log(SHML.parseInlineMarkup(String.raw`***Hello*** (R) (c)`))
