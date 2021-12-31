@@ -23,6 +23,7 @@
  */
 var SHML;
 (function (SHML) {
+    SHML.VERSION = '1.0.0';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -100,10 +101,9 @@ var SHML;
         }
         return decode(parseLevel(text, args));
     }
-    SHML.abstractParse = abstractParse;
-    let Formats;
-    (function (Formats) {
-        Formats.SYMBOLS = {
+    let Resources;
+    (function (Resources) {
+        Resources.SYMBOLS = {
             '~': { 'A': 'Ã', 'I': 'Ĩ', 'N': 'Ñ', 'O': 'Õ', 'U': 'Ũ', 'a': 'ã', 'i': 'ĩ', 'n': 'ñ', 'o': 'õ', 'u': 'ũ' },
             ':': { 'A': 'Ä', 'E': 'Ë', 'I': 'Ï', 'O': 'Ö', 'U': 'Ü', 'Y': 'Ÿ', 'a': 'ä', 'e': 'ë', 'i': 'ï', 'o': 'ö', 'u': 'ü', 'y': 'ÿ' },
             '\'': { 'A': 'Á', 'C': 'Ć', 'E': 'É', 'I': 'Í', 'L': 'Ĺ', 'N': 'Ń', 'O': 'Ó', 'R': 'Ŕ', 'S': 'Ś', 'U': 'Ú', 'Y': 'Ý', 'Z': 'Ź', 'a': 'á', 'c': 'ć', 'e': 'é', 'g': 'ǵ', 'i': 'í', 'l': 'ĺ', 'n': 'ń', 'o': 'ó', 'r': 'ŕ', 's': 'ś', 'u': 'ú', 'y': 'ý', 'z': 'ź' },
@@ -133,7 +133,7 @@ var SHML;
                     switch (groups.what) {
                         case '!': return '&iexcl;';
                         case '?': return '&iquest;';
-                        default: return (_b = (_a = SHML.Formats.SYMBOLS[groups.what[0]]) === null || _a === void 0 ? void 0 : _a[groups.what[1]]) !== null && _b !== void 0 ? _b : `/${groups.what}/`;
+                        default: return (_b = (_a = Resources.SYMBOLS[groups.what[0]]) === null || _a === void 0 ? void 0 : _a[groups.what[1]]) !== null && _b !== void 0 ? _b : `/${groups.what}/`;
                     }
                 } });
             args.set('unicode_shortcut', { pattern: /(?<=\b)(?:TM|SS)(?=\b)|\([cCrR]\)/g, reviver({ text }) {
@@ -186,7 +186,7 @@ var SHML;
                 } });
             return args;
         }
-        Formats.inline = inline;
+        Resources.inline = inline;
         function block(customTokens = new Map(), properties = new Map()) {
             const args = new Map();
             args.set('code_block', { pattern: /(```)(?<text>[\s\S]*?)\1/g, isInline: false, reviver({ groups }) {
@@ -241,16 +241,16 @@ var SHML;
                 } });
             return args;
         }
-        Formats.block = block;
-    })(Formats = SHML.Formats || (SHML.Formats = {}));
+        Resources.block = block;
+    })(Resources || (Resources = {}));
     function parseInlineMarkup(text, customTokens) {
-        return abstractParse(text, Formats.inline(customTokens));
+        return abstractParse(text, Resources.inline(customTokens));
     }
     SHML.parseInlineMarkup = parseInlineMarkup;
     function parseMarkup(text, customTokens, properties) {
         var _a;
         const value = new Map(((_a = properties === null || properties === void 0 ? void 0 : properties.entries()) !== null && _a !== void 0 ? _a : []));
-        const result = new String(abstractParse(text, Formats.block(customTokens, value)));
+        const result = new String(abstractParse(text, Resources.block(customTokens, value)));
         Object.defineProperty(result, 'properties', { value });
         return result;
     }
