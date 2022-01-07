@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.0.0';
+    SHML.VERSION = '1.0.1';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -125,6 +125,10 @@ var SHML;
             args.set('raw', { pattern: /&lt;&lt;\/(?<text>[\s\S]*?)\/&gt;&gt;/g, reviver({ groups }) {
                     return groups.text;
                 } });
+            args.set('src_comment', { pattern: /&lt;!!--(?<text>[\s\S]*?)--&gt;/g, reviver() { return ''; } });
+            args.set('comment', { pattern: /&lt;!--(?<text>[\s\S]*?)--&gt;/g, isInline: true, reviver({ groups }) {
+                    return `<!--${groups.text}-->`;
+                } });
             args.set('code', { pattern: /(`)(?<text>.*?)\1/g, reviver({ groups }) {
                     return `<code>${groups.text}</code>`;
                 } });
@@ -167,10 +171,6 @@ var SHML;
             args.set('custom_token', { pattern: /:(?<what>.*?):/g, isInline: true, reviver({ groups }) { var _a; return (_a = customTokens.get(groups.what)) !== null && _a !== void 0 ? _a : `:${groups.what}:`; } });
             args.set('linebreak', { pattern: /\\n/g, reviver() { return '<br>'; } });
             args.set('wordbreak', { pattern: /(?<=\S)-\/-(?=\S)/g, reviver() { return '<wbr>'; } });
-            args.set('src_comment', { pattern: /&lt;!!--(?<text>[\s\S]*?)--&gt;/g, reviver() { return ''; } });
-            args.set('comment', { pattern: /&lt;!--(?<text>[\s\S]*?)--&gt;/g, isInline: true, reviver({ groups }) {
-                    return `<!--${groups.text}-->`;
-                } });
             args.set('a', { pattern: /(?<newtab>\+)?\[(?<href>.*?)\]\((?<TEXT>.*?)\)/, isInline: true, reviver({ blockType, text, groups }) {
                     return `<a href="${/^[^:]*?(?:(?:(?<=mailto|https|http):|\/.*:).*)?$/g.test(groups.href) ? groups.href : 'about:blank#blocked'}"${groups.newtab ? ' target="_blank"' : ''}>${groups.TEXT}</a>`;
                 } });
@@ -188,7 +188,10 @@ var SHML;
         }
         Resources.inline = inline;
         function block(customTokens = new Map(), properties = new Map()) {
-            const args = new Map();
+            const args = new Map(), inlineArgs = inline(customTokens);
+            args.set('raw', inlineArgs.get('raw'));
+            args.set('src_comment', inlineArgs.get('src_comment'));
+            args.set('comment', inlineArgs.get('comment'));
             args.set('code_block', { pattern: /(```)(?<text>[\s\S]*?)\1/g, isInline: false, reviver({ groups }) {
                     return `<pre><code>${groups.text}</code></pre>`;
                 } });
@@ -206,8 +209,9 @@ var SHML;
                     (_a = groups.width) !== null && _a !== void 0 ? _a : (groups.width = groups.height);
                     return `<img src="${groups.src}${groups.alt ? ` alt="${groups.alt}"` : ''}${groups.height ? ` height="${groups.height}"` : ''}${groups.width ? ` width="${groups.width}"` : ''}">`;
                 } });
-            for (const entry of inline(customTokens).entries())
-                args.set(...entry);
+            for (const entry of inlineArgs.entries())
+                if (!args.has(entry[0]))
+                    args.set(...entry);
             args.set('text-align', { pattern: /(?<=\n|^)[^\S\n]*?@@\s*?(?<what>center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)\s*?(?<TEXT>[\s\S]*?)(?:$|(?:(?<=\n)[^\S\n]*?@@\s*?reset)|(?=\n[^\S\n]*?@@\s*?(?:center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)))/g, isInline: false, reviver({ groups }) {
                     var _a;
                     const overrides = { centered: 'center', justified: 'justify', 'justified-all': 'justify-all' };
