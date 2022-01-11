@@ -2,7 +2,7 @@
 ***Simplified HTML Markup Language (Or Simplified Hypertext Markup Language Markup Language)*** is a lightweight markup language parser built in JavaScript. The syntax is similar to that of Markdown, but with changes to make some things more intuitive. This software is distributed under the MIT license. A demo of SHML can be found [here](https://stevebeeblebrox.github.io/apps/shml).
 
 **This README is out of date, changes coming soon!**
-
+<!--
 ## Syntax
 SHML is composed of two main types of styling: inline and sections. All sections must be on their own line. Inline formatting can be applied to any part of a section.
 ### Inline Formatting
@@ -53,7 +53,7 @@ SHML is composed of two main types of styling: inline and sections. All sections
   * Resulting HTML Tag: `<code>`
   * Example: ``` `Code` ```
   * Notes: Aside from a `` ` ``, all other formatting sequence are escaped.
-+ [Links](https://www.youtube.com/watch?v=oHg5SJYRHA0) <!--¯\_(ツ)_/¯-->
++ [Links](https://www.youtube.com/watch?v=oHg5SJYRHA0) <!--¯\_(ツ)_/¯- ->
   * Formatting sequence: `[<text>](<url>)` (Opens in current tab or frame [`target="_self"`]) or `+[<text>](<url>)` (Opens in new tab [`target="_blank"`])
   * Resulting HTML Tag: `<a>`
   * Example: `[Links](https://stevebeeblebrox.github.io)` (Opens in current tab or frame [`target="_self"`]) or `+[Links](https://stevebeeblebrox.github.io)` (Opens in new tab [`target="_blank"`])
@@ -114,13 +114,13 @@ SHML is composed of two main types of styling: inline and sections. All sections
   
 **Work in progress, expect major changes!**
 <!--### Properties
-SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are passed as an array of strings in the second argument to `parseMarkup`. If no properties are passed in the second argument, the parser will look at the global property `properties` of SHML. They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string. By default, SHML does not look for any properties. Properties are not supported in inline markup.-->
+SHML can be given additional string keys to look for. This allows for the storage of metadata within SHML text that can be pulled from the result. Properties are passed as an array of strings in the second argument to `parseMarkup`. If no properties are passed in the second argument, the parser will look at the global property `properties` of SHML. They can be retrieved by calling `getProperty` on the result and passing the name of the property to retrieve as a string. By default, SHML does not look for any properties. Properties are not supported in inline markup.- ->
 ### Section Metadata
 + Single Line Comments
   * Formatting sequence: `!!<comment>`
   * Resulting HTML Tag: None
   * Example: `!!Work in progress`
-  * Notes: SHML has no multiline comments of its own; however, you can use HTML's `<!-- -->`.
+  * Notes: SHML has no multiline comments of its own; however, you can use HTML's `<!-- - ->`.
   * Retrieval: Comment metadata cannot be retrieved from the parsing result and is only avalible in the source.
 + Properties
   * Formatting sequence: `!<key>:<value>`
@@ -272,3 +272,4 @@ The special character format is used to create an upside down `!`, a `u` with an
  ```
 ##### Explanation
 By passing a map of strings as the second argument, SHML will convert any occurances of the keys surrounded by `:` into their matching values.
+-->
