@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.0.1'
+    export const VERSION = '1.0.2'
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -192,7 +192,7 @@ namespace SHML {
                 return `<mark${groups.color ? ` style="color:${groups.color}"`: ''}>${groups.TEXT}</mark>`
             }});
 
-            args.set('span', {pattern: /(&amp;&amp;)(\[(?:color=)?(?<color>[^"]*?)\])?(?<TEXT>.*?)\1/, reviver({groups}) {
+            args.set('span', {pattern: /(&amp;&amp;)(\[(?:color=)?(?<color>[^"]*?)\])?(?<TEXT>.*?)\1/g, reviver({groups}) {
                 return  `<span style="color:${groups.color ?? 'red'}">${groups.TEXT}</span>`
             }});
 
@@ -201,7 +201,7 @@ namespace SHML {
             args.set('linebreak', {pattern: /\\n/g, reviver() {return '<br>'}});
             args.set('wordbreak', {pattern: /(?<=\S)-\/-(?=\S)/g, reviver() {return '<wbr>'}});
             
-            args.set('a', {pattern: /(?<newtab>\+)?\[(?<href>.*?)\]\((?<TEXT>.*?)\)/, isInline: true, reviver({blockType, text, groups}) {
+            args.set('a', {pattern: /(?<newtab>\+)?\[(?<href>.*?)\]\((?<TEXT>.*?)\)/g, isInline: true, reviver({blockType, text, groups}) {
                 return `<a href="${/^[^:]*?(?:(?:(?<=mailto|https|http):|\/.*:).*)?$/g.test(groups.href) ? groups.href : 'about:blank#blocked'}"${groups.newtab ? ' target="_blank"':''}>${groups.TEXT}</a>`
             }});
 
@@ -249,7 +249,7 @@ namespace SHML {
 
             args.set('text-align', {pattern: /(?<=\n|^)[^\S\n]*?@@\s*?(?<what>center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)\s*?(?<TEXT>[\s\S]*?)(?:$|(?:(?<=\n)[^\S\n]*?@@\s*?reset)|(?=\n[^\S\n]*?@@\s*?(?:center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)))/g, isInline: false, reviver({groups}) {
                 const overrides: {[match: string]: string} = { centered: 'center', justified: 'justify', 'justified-all': 'justify-all' }
-                return `<div style="${overrides[groups.what] ?? groups.what}">${groups.TEXT}</div>`
+                return `<div style="text-align: ${overrides[groups.what] ?? groups.what};">${groups.TEXT}</div>`
             }})
 
             args.set('numbered_header', {pattern: /^\s*?(?<count>#{1,6})(?:\[(?<id>[a-zA-Z_][a-zA-Z_0-9]*?)\])?\s?(?<TEXT>[^\uffff]*?)(?=\n)/gm, isInline: false, reviver({groups}) {
