@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.0.1';
+    SHML.VERSION = '1.0.2';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -164,14 +164,14 @@ var SHML;
             args.set('mark', { pattern: /(\|\|)(\[(?:color=)?(?<color>[^"]*?)\])?(?<TEXT>.*?)\1/g, reviver({ groups }) {
                     return `<mark${groups.color ? ` style="color:${groups.color}"` : ''}>${groups.TEXT}</mark>`;
                 } });
-            args.set('span', { pattern: /(&amp;&amp;)(\[(?:color=)?(?<color>[^"]*?)\])?(?<TEXT>.*?)\1/, reviver({ groups }) {
+            args.set('span', { pattern: /(&amp;&amp;)(\[(?:color=)?(?<color>[^"]*?)\])?(?<TEXT>.*?)\1/g, reviver({ groups }) {
                     var _a;
                     return `<span style="color:${(_a = groups.color) !== null && _a !== void 0 ? _a : 'red'}">${groups.TEXT}</span>`;
                 } });
             args.set('custom_token', { pattern: /:(?<what>.*?):/g, isInline: true, reviver({ groups }) { var _a; return (_a = customTokens.get(groups.what)) !== null && _a !== void 0 ? _a : `:${groups.what}:`; } });
             args.set('linebreak', { pattern: /\\n/g, reviver() { return '<br>'; } });
             args.set('wordbreak', { pattern: /(?<=\S)-\/-(?=\S)/g, reviver() { return '<wbr>'; } });
-            args.set('a', { pattern: /(?<newtab>\+)?\[(?<href>.*?)\]\((?<TEXT>.*?)\)/, isInline: true, reviver({ blockType, text, groups }) {
+            args.set('a', { pattern: /(?<newtab>\+)?\[(?<href>.*?)\]\((?<TEXT>.*?)\)/g, isInline: true, reviver({ blockType, text, groups }) {
                     return `<a href="${/^[^:]*?(?:(?:(?<=mailto|https|http):|\/.*:).*)?$/g.test(groups.href) ? groups.href : 'about:blank#blocked'}"${groups.newtab ? ' target="_blank"' : ''}>${groups.TEXT}</a>`;
                 } });
             args.set('autolink', { pattern: /(?<text>(?:(?<protocol>https?:\/\/)|(?<www>www\.))(?<link>.+?\..+?)(?=\s|$))/g, reviver({ groups }) {
@@ -215,7 +215,7 @@ var SHML;
             args.set('text-align', { pattern: /(?<=\n|^)[^\S\n]*?@@\s*?(?<what>center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)\s*?(?<TEXT>[\s\S]*?)(?:$|(?:(?<=\n)[^\S\n]*?@@\s*?reset)|(?=\n[^\S\n]*?@@\s*?(?:center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)))/g, isInline: false, reviver({ groups }) {
                     var _a;
                     const overrides = { centered: 'center', justified: 'justify', 'justified-all': 'justify-all' };
-                    return `<div style="${(_a = overrides[groups.what]) !== null && _a !== void 0 ? _a : groups.what}">${groups.TEXT}</div>`;
+                    return `<div style="text-align: ${(_a = overrides[groups.what]) !== null && _a !== void 0 ? _a : groups.what};">${groups.TEXT}</div>`;
                 } });
             args.set('numbered_header', { pattern: /^\s*?(?<count>#{1,6})(?:\[(?<id>[a-zA-Z_][a-zA-Z_0-9]*?)\])?\s?(?<TEXT>[^\uffff]*?)(?=\n)/gm, isInline: false, reviver({ groups }) {
                     var _a;
