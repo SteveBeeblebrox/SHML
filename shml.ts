@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.0.2'
+    export const VERSION = '1.2.0'
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -145,6 +145,10 @@ namespace SHML {
         export function inline(customTokens: Map<string,string> = new Map()) {
             const args: FormatArgs = new Map();       
 
+            args.set('escaped', {pattern: /\\(?<what>[\s\S])/g, reviver({groups}) {
+                console.log(1)
+                return groups.what
+            }});
             args.set('raw', {pattern: /&lt;&lt;\/(?<text>[\s\S]*?)\/&gt;&gt;/g, reviver({groups}) {
                 return groups.text
             }});
@@ -222,6 +226,7 @@ namespace SHML {
         export function block(customTokens: Map<string,string> = new Map(), properties: Map<string,string> = new Map()) {
             const args: FormatArgs = new Map(), inlineArgs: FormatArgs = inline(customTokens);
 
+            args.set('escaped', inlineArgs.get('escaped')!)
             args.set('raw', inlineArgs.get('raw')!)
             args.set('src_comment', inlineArgs.get('src_comment')!)
             args.set('comment', inlineArgs.get('comment')!)
