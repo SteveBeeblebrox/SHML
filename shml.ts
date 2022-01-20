@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.2.0'
+    export const VERSION = '1.1.0'
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
