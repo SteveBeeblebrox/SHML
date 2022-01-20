@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.1.0'
+    export const VERSION = '1.1.1'
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -245,7 +245,7 @@ namespace SHML {
 
             args.set('image', {pattern: /!\[(?<src>\S*?)(?:\s*?(?<height>auto|\d*)(?:[xX](?<width>auto|\d*))?)?\](?:\((?<alt>.*?)\))?/g, reviver({groups}) {
                 groups.width ??= groups.height
-                return `<img src="${groups.src}${groups.alt ? ` alt="${groups.alt}"`: ''}${groups.height ? ` height="${groups.height}"` : ''}${groups.width ? ` width="${groups.width}"` : ''}">`
+                return `<img src="${groups.src}"${groups.alt ? ` alt="${groups.alt}"`: ''}${groups.height ? ` height="${groups.height}"` : ''}${groups.width ? ` width="${groups.width}"` : ''}">`
             }})
 
             for(const entry of inlineArgs.entries())
