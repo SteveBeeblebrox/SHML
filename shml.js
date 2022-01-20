@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.0.2';
+    SHML.VERSION = '1.1.0';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -122,6 +122,10 @@ var SHML;
         };
         function inline(customTokens = new Map()) {
             const args = new Map();
+            args.set('escaped', { pattern: /\\(?<what>[\s\S])/g, reviver({ groups }) {
+                    console.log(1);
+                    return groups.what;
+                } });
             args.set('raw', { pattern: /&lt;&lt;\/(?<text>[\s\S]*?)\/&gt;&gt;/g, reviver({ groups }) {
                     return groups.text;
                 } });
@@ -189,6 +193,7 @@ var SHML;
         Resources.inline = inline;
         function block(customTokens = new Map(), properties = new Map()) {
             const args = new Map(), inlineArgs = inline(customTokens);
+            args.set('escaped', inlineArgs.get('escaped'));
             args.set('raw', inlineArgs.get('raw'));
             args.set('src_comment', inlineArgs.get('src_comment'));
             args.set('comment', inlineArgs.get('comment'));
