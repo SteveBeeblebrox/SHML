@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.1.3';
+    SHML.VERSION = '1.1.4';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -178,11 +178,11 @@ var SHML;
             args.set('a', { pattern: /(?<newtab>\+)?\[(?<href>.*?)\]\((?<TEXT>.*?)\)/g, isInline: true, reviver({ blockType, text, groups }) {
                     return `<a href="${/^[^:]*?(?:(?:(?<=mailto|https|http):|\/.*:).*)?$/g.test(groups.href) ? groups.href : 'about:blank#blocked'}"${groups.newtab ? ' target="_blank"' : ''}>${groups.TEXT}</a>`;
                 } });
-            args.set('autolink', { pattern: /(?<text>(?:(?<protocol>https?:\/\/)|(?<www>www\.))(?<link>\S+\.[^.\s]+)(?=\.|\s|$))/g, reviver({ groups }) {
+            args.set('autolink', { pattern: /(?<text>(?:(?<protocol>https?:\/\/)|(?<www>www\.))(?<link>\w[\w\-]*(?<=\w)\.\w[\w.\/?&#%=+\-]*(?<=[\w\/])))/g, reviver({ groups }) {
                     var _a, _b;
                     return `<a href="${(_a = groups.protocol) !== null && _a !== void 0 ? _a : 'https://'}${(_b = groups.www) !== null && _b !== void 0 ? _b : ''}${groups.link}">${groups.text}</a>`;
                 } });
-            args.set('autolink_email', { pattern: /(?<text>\w[\w.-]*?@[\w.-]+\.\w+)/g, reviver({ groups }) {
+            args.set('autolink_email', { pattern: /(?<text>\w[\w.\-]*?@[\w.\-]+\.\w+)/g, reviver({ groups }) {
                     return `<a href="mailto:${groups.text}">${groups.text}</a>`;
                 } });
             args.set('html', { pattern: /&lt;(?<what>\/?(?:code|em|i|strong|b|u|del|sub|sup|mark|span|wbr|br))&gt;/g, isInline: true, reviver({ blockType, text, groups }) {
