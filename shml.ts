@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.1.1'
+    export const VERSION = '1.1.2'
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -209,7 +209,7 @@ namespace SHML {
                 return `<a href="${/^[^:]*?(?:(?:(?<=mailto|https|http):|\/.*:).*)?$/g.test(groups.href) ? groups.href : 'about:blank#blocked'}"${groups.newtab ? ' target="_blank"':''}>${groups.TEXT}</a>`
             }});
 
-            args.set('autolink', {pattern:/(?<text>(?:(?<protocol>https?:\/\/)|(?<www>www\.))(?<link>.+?\..+?)(?=\s|$))/g, reviver({groups}) {
+            args.set('autolink', {pattern:/(?<text>(?:(?<protocol>https?:\/\/)|(?<www>www\.))(?<link>\S+\.[^.\s]+)(?=\.|\s|$))/g, reviver({groups}) {
                 return `<a href="${groups.protocol ?? 'https://'}${groups.www ?? ''}${groups.link}">${groups.text}</a>`
             }})
 
