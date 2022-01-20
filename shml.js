@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.1.2';
+    SHML.VERSION = '1.1.3';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -182,7 +182,7 @@ var SHML;
                     var _a, _b;
                     return `<a href="${(_a = groups.protocol) !== null && _a !== void 0 ? _a : 'https://'}${(_b = groups.www) !== null && _b !== void 0 ? _b : ''}${groups.link}">${groups.text}</a>`;
                 } });
-            args.set('autolink_email', { pattern: /(?<text>.*?@.*?\..*?(?=\s|$))/g, reviver({ groups }) {
+            args.set('autolink_email', { pattern: /(?<text>\w[\w.-]*?@[\w.-]+\.\w+)/g, reviver({ groups }) {
                     return `<a href="mailto:${groups.text}">${groups.text}</a>`;
                 } });
             args.set('html', { pattern: /&lt;(?<what>\/?(?:code|em|i|strong|b|u|del|sub|sup|mark|span|wbr|br))&gt;/g, isInline: true, reviver({ blockType, text, groups }) {
