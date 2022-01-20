@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.1.2'
+    export const VERSION = '1.1.3'
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -213,7 +213,7 @@ namespace SHML {
                 return `<a href="${groups.protocol ?? 'https://'}${groups.www ?? ''}${groups.link}">${groups.text}</a>`
             }})
 
-            args.set('autolink_email', {pattern:/(?<text>.*?@.*?\..*?(?=\s|$))/g, reviver({groups}) {
+            args.set('autolink_email', {pattern:/(?<text>\w[\w.-]*?@[\w.-]+\.\w+)/g, reviver({groups}) {
                 return `<a href="mailto:${groups.text}">${groups.text}</a>`
             }})
 
