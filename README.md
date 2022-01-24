@@ -4,6 +4,10 @@
 ***SHML attempts to prevent script injection; however, it is not a dedicated sanitizer. If security is important, sanitize the output from SHML before writing it to a document.***
 
 **This README is out of date, changes coming soon!**
+
+## Formatting
+## API
+## Examples
 <!--
 ## Syntax
 SHML is composed of two main types of styling: inline and sections. All sections must be on their own line. Inline formatting can be applied to any part of a section.
