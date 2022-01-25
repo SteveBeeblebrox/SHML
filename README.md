@@ -9,7 +9,7 @@
 ## API
 ## Examples
 ## Known Issues
-1. Bullet points do no nest
+1. Bullet points do not nest
 <!--
 ## Syntax
 SHML is composed of two main types of styling: inline and sections. All sections must be on their own line. Inline formatting can be applied to any part of a section.
