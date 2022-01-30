@@ -6,11 +6,73 @@
 **This README is out of date, changes coming soon!**
 
 ## Formatting
+### Basics
+#### Bold
+#### Iitalics
+#### Underlined
+#### Superscript
+#### Subscript
+### Coloring
+#### Highlighted
+#### Text
+### Line Control
+#### Line Breaks
+#### Word Breaks
+
+### Links
+#### Automatic Links
+#### Automatic Emails
+
+### Comments
+### Source Comments
+### HTML Comments
+
+### Escaped Text
+#### Single Characters
+#### Sequences
+
+
+### Code
+#### Inline (TODO)
+#### Blocks
+
+### Properties
+#### Defining
+#### Referencing
+
+### Images
+
+### Headers
+
+### Horizontal Lines
+
+### Lists
+#### Bullets
+#### Numbered
+
+### Blockquotes
+
+### Paragraphs
+
+### Text Alignment
+
+### Tables
+
+### Other
+#### Custom Tokens
+#### Unicode Shortcuts
+#### Non English Characters
+
+###
 ## API
 ## Examples
 ## Known Issues
 1. Bullet points do not nest
 2. Bullet points are not properly detected and can occur midway into a line
+## Planned Changes
+1. Dashes for horizontal lines
+2. Improve lists
+3. Inline code
 <!--
 ## Syntax
 SHML is composed of two main types of styling: inline and sections. All sections must be on their own line. Inline formatting can be applied to any part of a section.
