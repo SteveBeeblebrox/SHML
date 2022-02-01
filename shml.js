@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.1.4';
+    SHML.VERSION = '1.1.5';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -123,7 +123,6 @@ var SHML;
         function inline(customTokens = new Map()) {
             const args = new Map();
             args.set('escaped', { pattern: /\\(?<what>[\s\S])/g, reviver({ groups }) {
-                    console.log(1);
                     return groups.what;
                 } });
             args.set('raw', { pattern: /&lt;&lt;\/(?<text>[\s\S]*?)\/&gt;&gt;/g, reviver({ groups }) {
@@ -172,7 +171,7 @@ var SHML;
                     var _a;
                     return `<span style="color:${(_a = groups.color) !== null && _a !== void 0 ? _a : 'red'}">${groups.TEXT}</span>`;
                 } });
-            args.set('custom_token', { pattern: /:(?<what>.*?):/g, isInline: true, reviver({ groups }) { var _a; return (_a = customTokens.get(groups.what)) !== null && _a !== void 0 ? _a : `:${groups.what}:`; } });
+            args.set('custom_token', { pattern: /:(?<what>[a-zA-Z0-9][a-zA-Z0-9_\-]*?):/g, isInline: true, reviver({ groups }) { var _a; return (_a = customTokens.get(groups.what)) !== null && _a !== void 0 ? _a : `:${groups.what}:`; } });
             args.set('linebreak', { pattern: /\\n/g, reviver() { return '<br>'; } });
             args.set('wordbreak', { pattern: /(?<=\S)-\/-(?=\S)/g, reviver() { return '<wbr>'; } });
             args.set('a', { pattern: /(?<newtab>\+)?\[(?<href>.*?)\]\((?<TEXT>.*?)\)/g, isInline: true, reviver({ blockType, text, groups }) {
@@ -227,7 +226,7 @@ var SHML;
                     (_a = groups.id) !== null && _a !== void 0 ? _a : (groups.id = cyrb64(groups.TEXT));
                     return `<h${groups.count.length} id="h${groups.count.length}:${groups.id}"><a href="#h${groups.count.length}:${groups.id}" title="Link to section">${groups.TEXT}</a></h${groups.count.length}>`;
                 } });
-            args.set('hr', { pattern: /===+/g, isInline: false, reviver() { return '<hr>'; } });
+            args.set('hr', { pattern: /^\s*([-=])\1{2,}\s*$/gm, isInline: false, reviver() { return '<hr>'; } });
             args.set('table', { pattern: /\[\[(?:\n\s*(?:title=)?(?<title>[^,\n]*)\n)?(?<contents>[\s\S]*?)\]\]/g, isInline: false, reviver({ groups }) {
                     const rows = groups.contents.trim().split('\n').map((row, index) => `\n<tr>${row.split(',').map((column) => `<t${index && 'd' || 'h'}>${column.trim()}</t${index && 'd' || 'h'}>`).join('')}</tr>`);
                     return `<table>${groups.title ? `\n<caption>${groups.title.trim()}</caption>` : ''}\n<thead>${rows.shift()}\n<thead>\n<tbody>${rows.join('')}\n<tbody>\n</table>`;
