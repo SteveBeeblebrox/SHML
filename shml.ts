@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.1.5'
+    export const VERSION = '1.2.0'
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -145,7 +145,7 @@ namespace SHML {
         export function inline(customTokens: Map<string,string> = new Map()) {
             const args: FormatArgs = new Map();       
 
-            args.set('escaped', {pattern: /\\(?<what>[\s\S])/g, reviver({groups}) {
+            args.set('escaped', {pattern: /\\(?<what>[^ntp])/g, reviver({groups}) {
                 return groups.what
             }});
             args.set('raw', {pattern: /&lt;&lt;\/(?<text>[\s\S]*?)\/&gt;&gt;/g, reviver({groups}) {
@@ -201,6 +201,8 @@ namespace SHML {
 
             args.set('custom_token', {pattern: /:(?<what>[a-zA-Z0-9][a-zA-Z0-9_\-]*?):/g, isInline: true, reviver({groups}) {return customTokens.get(groups.what) ?? `:${groups.what}:`}});
 
+            args.set('nbsp', {pattern: /\\p/g, reviver() {return '&nbsp;'}});
+            args.set('emsp', {pattern: /\\t/g, reviver() {return '&emsp;'}});
             args.set('linebreak', {pattern: /\\n/g, reviver() {return '<br>'}});
             args.set('wordbreak', {pattern: /(?<=\S)-\/-(?=\S)/g, reviver() {return '<wbr>'}});
             
