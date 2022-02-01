@@ -70,10 +70,6 @@
 ## Known Issues
 1. Bullet points do not nest
 2. Bullet points are not properly detected and can occur midway into a line
-## Planned Changes
-1. Dashes for horizontal lines
-2. Improve lists
-3. Inline code
 <!--
 ## Syntax
 SHML is composed of two main types of styling: inline and sections. All sections must be on their own line. Inline formatting can be applied to any part of a section.
