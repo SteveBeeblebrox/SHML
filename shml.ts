@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.1.4'
+    export const VERSION = '1.1.5'
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -146,7 +146,6 @@ namespace SHML {
             const args: FormatArgs = new Map();       
 
             args.set('escaped', {pattern: /\\(?<what>[\s\S])/g, reviver({groups}) {
-                console.log(1)
                 return groups.what
             }});
             args.set('raw', {pattern: /&lt;&lt;\/(?<text>[\s\S]*?)\/&gt;&gt;/g, reviver({groups}) {
@@ -200,7 +199,7 @@ namespace SHML {
                 return  `<span style="color:${groups.color ?? 'red'}">${groups.TEXT}</span>`
             }});
 
-            args.set('custom_token', {pattern: /:(?<what>.*?):/g, isInline: true, reviver({groups}) {return customTokens.get(groups.what) ?? `:${groups.what}:`}});
+            args.set('custom_token', {pattern: /:(?<what>[a-zA-Z0-9][a-zA-Z0-9_\-]*?):/g, isInline: true, reviver({groups}) {return customTokens.get(groups.what) ?? `:${groups.what}:`}});
 
             args.set('linebreak', {pattern: /\\n/g, reviver() {return '<br>'}});
             args.set('wordbreak', {pattern: /(?<=\S)-\/-(?=\S)/g, reviver() {return '<wbr>'}});
@@ -262,7 +261,7 @@ namespace SHML {
                 return `<h${groups.count.length} id="h${groups.count.length}:${groups.id}"><a href="#h${groups.count.length}:${groups.id}" title="Link to section">${groups.TEXT}</a></h${groups.count.length}>`
             }});
 
-            args.set('hr', {pattern: /===+/g, isInline: false, reviver() {return '<hr>'}});
+            args.set('hr', {pattern: /^\s*([-=])\1{2,}\s*$/gm, isInline: false, reviver() {return '<hr>'}});
             
             args.set('table', {pattern: /\[\[(?:\n\s*(?:title=)?(?<title>[^,\n]*)\n)?(?<contents>[\s\S]*?)\]\]/g, isInline: false, reviver({groups}) {
                 const rows = groups.contents.trim().split('\n').map((row: string, index:number) => `\n<tr>${row.split(',').map((column: string) => `<t${index && 'd' || 'h'}>${column.trim()}</t${index && 'd' || 'h'}>`).join('')}</tr>`)
