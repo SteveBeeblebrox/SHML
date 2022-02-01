@@ -28,6 +28,7 @@
 ### HTML Comments
 
 ### Escaped Text
+#### Escape Codes
 #### Single Characters
 #### Sequences
 
