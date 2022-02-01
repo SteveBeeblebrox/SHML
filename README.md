@@ -34,7 +34,7 @@
 
 
 ### Code
-#### Inline (TODO)
+#### Inline
 #### Blocks
 
 ### Properties
