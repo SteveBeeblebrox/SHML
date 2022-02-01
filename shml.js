@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.1.5';
+    SHML.VERSION = '1.2.0';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -122,7 +122,7 @@ var SHML;
         };
         function inline(customTokens = new Map()) {
             const args = new Map();
-            args.set('escaped', { pattern: /\\(?<what>[\s\S])/g, reviver({ groups }) {
+            args.set('escaped', { pattern: /\\(?<what>[^ntp])/g, reviver({ groups }) {
                     return groups.what;
                 } });
             args.set('raw', { pattern: /&lt;&lt;\/(?<text>[\s\S]*?)\/&gt;&gt;/g, reviver({ groups }) {
@@ -172,6 +172,8 @@ var SHML;
                     return `<span style="color:${(_a = groups.color) !== null && _a !== void 0 ? _a : 'red'}">${groups.TEXT}</span>`;
                 } });
             args.set('custom_token', { pattern: /:(?<what>[a-zA-Z0-9][a-zA-Z0-9_\-]*?):/g, isInline: true, reviver({ groups }) { var _a; return (_a = customTokens.get(groups.what)) !== null && _a !== void 0 ? _a : `:${groups.what}:`; } });
+            args.set('nbsp', { pattern: /\\p/g, reviver() { return '&nbsp;'; } });
+            args.set('emsp', { pattern: /\\t/g, reviver() { return '&emsp;'; } });
             args.set('linebreak', { pattern: /\\n/g, reviver() { return '<br>'; } });
             args.set('wordbreak', { pattern: /(?<=\S)-\/-(?=\S)/g, reviver() { return '<wbr>'; } });
             args.set('a', { pattern: /(?<newtab>\+)?\[(?<href>.*?)\]\((?<TEXT>.*?)\)/g, isInline: true, reviver({ blockType, text, groups }) {
