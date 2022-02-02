@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.2.1'
+    export const VERSION = '1.3.0'
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -166,7 +166,7 @@ namespace SHML {
             }
             }});
 
-            args.set('unicode_shortcut', {pattern: /(?<=\b)(?:TM|SS)(?=\b)|\([cCrR]\)/g, reviver({text}) {
+            args.set('unicode_shortcut', {pattern: /(?<=\b)(?:TM|SS)(?=\b)|\([cCrR]\)|-&gt;|&lt;-/g, reviver({text}) {
                 switch(text) {
                     case 'SS': return '&section;'
                     case 'PG': return '&para;'
@@ -174,7 +174,9 @@ namespace SHML {
                     case '(C)':
                     case '(c)': return '&copy';
                     case '(R)':
-                    case '(r)': return '&reg;'
+                    case '(r)': return '&reg;';
+                    case '-&gt;': return '&rarr;';
+                    case '&lt;-': return '&larr;';
                     default: return text;
                 }
             }})
@@ -197,6 +199,10 @@ namespace SHML {
 
             args.set('span', {pattern: /(&amp;&amp;)(\[(?:color=)?(?<color>[^"]*?)\])?(?<TEXT>.*?)\1/g, reviver({groups}) {
                 return  `<span style="color:${groups.color ?? 'red'}">${groups.TEXT}</span>`
+            }});
+
+            args.set('spoiler', {pattern: /&lt;\?(?<TEXT>.*?)\?&gt;/g, reviver({groups}) {
+                return `<span style="filter: blur(0.25em); cursor: pointer;" title="Show spoiler?" onclick="this.removeAttribute('style'); this.removeAttribute('title'); this.removeAttribute('onclick');">${groups.TEXT}</span>`
             }});
 
             args.set('custom_token', {pattern: /:(?<what>[a-zA-Z0-9][a-zA-Z0-9_\-]*?):/g, isInline: true, reviver({groups}) {return customTokens.get(groups.what) ?? `:${groups.what}:`}});
@@ -224,7 +230,7 @@ namespace SHML {
             return args
         }
 
-        export function block(customTokens: Map<string,string> = new Map(), properties: Map<string,string> = new Map()) {
+        export function block(customTokens: Map<string,string> = new Map(), properties: Map<string,string> = new Map(), ids: Set<string> = new Set()) {
             const args: FormatArgs = new Map(), inlineArgs: FormatArgs = inline(customTokens);
 
             args.set('escaped', inlineArgs.get('escaped')!)
@@ -259,6 +265,7 @@ namespace SHML {
             }})
 
             args.set('numbered_header', {pattern: /^\s*?(?<count>#{1,6})(?:\[(?<id>[a-zA-Z_][a-zA-Z_0-9]*?)\])?\s?(?<TEXT>[^\uffff]*?)(?=\n)/gm, isInline: false, reviver({groups}) {
+                if(groups.id) ids.add(`h${groups.count.length}:${groups.id}`)
                 groups.id ??= cyrb64(groups.TEXT)
                 return `<h${groups.count.length} id="h${groups.count.length}:${groups.id}"><a href="#h${groups.count.length}:${groups.id}" title="Link to section">${groups.TEXT}</a></h${groups.count.length}>`
             }});
@@ -298,10 +305,11 @@ namespace SHML {
         return abstractParse(text, Resources.inline(customTokens))
     }
 
-    export function parseMarkup(text: string, customTokens?: Map<string,string>, properties?: Map<string,string>): String & {properties: Map<string,string>} {
-        const value: Map<string,string> = new Map((properties?.entries() ?? []))
-        const result = new String(abstractParse(text, Resources.block(customTokens, value)))
-        Object.defineProperty(result, 'properties', {value})
-        return result as String & {properties: Map<string,string>}
+    export function parseMarkup(text: string, customTokens?: Map<string,string>, properties?: Map<string,string>): String & {properties: Map<string,string>, ids: Set<string>} {
+        const props: Map<string,string> = new Map((properties?.entries() ?? [])), ids: Set<string> = new Set()
+        const result = new String(abstractParse(text, Resources.block(customTokens, props, ids)))
+        Object.defineProperty(result, 'properties', {value: props})
+        Object.defineProperty(result, 'ids', {value: ids})
+        return result as String & {properties: Map<string,string>, ids: Set<string>}
     }
 }
