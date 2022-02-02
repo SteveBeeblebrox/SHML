@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.2.1';
+    SHML.VERSION = '1.3.0';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -143,7 +143,7 @@ var SHML;
                         default: return (_b = (_a = Resources.SYMBOLS[groups.what[0]]) === null || _a === void 0 ? void 0 : _a[groups.what[1]]) !== null && _b !== void 0 ? _b : `/${groups.what}/`;
                     }
                 } });
-            args.set('unicode_shortcut', { pattern: /(?<=\b)(?:TM|SS)(?=\b)|\([cCrR]\)/g, reviver({ text }) {
+            args.set('unicode_shortcut', { pattern: /(?<=\b)(?:TM|SS)(?=\b)|\([cCrR]\)|-&gt;|&lt;-/g, reviver({ text }) {
                     switch (text) {
                         case 'SS': return '&section;';
                         case 'PG': return '&para;';
@@ -152,6 +152,8 @@ var SHML;
                         case '(c)': return '&copy';
                         case '(R)':
                         case '(r)': return '&reg;';
+                        case '-&gt;': return '&rarr;';
+                        case '&lt;-': return '&larr;';
                         default: return text;
                     }
                 } });
@@ -170,6 +172,9 @@ var SHML;
             args.set('span', { pattern: /(&amp;&amp;)(\[(?:color=)?(?<color>[^"]*?)\])?(?<TEXT>.*?)\1/g, reviver({ groups }) {
                     var _a;
                     return `<span style="color:${(_a = groups.color) !== null && _a !== void 0 ? _a : 'red'}">${groups.TEXT}</span>`;
+                } });
+            args.set('spoiler', { pattern: /&lt;\?(?<TEXT>.*?)\?&gt;/g, reviver({ groups }) {
+                    return `<span style="filter: blur(0.25em); cursor: pointer;" title="Show spoiler?" onclick="this.removeAttribute('style'); this.removeAttribute('title'); this.removeAttribute('onclick');">${groups.TEXT}</span>`;
                 } });
             args.set('custom_token', { pattern: /:(?<what>[a-zA-Z0-9][a-zA-Z0-9_\-]*?):/g, isInline: true, reviver({ groups }) { var _a; return (_a = customTokens.get(groups.what)) !== null && _a !== void 0 ? _a : `:${groups.what}:`; } });
             args.set('nbsp', { pattern: /\\p/g, reviver() { return '&nbsp;'; } });
@@ -192,7 +197,7 @@ var SHML;
             return args;
         }
         Resources.inline = inline;
-        function block(customTokens = new Map(), properties = new Map()) {
+        function block(customTokens = new Map(), properties = new Map(), ids = new Set()) {
             const args = new Map(), inlineArgs = inline(customTokens);
             args.set('escaped', inlineArgs.get('escaped'));
             args.set('raw', inlineArgs.get('raw'));
@@ -225,6 +230,8 @@ var SHML;
                 } });
             args.set('numbered_header', { pattern: /^\s*?(?<count>#{1,6})(?:\[(?<id>[a-zA-Z_][a-zA-Z_0-9]*?)\])?\s?(?<TEXT>[^\uffff]*?)(?=\n)/gm, isInline: false, reviver({ groups }) {
                     var _a;
+                    if (groups.id)
+                        ids.add(`h${groups.count.length}:${groups.id}`);
                     (_a = groups.id) !== null && _a !== void 0 ? _a : (groups.id = cyrb64(groups.TEXT));
                     return `<h${groups.count.length} id="h${groups.count.length}:${groups.id}"><a href="#h${groups.count.length}:${groups.id}" title="Link to section">${groups.TEXT}</a></h${groups.count.length}>`;
                 } });
@@ -259,9 +266,10 @@ var SHML;
     SHML.parseInlineMarkup = parseInlineMarkup;
     function parseMarkup(text, customTokens, properties) {
         var _a;
-        const value = new Map(((_a = properties === null || properties === void 0 ? void 0 : properties.entries()) !== null && _a !== void 0 ? _a : []));
-        const result = new String(abstractParse(text, Resources.block(customTokens, value)));
-        Object.defineProperty(result, 'properties', { value });
+        const props = new Map(((_a = properties === null || properties === void 0 ? void 0 : properties.entries()) !== null && _a !== void 0 ? _a : [])), ids = new Set();
+        const result = new String(abstractParse(text, Resources.block(customTokens, props, ids)));
+        Object.defineProperty(result, 'properties', { value: props });
+        Object.defineProperty(result, 'ids', { value: ids });
         return result;
     }
     SHML.parseMarkup = parseMarkup;
