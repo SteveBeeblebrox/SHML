@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.2.0';
+    SHML.VERSION = '1.2.1';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -246,7 +246,7 @@ var SHML;
             args.set('block_html', { pattern: /&lt;(?<what>\/?(?:h[123456]|hr|blockquote|ul|ol|li))&gt;/g, isInline: false, reviver({ groups }) {
                     return `<${groups.what}>`;
                 } });
-            args.set('text', { pattern: /(?<=\n)\n?(?<TEXT>[^\uffff]+?)(?=  |\n\n|\uffff|$)/g, isInline: false, reviver({ blockType, text, groups }) {
+            args.set('text', { pattern: /(?<=\n)\n?(?<TEXT>[^\uffff]+?)(?=  \s*?\n|\n\n|\uffff|$)/g, isInline: false, reviver({ blockType, text, groups }) {
                     return groups.TEXT.trim() ? `<p>${groups.TEXT.trim()}</p>\n` : '';
                 } });
             return args;
