@@ -3,8 +3,10 @@
 
 ***SHML attempts to prevent script injection; however, it is not a dedicated sanitizer. If security is important, sanitize the output from SHML before writing it to a document.***
 
-**This README is out of date, changes coming soon!**
+***Version 1.3.1 contains security fixes. Update recommend!***
 
+**This README is out of date, changes coming soon!**
+<!--
 ## Formatting
 ### Basics
 #### Bold
@@ -12,9 +14,13 @@
 #### Underlined
 #### Superscript
 #### Subscript
+
+### Spoilers
+
 ### Coloring
 #### Highlighted
 #### Text
+
 ### Line Control
 #### Line Breaks
 #### Word Breaks
@@ -59,14 +65,14 @@
 
 ### Tables
 
-### Other
+### Special Characters
 #### Custom Tokens
 #### Unicode Shortcuts
 #### Non English Characters
 
 ###
 ## API
-## Examples
+## Examples-->
 ## Known Issues
 1. Bullet points do not nest
 2. Bullet points are not properly detected and can occur midway into a line
