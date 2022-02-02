@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.2.0'
+    export const VERSION = '1.2.1'
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -286,7 +286,7 @@ namespace SHML {
                 return `<${groups.what}>`
             }});
 
-            args.set('text', {pattern: /(?<=\n)\n?(?<TEXT>[^\uffff]+?)(?=  |\n\n|\uffff|$)/g, isInline: false, reviver({blockType, text, groups}) {
+            args.set('text', {pattern: /(?<=\n)\n?(?<TEXT>[^\uffff]+?)(?=  \s*?\n|\n\n|\uffff|$)/g, isInline: false, reviver({blockType, text, groups}) {
                 return groups.TEXT.trim() ? `<p>${groups.TEXT.trim()}</p>\n` : ''
             }});
 
