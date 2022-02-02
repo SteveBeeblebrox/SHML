@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.3.1';
+    SHML.VERSION = '1.3.2';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -168,10 +168,10 @@ var SHML;
             args.set('del', { pattern: SimpleInlineRegExp('~~') });
             args.set('sup', { pattern: SimpleInlineRegExp('^^') });
             args.set('sub', { pattern: SimpleInlineRegExp(',,') });
-            args.set('mark', { pattern: /(\|\|)(\[(?:color=)?(?<color>.*?)\])?(?<TEXT>.*?)\1/g, reviver({ groups }) {
+            args.set('mark', { pattern: /(\|\|)(\[(?:color=)?(?<color>[^;]*?)\])?(?<TEXT>.*?)\1/g, reviver({ groups }) {
                     return `<mark${groups.color ? ` style="color:${groups.color}"` : ''}>${groups.TEXT}</mark>`;
                 } });
-            args.set('span', { pattern: /(&amp;&amp;)(\[(?:color=)?(?<color>.*?)\])?(?<TEXT>.*?)\1/g, reviver({ groups }) {
+            args.set('span', { pattern: /(&amp;&amp;)(\[(?:color=)?(?<color>[^;]*?)\])?(?<TEXT>.*?)\1/g, reviver({ groups }) {
                     var _a;
                     return `<span style="color:${(_a = groups.color) !== null && _a !== void 0 ? _a : 'red'}">${groups.TEXT}</span>`;
                 } });
