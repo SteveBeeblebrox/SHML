@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.3.0';
+    SHML.VERSION = '1.3.1';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -68,11 +68,13 @@ var SHML;
     function abstractParse(text, args) {
         if (UnicodeHelper.isInvalid(text))
             throw 'Invalid Unicode Noncharacters present in text';
-        text = text.replace(/[<>&]/g, match => {
+        text = text.replace(/[<>&"']/g, match => {
             switch (match) {
                 case '<': return '&lt;';
                 case '>': return '&gt;';
                 case '&': return '&amp;';
+                case '"': return '&quot;';
+                case '\'': return '&#x27;';
                 default: throw null;
             }
         });
@@ -106,8 +108,8 @@ var SHML;
         Resources.SYMBOLS = {
             '~': { 'A': 'Ã', 'I': 'Ĩ', 'N': 'Ñ', 'O': 'Õ', 'U': 'Ũ', 'a': 'ã', 'i': 'ĩ', 'n': 'ñ', 'o': 'õ', 'u': 'ũ' },
             ':': { 'A': 'Ä', 'E': 'Ë', 'I': 'Ï', 'O': 'Ö', 'U': 'Ü', 'Y': 'Ÿ', 'a': 'ä', 'e': 'ë', 'i': 'ï', 'o': 'ö', 'u': 'ü', 'y': 'ÿ' },
-            '\'': { 'A': 'Á', 'C': 'Ć', 'E': 'É', 'I': 'Í', 'L': 'Ĺ', 'N': 'Ń', 'O': 'Ó', 'R': 'Ŕ', 'S': 'Ś', 'U': 'Ú', 'Y': 'Ý', 'Z': 'Ź', 'a': 'á', 'c': 'ć', 'e': 'é', 'g': 'ǵ', 'i': 'í', 'l': 'ĺ', 'n': 'ń', 'o': 'ó', 'r': 'ŕ', 's': 'ś', 'u': 'ú', 'y': 'ý', 'z': 'ź' },
-            '"': { 'O': 'Ő', 'U': 'Ű', 'o': 'ő', 'u': 'ű' },
+            /*'*/ '&#x27;': { 'A': 'Á', 'C': 'Ć', 'E': 'É', 'I': 'Í', 'L': 'Ĺ', 'N': 'Ń', 'O': 'Ó', 'R': 'Ŕ', 'S': 'Ś', 'U': 'Ú', 'Y': 'Ý', 'Z': 'Ź', 'a': 'á', 'c': 'ć', 'e': 'é', 'g': 'ǵ', 'i': 'í', 'l': 'ĺ', 'n': 'ń', 'o': 'ó', 'r': 'ŕ', 's': 'ś', 'u': 'ú', 'y': 'ý', 'z': 'ź' },
+            /*"*/ '&quot;': { 'O': 'Ő', 'U': 'Ű', 'o': 'ő', 'u': 'ű' },
             '`': { 'A': 'À', 'E': 'È', 'I': 'Ì', 'O': 'Ò', 'U': 'Ù', 'a': 'à', 'e': 'è', 'i': 'ì', 'o': 'ò', 'u': 'ù' },
             '^': { 'A': 'Â', 'C': 'Ĉ', 'E': 'Ê', 'G': 'Ĝ', 'H': 'Ĥ', 'I': 'Î', 'J': 'Ĵ', 'O': 'Ô', 'S': 'Ŝ', 'U': 'Û', 'W': 'Ŵ', 'Y': 'Ŷ', 'a': 'â', 'c': 'ĉ', 'e': 'ê', 'g': 'ĝ', 'h': 'ĥ', 'i': 'î', 'j': 'ĵ', 'o': 'ô', 's': 'ŝ', 'u': 'û', 'w': 'ŵ', 'x': '◯', 'y': 'ŷ' },
             'o': { 'A': 'Å', 'U': 'Ů', 'a': 'å', 'u': 'ů' },
@@ -135,12 +137,12 @@ var SHML;
             args.set('code', { pattern: /(`)(?<text>.*?)\1/g, reviver({ groups }) {
                     return `<code>${groups.text}</code>`;
                 } });
-            args.set('symbol', { pattern: /\/(?<what>..|\?|!)\//g, reviver({ groups }) {
+            args.set('symbol', { pattern: /\/(?<what>(&#x27;|&quot;|.).|\?|!)\//g, reviver({ groups }) {
                     var _a, _b;
                     switch (groups.what) {
                         case '!': return '&iexcl;';
                         case '?': return '&iquest;';
-                        default: return (_b = (_a = Resources.SYMBOLS[groups.what[0]]) === null || _a === void 0 ? void 0 : _a[groups.what[1]]) !== null && _b !== void 0 ? _b : `/${groups.what}/`;
+                        default: return (_b = (_a = Resources.SYMBOLS[groups.what.substring(0, groups.what.length - 1)]) === null || _a === void 0 ? void 0 : _a[groups.what.substring(groups.what.length - 1)]) !== null && _b !== void 0 ? _b : `/${groups.what}/`;
                     }
                 } });
             args.set('unicode_shortcut', { pattern: /(?<=\b)(?:TM|SS)(?=\b)|\([cCrR]\)|-&gt;|&lt;-/g, reviver({ text }) {
@@ -166,10 +168,10 @@ var SHML;
             args.set('del', { pattern: SimpleInlineRegExp('~~') });
             args.set('sup', { pattern: SimpleInlineRegExp('^^') });
             args.set('sub', { pattern: SimpleInlineRegExp(',,') });
-            args.set('mark', { pattern: /(\|\|)(\[(?:color=)?(?<color>[^"]*?)\])?(?<TEXT>.*?)\1/g, reviver({ groups }) {
+            args.set('mark', { pattern: /(\|\|)(\[(?:color=)?(?<color>.*?)\])?(?<TEXT>.*?)\1/g, reviver({ groups }) {
                     return `<mark${groups.color ? ` style="color:${groups.color}"` : ''}>${groups.TEXT}</mark>`;
                 } });
-            args.set('span', { pattern: /(&amp;&amp;)(\[(?:color=)?(?<color>[^"]*?)\])?(?<TEXT>.*?)\1/g, reviver({ groups }) {
+            args.set('span', { pattern: /(&amp;&amp;)(\[(?:color=)?(?<color>.*?)\])?(?<TEXT>.*?)\1/g, reviver({ groups }) {
                     var _a;
                     return `<span style="color:${(_a = groups.color) !== null && _a !== void 0 ? _a : 'red'}">${groups.TEXT}</span>`;
                 } });
@@ -218,7 +220,7 @@ var SHML;
             args.set('image', { pattern: /!\[(?<src>\S*?)(?:\s*?(?<height>auto|\d*)(?:[xX](?<width>auto|\d*))?)?\](?:\((?<alt>.*?)\))?/g, reviver({ groups }) {
                     var _a;
                     (_a = groups.width) !== null && _a !== void 0 ? _a : (groups.width = groups.height);
-                    return `<img src="${groups.src}"${groups.alt ? ` alt="${groups.alt}"` : ''}${groups.height ? ` height="${groups.height}"` : ''}${groups.width ? ` width="${groups.width}"` : ''}">`;
+                    return `<img src="${groups.src}"${groups.alt ? ` alt="${groups.alt}"` : ''}${groups.height ? ` height="${groups.height}"` : ''}${groups.width ? ` width="${groups.width}"` : ''}>`;
                 } });
             for (const entry of inlineArgs.entries())
                 if (!args.has(entry[0]))
