@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.3.2'
+    export const VERSION = '1.3.3'
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -267,7 +267,7 @@ namespace SHML {
                 return `<div style="text-align: ${overrides[groups.what] ?? groups.what};">${groups.TEXT}</div>`
             }})
 
-            args.set('numbered_header', {pattern: /^\s*?(?<count>#{1,6})(?:\[(?<id>[a-zA-Z_][a-zA-Z_0-9]*?)\])?\s?(?<TEXT>[^\uffff]*?)(?=\n)/gm, isInline: false, reviver({groups}) {
+            args.set('numbered_header', {pattern: /^\s*?(?<count>#{1,6})(?:\[(?<id>[a-zA-Z_][a-zA-Z_0-9]*?)\])?\s?(?<TEXT>[^\uffff]*?)(?=\n|$)/gm, isInline: false, reviver({groups}) {
                 if(groups.id) ids.add(`h${groups.count.length}:${groups.id}`)
                 groups.id ??= cyrb64(groups.TEXT)
                 return `<h${groups.count.length} id="h${groups.count.length}:${groups.id}"><a href="#h${groups.count.length}:${groups.id}" title="Link to section">${groups.TEXT}</a></h${groups.count.length}>`
