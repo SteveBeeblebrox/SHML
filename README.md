@@ -1,7 +1,7 @@
 # SHML ![GitHub](https://img.shields.io/github/license/SteveBeeblebrox/SHML?style=flat-square) ![GitHub last commit](https://img.shields.io/github/last-commit/SteveBeeblebrox/SHML?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues-raw/SteveBeeblebrox/SHML?style=flat-square) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/SteveBeeblebrox/SHML?style=flat-square) ![GitHub contributors](https://img.shields.io/github/contributors/SteveBeeblebrox/SHML?color=007EC6&style=flat-square) ![GitHub Repo stars](https://img.shields.io/github/stars/SteveBeeblebrox/SHML?style=flat-square)
 ***Simplified HTML Markup Language (Or Simplified Hypertext Markup Language Markup Language)*** is a lightweight markup language parser built in JavaScript. The syntax is similar to that of Markdown, but with changes to make some things more intuitive. This software is distributed under the MIT license. A demo of SHML can be found [here](https://stevebeeblebrox.github.io/apps/shml).
 
-***SHML attempts to prevent script injection; however, it is not a dedicated sanitizer. If security is important, sanitize the output from SHML before writing it to a document.***
+***SHML blocks most forms of script injection; however, older browsers that allow the use of the JavaScript protocol within the CSS url function pose a risk. If security is important, use a dedicated sanitizer on the output from SHML before writing it to a document.***
 
 ***Version 1.3.1 contains security fixes. Update recommend!***
 
