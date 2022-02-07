@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.3.3';
+    SHML.VERSION = '1.3.4';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -209,8 +209,7 @@ var SHML;
                     return `<pre><code>${groups.text}</code></pre>`;
                 } });
             args.set('property', { pattern: /^\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({ groups }) {
-                    var _a;
-                    properties.set(groups.key, (_a = properties.get(groups.key)) !== null && _a !== void 0 ? _a : groups.value.trim());
+                    properties.set(groups.key, groups.value.trim());
                     return '';
                 } });
             args.set('template', { pattern: /\${(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)\}/g, isInline: true, reviver({ groups }) {
