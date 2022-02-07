@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.3.3'
+    export const VERSION = '1.3.4'
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -246,7 +246,7 @@ namespace SHML {
             }});
 
             args.set('property', {pattern: /^\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({groups}) {
-                properties.set(groups.key, properties.get(groups.key) ?? groups.value.trim())
+                properties.set(groups.key, groups.value.trim())
                 return ''
             }});
             args.set('template', {pattern: /\${(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)\}/g, isInline: true, reviver({groups}) {
