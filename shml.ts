@@ -315,4 +315,22 @@ namespace SHML {
         Object.defineProperty(result, 'ids', {value: ids})
         return result as String & {properties: Map<string,string>, ids: Set<string>}
     }
+    
+    export function parseSimpleCode(text: string, keywords: string[] = ['break','case','catch','class','const','continue','debugger','default','delete','do','else','export','extends','finally','for','function','if','import','in','instanceof','new','return','super','switch','this','throw','try','typeof','var','void','while','with','yield','implements','interface','let','package','private','protected','public','static','yield','await','null','true','false','abstract','boolean','byte','char','double','final','float','goto','int','long','native','short','synchronized','throws','transient','volatile']): string {
+        const styling: FormatArgs = new Map()
+
+        function matchToken(name: string, pattern: RegExp): void {
+            styling.set(name, {pattern, reviver({groups}) {
+                return `<span data-code-token="${name}">${groups.text}</span>`
+            }});
+        }
+
+        matchToken('string',/(?<text>(?<what>&quot;|&#x27;|`)(?:.*?[^\\])?(?:\\\\)*\k<what>)/g);
+        matchToken('comment', /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g);
+        matchToken('number', /(?<text>\b(0[xbo])?\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?n?(?<!_))/gi);
+
+        matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${keywords.join('|')})\b)`, 'g'))
+
+        return abstractParse(text, styling)
+    }
 }
