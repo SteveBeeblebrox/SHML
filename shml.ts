@@ -375,4 +375,65 @@ namespace SHML {
 
         return styledText;
     }
+    
+    export function parseJSON(text: string, markLines: boolean = true): string {
+        const styling: FormatArgs = new Map();
+
+        const keywords = ['true','false','null'];
+
+        function matchToken(name: string, pattern: RegExp): void {
+            styling.set(name, {pattern, reviver({groups}) {
+                return `<span data-code-token="json-${name}">${groups.text}</span>`;
+            }});
+        }
+
+        matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+        
+        matchToken('number', /(?<text>[+\-]?\b(\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?n?(?<!_))(?:\b|[a-z]+))/gi);
+        matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${keywords.join('|')})\b)`, 'g'))
+
+        let styledText = abstractParse(text, styling);
+
+        if(markLines)
+            styledText = styledText.split('\n').map((line: string, i: number)=>`<span data-code-token="line-number">${(i+1).toString().padStart((styledText.split('\n').length+1).toString().length,' ')}</span><span data-code-token="line" data-code-line="${i+1}">${line}</span>`).join('\n')
+
+        return styledText;
+    }
+
+    export function parseHTML(text: string, markLines: boolean = true): string {
+        const styling: FormatArgs = new Map();
+        
+        function matchToken(name: string, pattern: RegExp): void {
+            styling.set(name, {pattern, reviver({groups}) {
+                return `<span data-code-token="html-${name}">${groups.text}</span>`;
+            }});
+        }
+
+        matchToken('comment', /(?<text>(?:&lt;!--[\s\S]*?--&gt;))/g);
+
+        styling.set('style', {pattern: /(?<OPENTAG>&lt;style\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/style&gt;)/g, reviver({groups}) {
+            return groups.OPENTAG + '<span data-code-token="html-style">' + parseCSS(groups.content, false) + '</span>' + groups.CLOSETAG;
+        }})
+
+        styling.set('script', {pattern: /(?<OPENTAG>&lt;script\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/script&gt;)/g, reviver({groups}) {
+            return groups.OPENTAG + '<span data-code-token="html-script">' + parseCode(groups.content, false) + '</span>' + groups.CLOSETAG;
+        }})
+
+        styling.set('open-tag', {pattern: /(?<name>&lt;[a-z\-]+)(?<DATA>[^\uffff]*?)(?<close>&gt;)/gi, reviver({groups}) {
+            return `<span data-code-token="html-open-tag">${groups.name}</span>${groups.DATA ?? ''}<span data-code-token="html-open-tag">${groups.close}</span>`
+        }});
+
+        styling.set('string',{pattern: /(?<front>=\s*?)(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g, reviver({groups}) {
+            return groups.front + `<span data-code-token="html-string">${groups.text}</span>`;
+        }});
+        
+        matchToken('close-tag', /(?<text>&lt;\/[a-z\-\s]+&gt;)/gi);
+
+        let styledText = abstractParse(text, styling);
+
+        if(markLines)
+            styledText = styledText.split('\n').map((line: string, i: number)=>`<span data-code-token="line-number">${(i+1).toString().padStart((styledText.split('\n').length+1).toString().length,' ')}</span><span data-code-token="line" data-code-line="${i+1}">${line}</span>`).join('\n')
+
+        return styledText;
+    }
 }
