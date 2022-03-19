@@ -78,6 +78,7 @@ A CLI Tool is in the works.
 ## Known Issues
 1. Bullet points do not nest
 2. Bullet points are not properly detected and can occur midway into a line
+3. Code blocks do not support language tags
 <!--
 ## Syntax
 SHML is composed of two main types of styling: inline and sections. All sections must be on their own line. Inline formatting can be applied to any part of a section.
