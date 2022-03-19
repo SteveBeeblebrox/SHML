@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.3.5'
+    export const VERSION = '1.3.6'
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -314,5 +314,29 @@ namespace SHML {
         Object.defineProperty(result, 'properties', {value: props})
         Object.defineProperty(result, 'ids', {value: ids})
         return result as String & {properties: Map<string,string>, ids: Set<string>}
+    }
+    
+    export function parseCode(text: string, markLines: boolean = true, keywords: string[] = ['break','case','catch','class','const','continue','debugger','default','delete','do','else','export','extends','finally','for','function','if','import','in','instanceof','new','return','super','switch','this','throw','try','typeof','var','void','while','with','yield','implements','interface','let','package','private','protected','public','static','yield','await','null','true','false','abstract','boolean','byte','char','double','final','float','goto','int','long','native','short','synchronized','throws','transient','volatile']): string {
+        const styling: FormatArgs = new Map();
+
+        function matchToken(name: string, pattern: RegExp): void {
+            styling.set(name, {pattern, reviver({groups}) {
+                return `<span data-code-token="${name}">${groups.text}</span>`;
+            }});
+        }
+
+        styling.set('multiline-string', {pattern: /(?<text>(?<what>`)(?:.*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => `<span data-code-token="string">${groups.text}</span>`});
+        matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+        
+        matchToken('comment', /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g);
+        matchToken('number', /(?<text>\b(?:0(?:x[0-9a-f][0-9a-f_]*|b[01][01_]*|o[0-7][0-7_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?n?(?<!_)))\b/gi);
+        matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${keywords.join('|')})\b)`, 'g'))
+
+        let styledText = abstractParse(text, styling);
+
+        if(markLines)
+            styledText = styledText.split('\n').map((line: string, i: number)=>`<span data-code-token="line-number">${(i+1).toString().padStart((styledText.split('\n').length+1).toString().length,' ')}</span><span data-code-token="line" data-code-line="${i+1}">${line}</span>`).join('\n')
+
+        return styledText;
     }
 }
