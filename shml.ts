@@ -402,7 +402,7 @@ namespace SHML {
 
     export function parseHTML(text: string, markLines: boolean = true): string {
         const styling: FormatArgs = new Map();
-        
+
         function matchToken(name: string, pattern: RegExp): void {
             styling.set(name, {pattern, reviver({groups}) {
                 return `<span data-code-token="html-${name}">${groups.text}</span>`;
@@ -410,6 +410,9 @@ namespace SHML {
         }
 
         matchToken('comment', /(?<text>(?:&lt;!--[\s\S]*?--&gt;))/g);
+        styling.set('doctype', {pattern:/^(?<whitespace>\s*)(?<text>&lt;!DOCTYPE\b.*?&gt;)/i,reviver({groups}) {
+            return `${groups.whitespace || ''}<span data-code-token="html-doctype">${groups.text}</span>`
+        }});
 
         styling.set('style', {pattern: /(?<OPENTAG>&lt;style\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/style&gt;)/g, reviver({groups}) {
             return groups.OPENTAG + '<span data-code-token="html-style">' + parseCSS(groups.content, false) + '</span>' + groups.CLOSETAG;
