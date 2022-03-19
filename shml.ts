@@ -339,4 +339,40 @@ namespace SHML {
 
         return styledText;
     }
+    
+    export function parseCSS(text: string, markLines: boolean = true): string {
+        const styling: FormatArgs = new Map();
+
+        const keywords = ['charset','color-profile ','counter-style','document ','font-face','font-feature-values','import','keyframes','media','namespace','page','property ','supports','viewport','color-profile','document','layer','property','scroll-timeline','swash','ornaments','annotation','stylistic','styleset','character-variant']
+
+        function matchToken(name: string, pattern: RegExp): void {
+            styling.set(name, {pattern, isInline:false, reviver({groups}) {
+                return `<span data-code-token="css-${name}">${groups.text}</span>`;
+            }});
+        }
+
+        matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+        
+        matchToken('comment', /(?<text>(?:\/\*[\s\S]*?\*\/))/g);
+        
+        
+        matchToken('keyword', new RegExp(String.raw`(?<text>@(?:${keywords.join('|')})\b)`, 'g'));
+
+        matchToken('selector', /(?<text>[^\s{}\s\uffff][^{}\uffff]*?[^\s{}\s\uffff]?(?=\s*{))/g);
+        matchToken('property', /(?<text>\b[a-z\-]*:)/g);
+
+        matchToken('number', /(?<text>\b(\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?n?(?<!_))(?:\b|[a-z]+))/gi);
+
+        matchToken('hexadecimal', /(?<text>#(?:(?:[0-9a-f]){8}|(?:[0-9a-f]){6}|(?:[0-9a-f]){3,4})\b)/gi);
+
+        matchToken('function', /(?<text>\b[a-z\-]+\b(?=\())/g);
+        matchToken('other', /(?<text>\b[a-z\-]+\b)/g);
+
+        let styledText = abstractParse(text, styling);
+
+        if(markLines)
+            styledText = styledText.split('\n').map((line: string, i: number)=>`<span data-code-token="line-number">${(i+1).toString().padStart((styledText.split('\n').length+1).toString().length,' ')}</span><span data-code-token="line" data-code-line="${i+1}">${line}</span>`).join('\n')
+
+        return styledText;
+    }
 }
