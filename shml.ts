@@ -67,8 +67,7 @@ namespace SHML {
             INLINE_MARKER = nextNoncharacter(),
             BLOCK_MARKER = nextNoncharacter(),
             HEXADECIMAL_MAPPING = Object.fromEntries(Array.apply(null,
-                    // @ts-expect-error
-                    {length:16}
+                    {length:16} as unknown[]
                 ).map((_,i) => [i.toString(16), nextNoncharacter()]))
     }
 
