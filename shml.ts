@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.3.6'
+    export const VERSION = '1.4.0'
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -316,7 +316,7 @@ namespace SHML {
         return result as String & {properties: Map<string,string>, ids: Set<string>}
     }
     
-    export function parseCode(text: string, markLines: boolean = true, keywords: string[] = ['break','case','catch','class','const','continue','debugger','default','delete','do','else','export','extends','finally','for','function','if','import','in','instanceof','new','return','super','switch','this','throw','try','typeof','var','void','while','with','yield','implements','interface','let','package','private','protected','public','static','yield','await','null','true','false','abstract','boolean','byte','char','double','final','float','goto','int','long','native','short','synchronized','throws','transient','volatile']): string {
+    export function parseJavaScript(text: string, markLines: boolean = true, keywords: string[] = ['break','case','catch','class','const','continue','debugger','default','delete','do','else','export','extends','finally','for','function','if','import','in','instanceof','new','return','super','switch','this','throw','try','typeof','var','void','while','with','yield','implements','interface','let','package','private','protected','public','static','yield','await','null','true','false','abstract','boolean','byte','char','double','final','float','goto','int','long','native','short','synchronized','throws','transient','volatile']): string {
         const styling: FormatArgs = new Map();
 
         function matchToken(name: string, pattern: RegExp): void {
@@ -329,7 +329,7 @@ namespace SHML {
         matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
         
         matchToken('comment', /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g);
-        matchToken('number', /(?<text>\b(?:0(?:x[0-9a-f][0-9a-f_]*|b[01][01_]*|o[0-7][0-7_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?n?(?<!_)))\b/gi);
+        matchToken('number', /(?<text>\bInfinity|NaN|(?:0(?:[xX][0-9a-fA-F][0-9a-fA-F_]*|[bB][01][01_]*|[oO][0-7][0-7_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])[eE][+\-]?\d[\d_]*)?n?(?<!_)))\b/g);
         matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${keywords.join('|')})\b)`, 'g'))
 
         let styledText = abstractParse(text, styling);
@@ -419,7 +419,7 @@ namespace SHML {
         }})
 
         styling.set('script', {pattern: /(?<OPENTAG>&lt;script\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/script&gt;)/g, reviver({groups}) {
-            return groups.OPENTAG + '<span data-code-token="html-script">' + parseCode(groups.content, false) + '</span>' + groups.CLOSETAG;
+            return groups.OPENTAG + '<span data-code-token="html-script">' + parseJavaScript(groups.content, false) + '</span>' + groups.CLOSETAG;
         }})
 
         styling.set('open-tag', {pattern: /(?<name>&lt;[a-z\-]+)(?<DATA>[^\uffff]*?)(?<close>&gt;)/gi, reviver({groups}) {
