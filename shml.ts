@@ -443,7 +443,7 @@ namespace SHML {
 
                 matchToken('comment', /(?<text>(?:#.*))/g);
                 
-                // TODO numbers
+                matchToken('number', /(?<text>\b(?:0(?:[xX][0-9a-fA-F][0-9a-fA-F_]*|[bB][01][01_]*|[oO][0-7][0-7_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])[eE][+\-]?\d[\d_]*)?j?(?<!_))\b)/g);
                 
                 matchToken('value', /(?<text>\b(?:True|False|None)\b)/g);
                 matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${PYTHON_KEYWORDS.join('|')})\b)`, 'g'));
