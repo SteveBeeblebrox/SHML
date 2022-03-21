@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.4.2';
+    export const VERSION = '1.4.3';
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -241,7 +241,7 @@ namespace SHML {
             args.set('comment', inlineArgs.get('comment')!)
 
             args.set('code_block', {pattern: /(```)(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({groups}) {
-                return `<pre><code>${(groups.language ? SHML.parseCode(groups.text.replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match: string) => {
+                return `<pre><code>${groups.language ? SHML.parseCode(groups.text.replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match: string) => {
                     switch(match) {
                         case '&lt;': return '<';
                         case '&gt;': return '>';
@@ -251,7 +251,7 @@ namespace SHML {
                         
                         default: throw null;
                     }
-                }), groups.language, false) : groups.text).trim()}</code></pre>`;
+                }).trim(), groups.language, false) : groups.text.trim()}</code></pre>`;
             }});
 
             args.set('property', {pattern: /^\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({groups}) {
