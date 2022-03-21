@@ -303,7 +303,7 @@ namespace SHML {
         }
 
         export namespace Code {
-            export const SUPPORTED_LANGUAGES = ['html', 'css', 'javascript', 'typescript', 'xml', 'json', 'python', 'none'] as const;
+            export const SUPPORTED_LANGUAGES = ['html', 'css', 'javascript', 'typescript', 'xml', 'json', 'python', 'diff', 'none'] as const;
 
             function appendTokenMatcher(name: string, pattern: RegExp, args: FormatArgs): void {
                 args.set(name, {pattern, reviver({groups}) {
@@ -450,6 +450,22 @@ namespace SHML {
 
                 return args;
             }
+
+            export function diffHighlighter(): FormatArgs {
+                const args: FormatArgs = new Map();
+
+                args.set('heading', {pattern: /^(?<range>@@ -\d+,\d+ \+\d+,\d+ @@)(?<heading> .*)?$/gm, reviver({groups}) {
+                    return `<span data-code-token="range">${groups.range}</span>` + (groups.heading ? `<span data-code-token="heading">${groups.heading}</span>` : '');
+                }});
+                args.set('insertion', {pattern: /^(?<text>\+.*)$/gm, reviver({groups}) {
+                    return `<span data-code-token="insertion"><ins>${groups.text}</ins></span>`;
+                }});
+                args.set('deletion', {pattern: /^(?<text>-.*)$/gm, reviver({groups}) {
+                    return `<span data-code-token="deletion"><del>${groups.text}</del></span>`;
+                }});
+
+                return args;
+            }
         }
     }
 
@@ -476,6 +492,7 @@ namespace SHML {
                     case 'xml': return Configuration.Code.xmlHighlighter();
                     case 'json': return Configuration.Code.jsonHighlighter();
                     case 'python': return Configuration.Code.pythonHighlighter();
+                    case 'diff': return Configuration.Code.diffHighlighter();
                     default: return new Map();
                 }
             })();
