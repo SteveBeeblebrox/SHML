@@ -218,11 +218,11 @@ namespace SHML {
                 return `<a href="${/^[^:]*?(?:(?:(?<=mailto|tel|https|http):|\/.*:).*)?$/g.test(groups.href) ? groups.href : 'about:blank#blocked'}"${groups.newtab ? ' target="_blank"':''}>${groups.TEXT}</a>`
             }});
 
-            args.set('autolink', {pattern:/(?<text>(?:(?<protocol>https?:\/\/)|(?<www>www\.))(?<link>\w[\w\-]*(?<=\w)\.\w[\w.\/?&#%=+\-]*(?<=[\w\/])))/g, reviver({groups}) {
+            args.set('autolink', {pattern: /(?<text>(?:(?<protocol>https?:\/\/)|(?<www>www\.))(?<link>\w[\w\-]*(?<=\w)\.\w[\w.\/?&#%=+\-]*(?<=[\w\/])))/g, reviver({groups}) {
                 return `<a href="${groups.protocol ?? 'https://'}${groups.www ?? ''}${groups.link}">${groups.text}</a>`
             }})
 
-            args.set('autolink_email', {pattern:/(?<text>\w[\w.\-]*?@[\w.\-]+\.\w+)/g, reviver({groups}) {
+            args.set('autolink_email', {pattern: /(?<text>\w[\w.\-]*?@[\w.\-]+\.\w+)/g, reviver({groups}) {
                 return `<a href="mailto:${groups.text}">${groups.text}</a>`
             }})
 
@@ -303,6 +303,8 @@ namespace SHML {
         }
 
         export namespace Code {
+            export const SUPPORTED_LANGUAGES = ['html', 'css', 'javascript', /*'typecript',*/ 'xml', 'json', /*'python',*/  'none'] as const;
+
             function appendTokenMatcher(name: string, pattern: RegExp, args: FormatArgs): void {
                 args.set(name, {pattern, reviver({groups}) {
                     return `<span data-code-token="${name}">${groups.text}</span>`;
@@ -327,20 +329,20 @@ namespace SHML {
                 }
 
                 matchToken('comment', /(?<text>(?:&lt;!--[\s\S]*?--&gt;))/g);
-                args.set('doctype', {pattern: /^(?<whitespace>\s*)(?<text>&lt;!DOCTYPE\b.*?&gt;)/i,reviver({groups}) {
+                args.set('doctype', {pattern: /^(?<whitespace>\s*)(?<text>&lt;!DOCTYPE\b.*?&gt;)/i, reviver({groups}) {
                     return `${groups.whitespace || ''}<span data-code-token="doctype">${groups.text}</span>`
                 }});
 
                 args.set('style', {pattern: /(?<OPENTAG>&lt;style\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/style&gt;)/g, reviver({groups}) {
                     return groups.OPENTAG + parseCode(desanitize(groups.content), 'css', false) + groups.CLOSETAG;
-                }})
+                }});
 
                 args.set('script', {pattern: /(?<OPENTAG>&lt;script\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/script&gt;)/g, reviver({groups}) {
                     return groups.OPENTAG + parseCode(desanitize(groups.content), 'javascript', false) + groups.CLOSETAG;
-                }})
+                }});
 
                 args.set('tag-open', {pattern: /(?<name>&lt;[a-z\-0-9]+)(?<DATA>[^\uffff\ufffe]*?)(?<close>&gt;)/gi, reviver({groups}) {
-                    return `<span data-code-token="tag-open">${groups.name}</span>${groups.DATA ?? ''}<span data-code-token="tag-open">${groups.close}</span>`
+                    return `<span data-code-token="tag">${groups.name}</span>${groups.DATA ?? ''}<span data-code-token="tag">${groups.close}</span>`
                 }});
 
                 args.set('string',{pattern: /(?<front>=\s*?)(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g, reviver({groups}) {
@@ -348,7 +350,7 @@ namespace SHML {
                 }});
                 
                 args.set('tag-close', {pattern: /(?<text>&lt;\/[a-z\-\s0-9]+&gt;)/gi, reviver({groups}) {
-                    return `<span data-code-token="tag-close">${groups.text}</span>`;
+                    return `<span data-code-token="tag">${groups.text}</span>`;
                 }});
 
                 return args;
@@ -393,6 +395,28 @@ namespace SHML {
                 return args;
             }
 
+            export function xmlHighlighter(): FormatArgs {
+                const args: FormatArgs = new Map();
+
+                const htmlArgs = htmlHighlighter(), inheritFromHTML = (name: string) => args.set(name, htmlArgs.get(name)!);
+
+                inheritFromHTML('comment');
+                
+                args.set('processing-instruction', {pattern: /(?<name>&lt;\?[a-z0-9\-]+)(?<DATA>\b.*?)(?<close>\?&gt;)/gi, reviver({groups}) {
+                    return `<span data-code-token="processing-instruction">${groups.name}</span>${groups.DATA}<span data-code-token="processing-instruction">${groups.close}</span>`
+                }})
+                
+                args.set('cdata', {pattern: /(?<open>&lt;!\[CDATA\[)(?<content>[\s\S]*?)(?<close>\]\]&gt;)/g, reviver({groups}) {
+                    return `<span data-code-token="cdata">${groups.open}</span><span data-code-token="cdata-content">${groups.content}</span><span data-code-token="cdata">${groups.close}</span>`
+                }});
+
+                inheritFromHTML('tag-open');
+                inheritFromHTML('string');
+                inheritFromHTML('tag-close');
+
+                return args;
+            }
+
             export function jsonHighlighter(): FormatArgs {
                 const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
 
@@ -417,8 +441,7 @@ namespace SHML {
         return result as String & {properties: Map<string,string>, ids: Set<string>}
     }
 
-    type BuiltinLanguageMode =  'html' | 'css' | 'javascript' /*| 'typecript' | 'xml'*/ | 'json' /*| 'python'*/ | 'none'
-    export function parseCode(text: string, language: BuiltinLanguageMode = 'none', markLines: boolean = true, lineOffset: number = 1): string {
+    export function parseCode(text: string, language: typeof Configuration.Code.SUPPORTED_LANGUAGES[number] = 'none', markLines: boolean = true, lineOffset: number = 1): string {
         if(language !== 'none') {
             const args: FormatArgs = (function() {
                 switch(language) {
@@ -426,7 +449,7 @@ namespace SHML {
                     case 'css': return Configuration.Code.cssHighlighter();
                     case 'javascript': return Configuration.Code.javascriptHighlighter();
                     //NYI case 'typecript': return Configuration.Code.typescriptHighlighter();
-                    //NYI case 'xml': return Configuration.Code.xmlHighlighter();
+                    case 'xml': return Configuration.Code.xmlHighlighter();
                     case 'json': return Configuration.Code.jsonHighlighter();
                     //NYI case 'python': return Configuration.Code.pythonHighlighter();
                     default: return new Map();
