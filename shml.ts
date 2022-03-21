@@ -303,7 +303,7 @@ namespace SHML {
         }
 
         export namespace Code {
-            export const SUPPORTED_LANGUAGES = ['html', 'css', 'javascript', 'typescript', 'xml', 'json', /*'python',*/  'none'] as const;
+            export const SUPPORTED_LANGUAGES = ['html', 'css', 'javascript', 'typescript', 'xml', 'json', 'python', 'none'] as const;
 
             function appendTokenMatcher(name: string, pattern: RegExp, args: FormatArgs): void {
                 args.set(name, {pattern, reviver({groups}) {
@@ -392,12 +392,12 @@ namespace SHML {
             export function ecmascriptHighlighter(keywords: string[]): FormatArgs {
                 const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
 
-                args.set('multiline-string', {pattern: /(?<text>(?<what>`)(?:.*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => `<span data-code-token="string">${groups.text}</span>`});
+                args.set('multiline-string', {pattern: /(?<text>(?<what>`)(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => `<span data-code-token="string">${groups.text}</span>`});
                 matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
                 
                 matchToken('comment', /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g);
                 matchToken('number', /(?<text>\b(?:Infinity|NaN|0(?:[xX][0-9a-fA-F][0-9a-fA-F_]*|[bB][01][01_]*|[oO][0-7][0-7_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])[eE][+\-]?\d[\d_]*)?n?(?<!_))\b)/g);
-                matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${keywords.join('|')})\b)`, 'g'))
+                matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${keywords.join('|')})\b)`, 'g'));
 
                 return args;
             }
@@ -433,6 +433,23 @@ namespace SHML {
 
                 return args;
             }
+
+            const PYTHON_KEYWORDS = ['and','as','assert','break','class','continue','def','del','elif','else','except','finally','for','from','global','if','import','in','is','lambda','nonlocal','not','or','pass','raise','return','try','while','with','yield'];
+            export function pythonHighlighter(): FormatArgs {
+                const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
+
+                args.set('multiline-string', {pattern: /(?<text>(?<what>(?:&quot;|&#x27;){3})(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => `<span data-code-token="string">${groups.text}</span>`});
+                matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+
+                matchToken('comment', /(?<text>(?:#.*))/g);
+                
+                // TODO numbers
+                
+                matchToken('value', /(?<text>\b(?:True|False|None)\b)/g);
+                matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${PYTHON_KEYWORDS.join('|')})\b)`, 'g'));
+
+                return args;
+            }
         }
     }
 
@@ -458,7 +475,7 @@ namespace SHML {
                     case 'typescript': return Configuration.Code.typescriptHighlighter();
                     case 'xml': return Configuration.Code.xmlHighlighter();
                     case 'json': return Configuration.Code.jsonHighlighter();
-                    //NYI case 'python': return Configuration.Code.pythonHighlighter();
+                    case 'python': return Configuration.Code.pythonHighlighter();
                     default: return new Map();
                 }
             })();
