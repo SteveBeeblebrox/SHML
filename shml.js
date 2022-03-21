@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.4.0';
+    SHML.VERSION = '1.4.1';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -204,7 +204,16 @@ var SHML;
             args.set('src_comment', inlineArgs.get('src_comment'));
             args.set('comment', inlineArgs.get('comment'));
             args.set('code_block', { pattern: /(```)(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({ groups }) {
-                    return `<pre><code>${groups.language ? SHML.parseCode(groups.text, groups.language, false) : groups.text}</code></pre>`;
+                    return `<pre><code>${groups.language ? SHML.parseCode(groups.text.replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match) => {
+                        switch (match) {
+                            case '&lt;': return '<';
+                            case '&gt;': return '>';
+                            case '&amp;': return '&';
+                            case '&quot;': return '"';
+                            case '&#x27;': return '\'';
+                            default: throw null;
+                        }
+                    }), groups.language, false) : groups.text}</code></pre>`;
                 } });
             args.set('property', { pattern: /^\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({ groups }) {
                     properties.set(groups.key, groups.value.trim());
@@ -269,7 +278,7 @@ var SHML;
             function htmlHighlighter() {
                 const args = new Map(), matchToken = (name, pattern) => appendTokenMatcher(name, pattern, args);
                 function desanitize(text) {
-                    return text.replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, match => {
+                    return text.replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match) => {
                         switch (match) {
                             case '&lt;': return '<';
                             case '&gt;': return '>';
