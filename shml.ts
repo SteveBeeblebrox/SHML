@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.4.0'
+    export const VERSION = '1.4.1';
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -241,7 +241,17 @@ namespace SHML {
             args.set('comment', inlineArgs.get('comment')!)
 
             args.set('code_block', {pattern: /(```)(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({groups}) {
-                return `<pre><code>${groups.language ? SHML.parseCode(groups.text, groups.language, false) : groups.text}</code></pre>`;
+                return `<pre><code>${groups.language ? SHML.parseCode(groups.text.replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match: string) => {
+                    switch(match) {
+                        case '&lt;': return '<';
+                        case '&gt;': return '>';
+                        case '&amp;': return '&';
+                        case '&quot;': return '"';
+                        case '&#x27;': return '\'';
+                        
+                        default: throw null;
+                    }
+                }), groups.language, false) : groups.text}</code></pre>`;
             }});
 
             args.set('property', {pattern: /^\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({groups}) {
@@ -315,7 +325,7 @@ namespace SHML {
                 const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
 
                 function desanitize(text: string) {
-                    return text.replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, match => {
+                    return text.replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match: string) => {
                         switch(match) {
                             case '&lt;': return '<';
                             case '&gt;': return '>';
@@ -325,7 +335,7 @@ namespace SHML {
                             
                             default: throw null;
                         }
-                    })
+                    });
                 }
 
                 matchToken('comment', /(?<text>(?:&lt;!--[\s\S]*?--&gt;))/g);
