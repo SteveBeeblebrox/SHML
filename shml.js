@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.4.3';
+    SHML.VERSION = '1.4.4';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -95,7 +95,7 @@ var SHML;
                 text = text.replace(/([\ufffe\uffff]).*?\1/, hash => {
                     var _a;
                     const block = hashmap.get(hash);
-                    return ((_a = args.get(block.blockType).reviver) !== null && _a !== void 0 ? _a : (({ blockType, groups }) => `<${blockType}>${groups.TEXT}</${blockType}>`))(block);
+                    return ((_a = args.get(block.blockType).reviver) !== null && _a !== void 0 ? _a : (({ blockType, groups }) => `<${blockType}>${groups.TEXT}</${blockType}>`))(block, decode);
                 });
             return text;
         }
@@ -203,8 +203,8 @@ var SHML;
             args.set('raw', inlineArgs.get('raw'));
             args.set('src_comment', inlineArgs.get('src_comment'));
             args.set('comment', inlineArgs.get('comment'));
-            args.set('code_block', { pattern: /(```)(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({ groups }) {
-                    return `<pre><code>${groups.language ? SHML.parseCode(groups.text.replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match) => {
+            args.set('code_block', { pattern: /(```)(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({ groups }, decode) {
+                    return `<pre><code>${groups.language ? SHML.parseCode(decode(groups.text).replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match) => {
                         switch (match) {
                             case '&lt;': return '<';
                             case '&gt;': return '>';
@@ -293,11 +293,11 @@ var SHML;
                 args.set('doctype', { pattern: /^(?<whitespace>\s*)(?<text>&lt;!DOCTYPE\b.*?&gt;)/i, reviver({ groups }) {
                         return `${groups.whitespace || ''}<span data-code-token="doctype">${groups.text}</span>`;
                     } });
-                args.set('style', { pattern: /(?<OPENTAG>&lt;style\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/style&gt;)/g, reviver({ groups }) {
-                        return groups.OPENTAG + parseCode(desanitize(groups.content), 'css', false) + groups.CLOSETAG;
+                args.set('style', { pattern: /(?<OPENTAG>&lt;style\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/style&gt;)/g, reviver({ groups }, decode) {
+                        return groups.OPENTAG + parseCode(desanitize(decode(groups.content)), 'css', false) + groups.CLOSETAG;
                     } });
-                args.set('script', { pattern: /(?<OPENTAG>&lt;script\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/script&gt;)/g, reviver({ groups }) {
-                        return groups.OPENTAG + parseCode(desanitize(groups.content), 'javascript', false) + groups.CLOSETAG;
+                args.set('script', { pattern: /(?<OPENTAG>&lt;script\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/script&gt;)/g, reviver({ groups }, decode) {
+                        return groups.OPENTAG + parseCode(desanitize(decode(groups.content)), 'javascript', false) + groups.CLOSETAG;
                     } });
                 args.set('tag-open', { pattern: /(?<name>&lt;[a-z\-0-9]+)(?<DATA>[^\uffff\ufffe]*?)(?<close>&gt;)/gi, reviver({ groups }) {
                         var _a;
@@ -342,6 +342,9 @@ var SHML;
                 args.set('multiline-string', { pattern: /(?<text>(?<what>`)(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({ groups }) => `<span data-code-token="string">${groups.text}</span>` });
                 matchToken('string', /(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
                 matchToken('comment', /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g);
+                args.set('comment', { pattern: /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g, reviver({ groups }, decode) {
+                        return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
+                    } });
                 matchToken('number', /(?<text>\b(?:Infinity|NaN|0(?:[xX][0-9a-fA-F][0-9a-fA-F_]*|[bB][01][01_]*|[oO][0-7][0-7_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])[eE][+\-]?\d[\d_]*)?n?(?<!_))\b)/g);
                 matchToken('keyword', new RegExp(String.raw `(?<text>\b(?:${keywords.join('|')})\b)`, 'g'));
                 return args;
@@ -431,7 +434,7 @@ var SHML;
         }
         if (markLines)
             text = text.split('\n').map((line, i) => `<span data-code-token="line-number">${(i + lineOffset).toString().padStart((text.split('\n').length + lineOffset).toString().length, ' ')}</span><span data-code-token="line" data-code-line="${i + lineOffset}">${line}</span>`).join('\n');
-        return `<span data-code-language="${language}">${text}<span>`;
+        return `<span data-code-language="${language}">${text}</span>`;
     }
     SHML.parseCode = parseCode;
 })(SHML || (SHML = {}));
