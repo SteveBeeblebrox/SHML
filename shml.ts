@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.4.3';
+    export const VERSION = '1.4.4';
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -72,7 +72,7 @@ namespace SHML {
     }
 
     type Block = {blockType: string, text: string, groups?: any}
-    type FormatArgs = Map<string, {pattern: RegExp, isInline?: boolean, reviver?: {(block: Block): string}}>
+    type FormatArgs = Map<string, {pattern: RegExp, isInline?: boolean, reviver?: {(block: Block, decode:(text:string)=>string): string}}>
 
     function abstractParse(text: string, args: FormatArgs) {
         if(UnicodeHelper.isInvalid(text)) throw 'Invalid Unicode Noncharacters present in text'
@@ -117,7 +117,7 @@ namespace SHML {
             while(text.includes(UnicodeHelper.INLINE_MARKER) || text.includes(UnicodeHelper.BLOCK_MARKER))
                 text = text.replace(/([\ufffe\uffff]).*?\1/, hash => {
                     const block = hashmap.get(hash)!;
-                    return (args.get(block.blockType)!.reviver ?? (({blockType, groups}) => `<${blockType}>${groups.TEXT}</${blockType}>`))(block)
+                    return (args.get(block.blockType)!.reviver ?? (({blockType, groups}) => `<${blockType}>${groups.TEXT}</${blockType}>`))(block, decode)
                 })
             return text
         }
@@ -240,8 +240,8 @@ namespace SHML {
             args.set('src_comment', inlineArgs.get('src_comment')!)
             args.set('comment', inlineArgs.get('comment')!)
 
-            args.set('code_block', {pattern: /(```)(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({groups}) {
-                return `<pre><code>${groups.language ? SHML.parseCode(groups.text.replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match: string) => {
+            args.set('code_block', {pattern: /(```)(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({groups}, decode) {
+                return `<pre><code>${groups.language ? SHML.parseCode(decode(groups.text).replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match: string) => {
                     switch(match) {
                         case '&lt;': return '<';
                         case '&gt;': return '>';
@@ -343,12 +343,12 @@ namespace SHML {
                     return `${groups.whitespace || ''}<span data-code-token="doctype">${groups.text}</span>`
                 }});
 
-                args.set('style', {pattern: /(?<OPENTAG>&lt;style\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/style&gt;)/g, reviver({groups}) {
-                    return groups.OPENTAG + parseCode(desanitize(groups.content), 'css', false) + groups.CLOSETAG;
+                args.set('style', {pattern: /(?<OPENTAG>&lt;style\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/style&gt;)/g, reviver({groups}, decode) {
+                    return groups.OPENTAG + parseCode(desanitize(decode(groups.content)), 'css', false) + groups.CLOSETAG;
                 }});
 
-                args.set('script', {pattern: /(?<OPENTAG>&lt;script\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/script&gt;)/g, reviver({groups}) {
-                    return groups.OPENTAG + parseCode(desanitize(groups.content), 'javascript', false) + groups.CLOSETAG;
+                args.set('script', {pattern: /(?<OPENTAG>&lt;script\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/script&gt;)/g, reviver({groups}, decode) {
+                    return groups.OPENTAG + parseCode(desanitize(decode(groups.content)), 'javascript', false) + groups.CLOSETAG;
                 }});
 
                 args.set('tag-open', {pattern: /(?<name>&lt;[a-z\-0-9]+)(?<DATA>[^\uffff\ufffe]*?)(?<close>&gt;)/gi, reviver({groups}) {
@@ -406,6 +406,10 @@ namespace SHML {
                 matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
                 
                 matchToken('comment', /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g);
+
+                args.set('comment', {pattern: /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g, reviver({groups}, decode) {
+                    return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
+                }})
                 matchToken('number', /(?<text>\b(?:Infinity|NaN|0(?:[xX][0-9a-fA-F][0-9a-fA-F_]*|[bB][01][01_]*|[oO][0-7][0-7_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])[eE][+\-]?\d[\d_]*)?n?(?<!_))\b)/g);
                 matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${keywords.join('|')})\b)`, 'g'));
 
@@ -513,6 +517,6 @@ namespace SHML {
         if(markLines)
             text = text.split('\n').map((line: string, i: number)=>`<span data-code-token="line-number">${(i+lineOffset).toString().padStart((text.split('\n').length+lineOffset).toString().length,' ')}</span><span data-code-token="line" data-code-line="${i+lineOffset}">${line}</span>`).join('\n');
 
-        return `<span data-code-language="${language}">${text}<span>`;
+        return `<span data-code-language="${language}">${text}</span>`;
     }
 }
