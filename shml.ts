@@ -303,7 +303,7 @@ namespace SHML {
         }
 
         export namespace Code {
-            export const SUPPORTED_LANGUAGES = ['html', 'css', 'javascript', /*'typecript',*/ 'xml', 'json', /*'python',*/  'none'] as const;
+            export const SUPPORTED_LANGUAGES = ['html', 'css', 'javascript', 'typescript', 'xml', 'json', /*'python',*/  'none'] as const;
 
             function appendTokenMatcher(name: string, pattern: RegExp, args: FormatArgs): void {
                 args.set(name, {pattern, reviver({groups}) {
@@ -378,8 +378,15 @@ namespace SHML {
                 return args;
             }
 
+            const JAVASCRIPT_KEYWORDS = ['break','case','catch','class','const','continue','debugger','default','delete','do','else','export','extends','finally','for','function','if','import','in','instanceof','new','return','super','switch','this','throw','try','typeof','var','void','while','with','yield','implements','interface','let','package','private','protected','public','static','yield','await','null','true','false','abstract','boolean','byte','char','double','final','float','goto','int','long','native','short','synchronized','throws','transient','volatile','of','eval'];
             export function javascriptHighlighter(): FormatArgs {
-                return ecmascriptHighlighter(['break','case','catch','class','const','continue','debugger','default','delete','do','else','export','extends','finally','for','function','if','import','in','instanceof','new','return','super','switch','this','throw','try','typeof','var','void','while','with','yield','implements','interface','let','package','private','protected','public','static','yield','await','null','true','false','abstract','boolean','byte','char','double','final','float','goto','int','long','native','short','synchronized','throws','transient','volatile']);
+                return ecmascriptHighlighter(JAVASCRIPT_KEYWORDS);
+            }
+
+
+            const TYPESCRIPT_KEYWORDS = ['enum','as','asserts','any','async','constructor','declare','get','infer','intrinsic','is','keyof','module','namespace','never','readonly','require','number','object','set','string','symbol','type','undefined','unique','unknown','from','global','bigint','override'];
+            export function typescriptHighlighter(): FormatArgs {
+                return ecmascriptHighlighter([...JAVASCRIPT_KEYWORDS, ...TYPESCRIPT_KEYWORDS])
             }
 
             export function ecmascriptHighlighter(keywords: string[]): FormatArgs {
@@ -448,7 +455,7 @@ namespace SHML {
                     case 'html': return Configuration.Code.htmlHighlighter();
                     case 'css': return Configuration.Code.cssHighlighter();
                     case 'javascript': return Configuration.Code.javascriptHighlighter();
-                    //NYI case 'typecript': return Configuration.Code.typescriptHighlighter();
+                    case 'typescript': return Configuration.Code.typescriptHighlighter();
                     case 'xml': return Configuration.Code.xmlHighlighter();
                     case 'json': return Configuration.Code.jsonHighlighter();
                     //NYI case 'python': return Configuration.Code.pythonHighlighter();
