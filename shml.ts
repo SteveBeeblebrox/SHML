@@ -240,8 +240,8 @@ namespace SHML {
             args.set('src_comment', inlineArgs.get('src_comment')!)
             args.set('comment', inlineArgs.get('comment')!)
 
-            args.set('code_block', {pattern: /(```)(?<text>[\s\S]*?)\1/g, isInline: false, reviver({groups}) {
-                return `<pre><code>${groups.text}</code></pre>`
+            args.set('code_block', {pattern: /(```)(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({groups}) {
+                return `<pre><code>${groups.language ? SHML.parseCode(groups.text, groups.language, false) : groups.text}</code></pre>`;
             }});
 
             args.set('property', {pattern: /^\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({groups}) {
