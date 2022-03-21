@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.3.6';
+    SHML.VERSION = '1.4.0';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -61,9 +61,7 @@ var SHML;
             return new RegExp(`[${UnicodeHelper.NONCHARACTERS.join('')}]`).test(text);
         }
         UnicodeHelper.isInvalid = isInvalid;
-        UnicodeHelper.INLINE_MARKER = nextNoncharacter(), UnicodeHelper.BLOCK_MARKER = nextNoncharacter(), UnicodeHelper.HEXADECIMAL_MAPPING = Object.fromEntries(Array.apply(null, 
-        // @ts-expect-error
-        { length: 16 }).map((_, i) => [i.toString(16), nextNoncharacter()]));
+        UnicodeHelper.INLINE_MARKER = nextNoncharacter(), UnicodeHelper.BLOCK_MARKER = nextNoncharacter(), UnicodeHelper.HEXADECIMAL_MAPPING = Object.fromEntries(Array.apply(null, { length: 16 }).map((_, i) => [i.toString(16), nextNoncharacter()]));
     })(UnicodeHelper || (UnicodeHelper = {}));
     function abstractParse(text, args) {
         if (UnicodeHelper.isInvalid(text))
@@ -103,9 +101,9 @@ var SHML;
         }
         return decode(parseLevel(text, args));
     }
-    let Resources;
-    (function (Resources) {
-        Resources.SYMBOLS = {
+    let Configuration;
+    (function (Configuration) {
+        Configuration.SYMBOLS = {
             '~': { 'A': 'Ã', 'I': 'Ĩ', 'N': 'Ñ', 'O': 'Õ', 'U': 'Ũ', 'a': 'ã', 'i': 'ĩ', 'n': 'ñ', 'o': 'õ', 'u': 'ũ' },
             ':': { 'A': 'Ä', 'E': 'Ë', 'I': 'Ï', 'O': 'Ö', 'U': 'Ü', 'Y': 'Ÿ', 'a': 'ä', 'e': 'ë', 'i': 'ï', 'o': 'ö', 'u': 'ü', 'y': 'ÿ' },
             /*'*/ '&#x27;': { 'A': 'Á', 'C': 'Ć', 'E': 'É', 'I': 'Í', 'L': 'Ĺ', 'N': 'Ń', 'O': 'Ó', 'R': 'Ŕ', 'S': 'Ś', 'U': 'Ú', 'Y': 'Ý', 'Z': 'Ź', 'a': 'á', 'c': 'ć', 'e': 'é', 'g': 'ǵ', 'i': 'í', 'l': 'ĺ', 'n': 'ń', 'o': 'ó', 'r': 'ŕ', 's': 'ś', 'u': 'ú', 'y': 'ý', 'z': 'ź' },
@@ -122,7 +120,7 @@ var SHML;
             'v': { 'C': 'Č', 'D': 'Ď', 'E': 'Ě', 'L': 'Ľ', 'N': 'Ň', 'R': 'Ř', 'S': 'Š', 'T': 'Ť', 'Z': 'Ž', 'c': 'č', 'd': 'ď', 'e': 'ě', 'l': 'ľ', 'n': 'ň', 'r': 'ř', 's': 'š', 't': 'ť', 'z': 'ž' },
             '_': { 'D': 'Đ', 'H': 'Ħ', 'L': 'Ł', 'T': 'Ŧ', 'd': 'đ', 'h': 'ħ', 'l': 'ł', 't': 'ŧ' }
         };
-        function inline(customTokens = new Map()) {
+        function inlineMarkup(customTokens = new Map()) {
             const args = new Map();
             args.set('escaped', { pattern: /\\(?<what>[^ntp])/g, reviver({ groups }) {
                     return groups.what;
@@ -142,7 +140,7 @@ var SHML;
                     switch (groups.what) {
                         case '!': return '&iexcl;';
                         case '?': return '&iquest;';
-                        default: return (_b = (_a = Resources.SYMBOLS[groups.what.substring(0, groups.what.length - 1)]) === null || _a === void 0 ? void 0 : _a[groups.what.substring(groups.what.length - 1)]) !== null && _b !== void 0 ? _b : `/${groups.what}/`;
+                        default: return (_b = (_a = Configuration.SYMBOLS[groups.what.substring(0, groups.what.length - 1)]) === null || _a === void 0 ? void 0 : _a[groups.what.substring(groups.what.length - 1)]) !== null && _b !== void 0 ? _b : `/${groups.what}/`;
                     }
                 } });
             args.set('unicode_shortcut', { pattern: /(?<=\b)(?:TM|SS)(?=\b)|\([cCrR]\)|-&gt;|&lt;-/g, reviver({ text }) {
@@ -198,15 +196,15 @@ var SHML;
                 } });
             return args;
         }
-        Resources.inline = inline;
-        function block(customTokens = new Map(), properties = new Map(), ids = new Set()) {
-            const args = new Map(), inlineArgs = inline(customTokens);
+        Configuration.inlineMarkup = inlineMarkup;
+        function blockMarkup(customTokens = new Map(), properties = new Map(), ids = new Set()) {
+            const args = new Map(), inlineArgs = inlineMarkup(customTokens);
             args.set('escaped', inlineArgs.get('escaped'));
             args.set('raw', inlineArgs.get('raw'));
             args.set('src_comment', inlineArgs.get('src_comment'));
             args.set('comment', inlineArgs.get('comment'));
-            args.set('code_block', { pattern: /(```)(?<text>[\s\S]*?)\1/g, isInline: false, reviver({ groups }) {
-                    return `<pre><code>${groups.text}</code></pre>`;
+            args.set('code_block', { pattern: /(```)(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({ groups }) {
+                    return `<pre><code>${groups.language ? SHML.parseCode(groups.text, groups.language, false) : groups.text}</code></pre>`;
                 } });
             args.set('property', { pattern: /^\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({ groups }) {
                     properties.set(groups.key, groups.value.trim());
@@ -259,37 +257,172 @@ var SHML;
                 } });
             return args;
         }
-        Resources.block = block;
-    })(Resources || (Resources = {}));
+        Configuration.blockMarkup = blockMarkup;
+        let Code;
+        (function (Code) {
+            Code.SUPPORTED_LANGUAGES = ['html', 'css', 'javascript', 'typescript', 'xml', 'json', 'python', 'diff', 'none'];
+            function appendTokenMatcher(name, pattern, args) {
+                args.set(name, { pattern, reviver({ groups }) {
+                        return `<span data-code-token="${name}">${groups.text}</span>`;
+                    } });
+            }
+            function htmlHighlighter() {
+                const args = new Map(), matchToken = (name, pattern) => appendTokenMatcher(name, pattern, args);
+                function desanitize(text) {
+                    return text.replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, match => {
+                        switch (match) {
+                            case '&lt;': return '<';
+                            case '&gt;': return '>';
+                            case '&amp;': return '&';
+                            case '&quot;': return '"';
+                            case '&#x27;': return '\'';
+                            default: throw null;
+                        }
+                    });
+                }
+                matchToken('comment', /(?<text>(?:&lt;!--[\s\S]*?--&gt;))/g);
+                args.set('doctype', { pattern: /^(?<whitespace>\s*)(?<text>&lt;!DOCTYPE\b.*?&gt;)/i, reviver({ groups }) {
+                        return `${groups.whitespace || ''}<span data-code-token="doctype">${groups.text}</span>`;
+                    } });
+                args.set('style', { pattern: /(?<OPENTAG>&lt;style\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/style&gt;)/g, reviver({ groups }) {
+                        return groups.OPENTAG + parseCode(desanitize(groups.content), 'css', false) + groups.CLOSETAG;
+                    } });
+                args.set('script', { pattern: /(?<OPENTAG>&lt;script\b.*?&gt;)(?<content>[\s\S]*?)(?<CLOSETAG>&lt;\/script&gt;)/g, reviver({ groups }) {
+                        return groups.OPENTAG + parseCode(desanitize(groups.content), 'javascript', false) + groups.CLOSETAG;
+                    } });
+                args.set('tag-open', { pattern: /(?<name>&lt;[a-z\-0-9]+)(?<DATA>[^\uffff\ufffe]*?)(?<close>&gt;)/gi, reviver({ groups }) {
+                        var _a;
+                        return `<span data-code-token="tag">${groups.name}</span>${(_a = groups.DATA) !== null && _a !== void 0 ? _a : ''}<span data-code-token="tag">${groups.close}</span>`;
+                    } });
+                args.set('string', { pattern: /(?<front>=\s*?)(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g, reviver({ groups }) {
+                        return groups.front + `<span data-code-token="string">${groups.text}</span>`;
+                    } });
+                args.set('tag-close', { pattern: /(?<text>&lt;\/[a-z\-\s0-9]+&gt;)/gi, reviver({ groups }) {
+                        return `<span data-code-token="tag">${groups.text}</span>`;
+                    } });
+                return args;
+            }
+            Code.htmlHighlighter = htmlHighlighter;
+            const CSS_AT_RULES = ['charset', 'color-profile ', 'counter-style', 'document ', 'font-face', 'font-feature-values', 'import', 'keyframes', 'media', 'namespace', 'page', 'property ', 'supports', 'viewport', 'color-profile', 'document', 'layer', 'property', 'scroll-timeline', 'swash', 'ornaments', 'annotation', 'stylistic', 'styleset', 'character-variant'];
+            function cssHighlighter() {
+                const args = new Map(), matchToken = (name, pattern) => appendTokenMatcher(name, pattern, args);
+                matchToken('string', /(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+                matchToken('comment', /(?<text>(?:\/\*[\s\S]*?\*\/))/g);
+                matchToken('keyword', new RegExp(String.raw `(?<text>@(?:${CSS_AT_RULES.join('|')})\b)`, 'g'));
+                matchToken('selector', /(?<text>[^\s{}\s\uffff\ufffe][^{}\uffff\ufffe]*?[^\s{}\s\uffff\ufffe]?(?=\s*{))/g);
+                matchToken('property', /(?<text>\b[a-z\-]+:)/g);
+                matchToken('number', /(?<text>\b(\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?n?(?<!_))(?:%|\b|[a-z]+))/gi);
+                matchToken('hexadecimal', /(?<text>#(?:(?:[0-9a-f]){8}|(?:[0-9a-f]){6}|(?:[0-9a-f]){3,4})\b)/gi);
+                matchToken('function', /(?<text>\b[a-z\-]+\b(?=\())/g);
+                matchToken('other', /(?<text>\b[a-z\-]+\b)/g);
+                return args;
+            }
+            Code.cssHighlighter = cssHighlighter;
+            const JAVASCRIPT_KEYWORDS = ['break', 'case', 'catch', 'class', 'const', 'continue', 'debugger', 'default', 'delete', 'do', 'else', 'export', 'extends', 'finally', 'for', 'function', 'if', 'import', 'in', 'instanceof', 'new', 'return', 'super', 'switch', 'this', 'throw', 'try', 'typeof', 'var', 'void', 'while', 'with', 'yield', 'implements', 'interface', 'let', 'package', 'private', 'protected', 'public', 'static', 'yield', 'await', 'null', 'true', 'false', 'abstract', 'boolean', 'byte', 'char', 'double', 'final', 'float', 'goto', 'int', 'long', 'native', 'short', 'synchronized', 'throws', 'transient', 'volatile', 'of', 'eval'];
+            function javascriptHighlighter() {
+                return ecmascriptHighlighter(JAVASCRIPT_KEYWORDS);
+            }
+            Code.javascriptHighlighter = javascriptHighlighter;
+            const TYPESCRIPT_KEYWORDS = ['enum', 'as', 'asserts', 'any', 'async', 'constructor', 'declare', 'get', 'infer', 'intrinsic', 'is', 'keyof', 'module', 'namespace', 'never', 'readonly', 'require', 'number', 'object', 'set', 'string', 'symbol', 'type', 'undefined', 'unique', 'unknown', 'from', 'global', 'bigint', 'override'];
+            function typescriptHighlighter() {
+                return ecmascriptHighlighter([...JAVASCRIPT_KEYWORDS, ...TYPESCRIPT_KEYWORDS]);
+            }
+            Code.typescriptHighlighter = typescriptHighlighter;
+            function ecmascriptHighlighter(keywords) {
+                const args = new Map(), matchToken = (name, pattern) => appendTokenMatcher(name, pattern, args);
+                args.set('multiline-string', { pattern: /(?<text>(?<what>`)(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({ groups }) => `<span data-code-token="string">${groups.text}</span>` });
+                matchToken('string', /(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+                matchToken('comment', /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g);
+                matchToken('number', /(?<text>\b(?:Infinity|NaN|0(?:[xX][0-9a-fA-F][0-9a-fA-F_]*|[bB][01][01_]*|[oO][0-7][0-7_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])[eE][+\-]?\d[\d_]*)?n?(?<!_))\b)/g);
+                matchToken('keyword', new RegExp(String.raw `(?<text>\b(?:${keywords.join('|')})\b)`, 'g'));
+                return args;
+            }
+            Code.ecmascriptHighlighter = ecmascriptHighlighter;
+            function xmlHighlighter() {
+                const args = new Map();
+                const htmlArgs = htmlHighlighter(), inheritFromHTML = (name) => args.set(name, htmlArgs.get(name));
+                inheritFromHTML('comment');
+                args.set('processing-instruction', { pattern: /(?<name>&lt;\?[a-z0-9\-]+)(?<DATA>\b.*?)(?<close>\?&gt;)/gi, reviver({ groups }) {
+                        return `<span data-code-token="processing-instruction">${groups.name}</span>${groups.DATA}<span data-code-token="processing-instruction">${groups.close}</span>`;
+                    } });
+                args.set('cdata', { pattern: /(?<open>&lt;!\[CDATA\[)(?<content>[\s\S]*?)(?<close>\]\]&gt;)/g, reviver({ groups }) {
+                        return `<span data-code-token="cdata">${groups.open}</span><span data-code-token="cdata-content">${groups.content}</span><span data-code-token="cdata">${groups.close}</span>`;
+                    } });
+                inheritFromHTML('tag-open');
+                inheritFromHTML('string');
+                inheritFromHTML('tag-close');
+                return args;
+            }
+            Code.xmlHighlighter = xmlHighlighter;
+            function jsonHighlighter() {
+                const args = new Map(), matchToken = (name, pattern) => appendTokenMatcher(name, pattern, args);
+                matchToken('string', /(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+                matchToken('number', /(?<text>-?\b\d+(\.\d+)?(e[+\-]?\d+)?\b)/gi);
+                matchToken('keyword', /(?<text>\b(?:true|false|null)\b)/g);
+                return args;
+            }
+            Code.jsonHighlighter = jsonHighlighter;
+            const PYTHON_KEYWORDS = ['and', 'as', 'assert', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'];
+            function pythonHighlighter() {
+                const args = new Map(), matchToken = (name, pattern) => appendTokenMatcher(name, pattern, args);
+                args.set('multiline-string', { pattern: /(?<text>(?<what>(?:&quot;|&#x27;){3})(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({ groups }) => `<span data-code-token="string">${groups.text}</span>` });
+                matchToken('string', /(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+                matchToken('comment', /(?<text>(?:#.*))/g);
+                matchToken('number', /(?<text>\b(?:0(?:[xX][0-9a-fA-F][0-9a-fA-F_]*|[bB][01][01_]*|[oO][0-7][0-7_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])[eE][+\-]?\d[\d_]*)?j?(?<!_))\b)/g);
+                matchToken('value', /(?<text>\b(?:True|False|None)\b)/g);
+                matchToken('keyword', new RegExp(String.raw `(?<text>\b(?:${PYTHON_KEYWORDS.join('|')})\b)`, 'g'));
+                return args;
+            }
+            Code.pythonHighlighter = pythonHighlighter;
+            function diffHighlighter() {
+                const args = new Map();
+                args.set('heading', { pattern: /^(?<range>@@ -\d+,\d+ \+\d+,\d+ @@)(?<heading> .*)?$/gm, reviver({ groups }) {
+                        return `<span data-code-token="range">${groups.range}</span>` + (groups.heading ? `<span data-code-token="heading">${groups.heading}</span>` : '');
+                    } });
+                args.set('insertion', { pattern: /^(?<text>\+.*)$/gm, reviver({ groups }) {
+                        return `<span data-code-token="insertion"><ins>${groups.text}</ins></span>`;
+                    } });
+                args.set('deletion', { pattern: /^(?<text>-.*)$/gm, reviver({ groups }) {
+                        return `<span data-code-token="deletion"><del>${groups.text}</del></span>`;
+                    } });
+                return args;
+            }
+            Code.diffHighlighter = diffHighlighter;
+        })(Code = Configuration.Code || (Configuration.Code = {}));
+    })(Configuration || (Configuration = {}));
     function parseInlineMarkup(text, customTokens) {
-        return abstractParse(text, Resources.inline(customTokens));
+        return abstractParse(text, Configuration.inlineMarkup(customTokens));
     }
     SHML.parseInlineMarkup = parseInlineMarkup;
     function parseMarkup(text, customTokens, properties) {
         var _a;
         const props = new Map(((_a = properties === null || properties === void 0 ? void 0 : properties.entries()) !== null && _a !== void 0 ? _a : [])), ids = new Set();
-        const result = new String(abstractParse(text, Resources.block(customTokens, props, ids)));
+        const result = new String(abstractParse(text, Configuration.blockMarkup(customTokens, props, ids)));
         Object.defineProperty(result, 'properties', { value: props });
         Object.defineProperty(result, 'ids', { value: ids });
         return result;
     }
     SHML.parseMarkup = parseMarkup;
-    function parseCode(text, markLines = true, keywords = ['break', 'case', 'catch', 'class', 'const', 'continue', 'debugger', 'default', 'delete', 'do', 'else', 'export', 'extends', 'finally', 'for', 'function', 'if', 'import', 'in', 'instanceof', 'new', 'return', 'super', 'switch', 'this', 'throw', 'try', 'typeof', 'var', 'void', 'while', 'with', 'yield', 'implements', 'interface', 'let', 'package', 'private', 'protected', 'public', 'static', 'yield', 'await', 'null', 'true', 'false', 'abstract', 'boolean', 'byte', 'char', 'double', 'final', 'float', 'goto', 'int', 'long', 'native', 'short', 'synchronized', 'throws', 'transient', 'volatile']) {
-        const styling = new Map();
-        function matchToken(name, pattern) {
-            styling.set(name, { pattern, reviver({ groups }) {
-                    return `<span data-code-token="${name}">${groups.text}</span>`;
-                } });
+    function parseCode(text, language = 'none', markLines = true, lineOffset = 1) {
+        if (language !== 'none') {
+            const args = (function () {
+                switch (language) {
+                    case 'html': return Configuration.Code.htmlHighlighter();
+                    case 'css': return Configuration.Code.cssHighlighter();
+                    case 'javascript': return Configuration.Code.javascriptHighlighter();
+                    case 'typescript': return Configuration.Code.typescriptHighlighter();
+                    case 'xml': return Configuration.Code.xmlHighlighter();
+                    case 'json': return Configuration.Code.jsonHighlighter();
+                    case 'python': return Configuration.Code.pythonHighlighter();
+                    case 'diff': return Configuration.Code.diffHighlighter();
+                    default: return new Map();
+                }
+            })();
+            text = abstractParse(text, args);
         }
-        styling.set('multiline-string', { pattern: /(?<text>(?<what>`)(?:.*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({ groups }) => `<span data-code-token="string">${groups.text}</span>` });
-        matchToken('string', /(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
-        matchToken('comment', /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g);
-        matchToken('number', /(?<text>\b(?:0(?:x[0-9a-f][0-9a-f_]*|b[01][01_]*|o[0-7][0-7_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?n?(?<!_)))\b/gi);
-        matchToken('keyword', new RegExp(String.raw `(?<text>\b(?:${keywords.join('|')})\b)`, 'g'));
-        let styledText = abstractParse(text, styling);
         if (markLines)
-            styledText = styledText.split('\n').map((line, i) => `<span data-code-token="line-number">${(i + 1).toString().padStart((styledText.split('\n').length + 1).toString().length, ' ')}</span><span data-code-token="line" data-code-line="${i + 1}">${line}</span>`).join('\n');
-        return styledText;
+            text = text.split('\n').map((line, i) => `<span data-code-token="line-number">${(i + lineOffset).toString().padStart((text.split('\n').length + lineOffset).toString().length, ' ')}</span><span data-code-token="line" data-code-line="${i + lineOffset}">${line}</span>`).join('\n');
+        return `<span data-code-language="${language}">${text}<span>`;
     }
     SHML.parseCode = parseCode;
 })(SHML || (SHML = {}));
