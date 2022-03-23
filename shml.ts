@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.4.4';
+    export const VERSION = '1.4.5';
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -338,7 +338,9 @@ namespace SHML {
                     });
                 }
 
-                matchToken('comment', /(?<text>(?:&lt;!--[\s\S]*?--&gt;))/g);
+                args.set('comment', {pattern: /(?<text>(?:&lt;!--[\s\S]*?--&gt;))/g, reviver({groups}, decode) {
+                    return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
+                }});
                 args.set('doctype', {pattern: /^(?<whitespace>\s*)(?<text>&lt;!DOCTYPE\b.*?&gt;)/i, reviver({groups}) {
                     return `${groups.whitespace || ''}<span data-code-token="doctype">${groups.text}</span>`
                 }});
@@ -372,7 +374,9 @@ namespace SHML {
 
                 matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
         
-                matchToken('comment', /(?<text>(?:\/\*[\s\S]*?\*\/))/g);
+                args.set('comment', {pattern: /(?<text>(?:\/\*[\s\S]*?\*\/))/g, reviver({groups}, decode) {
+                    return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
+                }});
                 
                 matchToken('keyword', new RegExp(String.raw`(?<text>@(?:${CSS_AT_RULES.join('|')})\b)`, 'g'));
 
@@ -405,11 +409,10 @@ namespace SHML {
                 args.set('multiline-string', {pattern: /(?<text>(?<what>`)(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => `<span data-code-token="string">${groups.text}</span>`});
                 matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
                 
-                matchToken('comment', /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g);
-
                 args.set('comment', {pattern: /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g, reviver({groups}, decode) {
                     return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
-                }})
+                }});
+                
                 matchToken('number', /(?<text>\b(?:Infinity|NaN|0(?:[xX][0-9a-fA-F][0-9a-fA-F_]*|[bB][01][01_]*|[oO][0-7][0-7_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])[eE][+\-]?\d[\d_]*)?n?(?<!_))\b)/g);
                 matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${keywords.join('|')})\b)`, 'g'));
 
@@ -455,7 +458,9 @@ namespace SHML {
                 args.set('multiline-string', {pattern: /(?<text>(?<what>(?:&quot;|&#x27;){3})(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => `<span data-code-token="string">${groups.text}</span>`});
                 matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
 
-                matchToken('comment', /(?<text>(?:#.*))/g);
+                args.set('comment', {pattern: /(?<text>(?:#.*))/g, reviver({groups}, decode) {
+                    return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
+                }});
                 
                 matchToken('number', /(?<text>\b(?:0(?:[xX][0-9a-fA-F][0-9a-fA-F_]*|[bB][01][01_]*|[oO][0-7][0-7_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])[eE][+\-]?\d[\d_]*)?j?(?<!_))\b)/g);
                 
