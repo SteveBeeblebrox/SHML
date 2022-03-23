@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.4.4';
+    SHML.VERSION = '1.4.5';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -289,7 +289,9 @@ var SHML;
                         }
                     });
                 }
-                matchToken('comment', /(?<text>(?:&lt;!--[\s\S]*?--&gt;))/g);
+                args.set('comment', { pattern: /(?<text>(?:&lt;!--[\s\S]*?--&gt;))/g, reviver({ groups }, decode) {
+                        return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
+                    } });
                 args.set('doctype', { pattern: /^(?<whitespace>\s*)(?<text>&lt;!DOCTYPE\b.*?&gt;)/i, reviver({ groups }) {
                         return `${groups.whitespace || ''}<span data-code-token="doctype">${groups.text}</span>`;
                     } });
@@ -316,7 +318,9 @@ var SHML;
             function cssHighlighter() {
                 const args = new Map(), matchToken = (name, pattern) => appendTokenMatcher(name, pattern, args);
                 matchToken('string', /(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
-                matchToken('comment', /(?<text>(?:\/\*[\s\S]*?\*\/))/g);
+                args.set('comment', { pattern: /(?<text>(?:\/\*[\s\S]*?\*\/))/g, reviver({ groups }, decode) {
+                        return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
+                    } });
                 matchToken('keyword', new RegExp(String.raw `(?<text>@(?:${CSS_AT_RULES.join('|')})\b)`, 'g'));
                 matchToken('selector', /(?<text>[^\s{}\s\uffff\ufffe][^{}\uffff\ufffe]*?[^\s{}\s\uffff\ufffe]?(?=\s*{))/g);
                 matchToken('property', /(?<text>\b[a-z\-]+:)/g);
@@ -341,7 +345,6 @@ var SHML;
                 const args = new Map(), matchToken = (name, pattern) => appendTokenMatcher(name, pattern, args);
                 args.set('multiline-string', { pattern: /(?<text>(?<what>`)(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({ groups }) => `<span data-code-token="string">${groups.text}</span>` });
                 matchToken('string', /(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
-                matchToken('comment', /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g);
                 args.set('comment', { pattern: /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g, reviver({ groups }, decode) {
                         return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
                     } });
@@ -379,7 +382,9 @@ var SHML;
                 const args = new Map(), matchToken = (name, pattern) => appendTokenMatcher(name, pattern, args);
                 args.set('multiline-string', { pattern: /(?<text>(?<what>(?:&quot;|&#x27;){3})(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({ groups }) => `<span data-code-token="string">${groups.text}</span>` });
                 matchToken('string', /(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
-                matchToken('comment', /(?<text>(?:#.*))/g);
+                args.set('comment', { pattern: /(?<text>(?:#.*))/g, reviver({ groups }, decode) {
+                        return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
+                    } });
                 matchToken('number', /(?<text>\b(?:0(?:[xX][0-9a-fA-F][0-9a-fA-F_]*|[bB][01][01_]*|[oO][0-7][0-7_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])[eE][+\-]?\d[\d_]*)?j?(?<!_))\b)/g);
                 matchToken('value', /(?<text>\b(?:True|False|None)\b)/g);
                 matchToken('keyword', new RegExp(String.raw `(?<text>\b(?:${PYTHON_KEYWORDS.join('|')})\b)`, 'g'));
