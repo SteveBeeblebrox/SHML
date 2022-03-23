@@ -77,7 +77,6 @@ A CLI Tool is in the works.
 ## Examples-->
 ## Known Issues
 1. Bullet points and lists are broken
-2. CSS highlighter includes `;` in selectors in certain cases
 <!--
 ## Syntax
 SHML is composed of two main types of styling: inline and sections. All sections must be on their own line. Inline formatting can be applied to any part of a section.
