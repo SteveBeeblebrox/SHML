@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.4.5';
+    export const VERSION = '1.4.6';
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -380,7 +380,7 @@ namespace SHML {
                 
                 matchToken('keyword', new RegExp(String.raw`(?<text>@(?:${CSS_AT_RULES.join('|')})\b)`, 'g'));
 
-                matchToken('selector', /(?<text>[^\s{}\s\uffff\ufffe][^{}\uffff\ufffe]*?[^\s{}\s\uffff\ufffe]?(?=\s*{))/g);
+                matchToken('selector', /(?<text>[^\s{};\uffff\ufffe][^{};\uffff\ufffe]*?[^\s{};\uffff\ufffe]?(?=\s*{))/g);
                 matchToken('property', /(?<text>\b[a-z\-]+:)/g);
 
                 matchToken('number', /(?<text>\b(\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?n?(?<!_))(?:%|\b|[a-z]+))/gi);
