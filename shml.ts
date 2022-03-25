@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.4.6';
+    export const VERSION = '1.4.7';
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -289,12 +289,12 @@ namespace SHML {
                 return `<table>${groups.title ? `\n<caption>${groups.title.trim()}</caption>`: ''}\n<thead>${rows.shift()}\n<thead>\n<tbody>${rows.join('')}\n<tbody>\n</table>`
             }})
 
-            args.set('bull', {pattern: /(?<text>(?:\+.*?(?:\n|$))+)/g, isInline: false, reviver({groups}) {
+            args.set('bull', {pattern: /(?<text>(?<=\n|^)(?<whitespace>[^\S\n\r]*)\+ .*(?:\n\k<whitespace>\+ .*)?)/g, isInline: false, reviver({groups}) {
                 return `<ul>\n${groups.text.split('\n').filter((line:string)=>line.trim()).map((line:string)=>`<li>${line.replace(/^\s*?\+\s*/, '')}</li>`).join('\n')}\n</ul>`
             }})
 
-            args.set('list', {pattern: /(?<text>(?:\d+[).].*?(?:\n|$))+)/g, isInline: false, reviver({groups}) {
-                return `<ol>\n${groups.text.split('\n').filter((line:string)=>line.trim()).map((line:string)=>`<li>${line.replace(/^\s*?\d+[).]\s*/, '')}</li>`).join('\n')}\n</ol>`
+            args.set('list', {pattern: /(?<text>(?<=\n|^)(?<whitespace>[^\S\n\r]*)\d+[.)] .*(?:\n\k<whitespace>\d+[.)] .*)?)/g, isInline: false, reviver({groups}) {
+                return `<ol>\n${groups.text.split('\n').filter((line:string)=>line.trim()).map((line:string)=>`<li>${line.replace(/^\s*?\d+[.)] \s*/, '')}</li>`).join('\n')}\n</ol>`
             }})
 
             args.set('blockquote', {pattern: /(?<text>(?:(?:&gt;){3}[\s\S]*?(?:-\s*?(?<citation>.*?))?(?:\n|$))+)/g, isInline: false, reviver({groups}) {
