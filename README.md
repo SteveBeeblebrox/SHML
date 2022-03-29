@@ -3,9 +3,7 @@
 
 A CLI Tool is in the works.
 
-***SHML blocks most forms of script injection; however, older browsers that allow the use of the JavaScript protocol within the CSS url function pose a risk. If security is important, use a dedicated sanitizer on the output from SHML before writing it to a document.***
-
-***Version 1.3.1 contains security fixes. Update recommend!***
+***SHML blocks most forms of script injection; however, older browsers may stil have vulnerabilities. If security is important, use a dedicated sanitizer on the output from SHML before writing it to a document.***
 
 **This README is out of date, changes coming soon!**
 <!--
@@ -76,7 +74,7 @@ A CLI Tool is in the works.
 ## API
 ## Examples-->
 ## Known Issues
-1. Bullet points and lists are broken
+1. Bullet points and lists do not nest/indent
 <!--
 ## Syntax
 SHML is composed of two main types of styling: inline and sections. All sections must be on their own line. Inline formatting can be applied to any part of a section.
