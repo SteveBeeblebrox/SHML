@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.4.8';
+    SHML.VERSION = '1.4.9';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -269,7 +269,7 @@ var SHML;
         Configuration.blockMarkup = blockMarkup;
         let Code;
         (function (Code) {
-            Code.SUPPORTED_LANGUAGES = ['html', 'css', 'javascript', 'typescript', 'xml', 'json', 'python', 'diff', 'none'];
+            Code.SUPPORTED_LANGUAGES = ['html', 'css', 'javascript', 'typescript', 'xml', 'json', 'python', 'diff', 'java', 'none'];
             function appendTokenMatcher(name, pattern, args) {
                 args.set(name, { pattern, reviver({ groups }) {
                         return `<span data-code-token="${name}">${groups.text}</span>`;
@@ -405,6 +405,20 @@ var SHML;
                 return args;
             }
             Code.diffHighlighter = diffHighlighter;
+            function javaHighlighter() {
+                const args = new Map(), matchToken = (name, pattern) => appendTokenMatcher(name, pattern, args);
+                args.set('multiline-string', { pattern: /(?<text>(?<what>(?<qtype>&quot;){3})(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({ groups }) => `<span data-code-token="string">${groups.text}</span>` });
+                matchToken('string', /(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+                args.set('comment', { pattern: /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g, reviver({ groups }, decode) {
+                        return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
+                    } });
+                const keywords = ['abstract', 'continue', 'for', 'new', 'switch', 'assert', 'default', 'goto', 'package', 'synchronized', 'boolean', 'do', 'if', 'private', 'this', 'break', 'double', 'implements', 'protected', 'throw', 'byte', 'else', 'import', 'public', 'throws', 'case', 'enum', 'instanceof', 'return', 'transient', 'catch', 'extends', 'int', 'short', 'try', 'char', 'final', 'interface', 'static', 'void', 'class', 'finally', 'long', 'strictfp', 'volatile', 'const', 'float', 'native', 'super', 'while', 'try', 'false', 'null', 'var'];
+                matchToken('number', /(?<text>\b(?:0(?:x[0-9a-f][0-9a-f_]*|b[01][01_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?[dfl]?(?<!_))\b)/gi);
+                matchToken('keyword', new RegExp(String.raw `(?<text>\b(?:${keywords.join('|')})\b)`, 'g'));
+                matchToken('annotation', /(?<text>@[a-zA-Z_$][a-zA-Z_$0-9]*)/g);
+                return args;
+            }
+            Code.javaHighlighter = javaHighlighter;
         })(Code = Configuration.Code || (Configuration.Code = {}));
     })(Configuration || (Configuration = {}));
     function parseInlineMarkup(text, customTokens) {
@@ -432,6 +446,7 @@ var SHML;
                     case 'json': return Configuration.Code.jsonHighlighter();
                     case 'python': return Configuration.Code.pythonHighlighter();
                     case 'diff': return Configuration.Code.diffHighlighter();
+                    case 'java': return Configuration.Code.javaHighlighter();
                     default: return new Map();
                 }
             })();
