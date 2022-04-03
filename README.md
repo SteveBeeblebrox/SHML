@@ -76,4 +76,4 @@ A CLI Tool is in the works.
 ## Known Issues
 1. Bullet points and lists do not nest/indent
 ## Planned Features
-1. Add new syntax highlighters for Java, Rust, and others
+1. More syntax highlighters for Rust and other languages
