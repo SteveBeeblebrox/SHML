@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.4.7';
+    export const VERSION = '1.4.8';
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -455,7 +455,7 @@ namespace SHML {
             export function pythonHighlighter(): FormatArgs {
                 const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
 
-                args.set('multiline-string', {pattern: /(?<text>(?<what>(?:&quot;|&#x27;){3})(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => `<span data-code-token="string">${groups.text}</span>`});
+                args.set('multiline-string', {pattern: /(?<text>(?<what>(?<qtype>&quot;|&#x27;)\k<qtype>{2})(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => `<span data-code-token="string">${groups.text}</span>`});
                 matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
 
                 args.set('comment', {pattern: /(?<text>(?:#.*))/g, reviver({groups}, decode) {
