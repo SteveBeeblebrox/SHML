@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.4.7';
+    SHML.VERSION = '1.4.8';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -380,7 +380,7 @@ var SHML;
             const PYTHON_KEYWORDS = ['and', 'as', 'assert', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'];
             function pythonHighlighter() {
                 const args = new Map(), matchToken = (name, pattern) => appendTokenMatcher(name, pattern, args);
-                args.set('multiline-string', { pattern: /(?<text>(?<what>(?:&quot;|&#x27;){3})(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({ groups }) => `<span data-code-token="string">${groups.text}</span>` });
+                args.set('multiline-string', { pattern: /(?<text>(?<what>(?<qtype>&quot;|&#x27;)\k<qtype>{2})(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({ groups }) => `<span data-code-token="string">${groups.text}</span>` });
                 matchToken('string', /(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
                 args.set('comment', { pattern: /(?<text>(?:#.*))/g, reviver({ groups }, decode) {
                         return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
