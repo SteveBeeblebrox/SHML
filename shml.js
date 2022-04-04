@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.4.9';
+    SHML.VERSION = '1.5.0';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -231,6 +231,10 @@ var SHML;
             for (const entry of inlineArgs.entries())
                 if (!args.has(entry[0]))
                     args.set(...entry);
+            args.set('details', { pattern: /(?<=\n|^)\s*!(?<mode>[vV]|&gt;)?!(?<summary>.*?)\[\s*(?<DETAILS>[\s\S]*?)\s*(?<!\])\](?!\])/g, isInline: false, reviver({ groups }) {
+                    var _a, _b;
+                    return `<details${((_b = (_a = groups.mode) === null || _a === void 0 ? void 0 : _a.toLowerCase) === null || _b === void 0 ? void 0 : _b.call(_a)) === 'v' ? ' open' : ''}><summary>${groups.summary}</summary>\n${groups.DETAILS}</details>`;
+                } });
             args.set('text-align', { pattern: /(?<=\n|^)[^\S\n]*?@@\s*?(?<what>center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)\s*?(?<TEXT>[\s\S]*?)(?:$|(?:(?<=\n)[^\S\n]*?@@\s*?reset)|(?=\n[^\S\n]*?@@\s*?(?:center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)))/g, isInline: false, reviver({ groups }) {
                     var _a;
                     const overrides = { centered: 'center', justified: 'justify', 'justified-all': 'justify-all' };
@@ -415,7 +419,7 @@ var SHML;
                 const keywords = ['abstract', 'continue', 'for', 'new', 'switch', 'assert', 'default', 'goto', 'package', 'synchronized', 'boolean', 'do', 'if', 'private', 'this', 'break', 'double', 'implements', 'protected', 'throw', 'byte', 'else', 'import', 'public', 'throws', 'case', 'enum', 'instanceof', 'return', 'transient', 'catch', 'extends', 'int', 'short', 'try', 'char', 'final', 'interface', 'static', 'void', 'class', 'finally', 'long', 'strictfp', 'volatile', 'const', 'float', 'native', 'super', 'while', 'try', 'false', 'null', 'var'];
                 matchToken('number', /(?<text>\b(?:0(?:x[0-9a-f][0-9a-f_]*|b[01][01_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?[dfl]?(?<!_))\b)/gi);
                 matchToken('keyword', new RegExp(String.raw `(?<text>\b(?:${keywords.join('|')})\b)`, 'g'));
-                matchToken('annotation', /(?<text>@[a-zA-Z_$][a-zA-Z_$0-9]*)/g);
+                matchToken('annotation', /(?<text>@[a-zA-Z_$][a-zA-Z_$0-9]*)\b/g);
                 return args;
             }
             Code.javaHighlighter = javaHighlighter;
