@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.4.9';
+    export const VERSION = '1.5.0';
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -271,6 +271,10 @@ namespace SHML {
                 if(!args.has(entry[0]))
                     args.set(...entry)
 
+            args.set('details', {pattern: /(?<=\n|^)\s*!(?<mode>[vV]|&gt;)?!(?<summary>.*?)\[\s*(?<DETAILS>[\s\S]*?)\s*(?<!\])\](?!\])/g, isInline: false, reviver({groups}) {
+                return `<details${groups.mode?.toLowerCase?.() === 'v' ? ' open' : ''}><summary>${groups.summary}</summary>\n${groups.DETAILS}</details>`
+            }});
+
             args.set('text-align', {pattern: /(?<=\n|^)[^\S\n]*?@@\s*?(?<what>center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)\s*?(?<TEXT>[\s\S]*?)(?:$|(?:(?<=\n)[^\S\n]*?@@\s*?reset)|(?=\n[^\S\n]*?@@\s*?(?:center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)))/g, isInline: false, reviver({groups}) {
                 const overrides: {[match: string]: string} = { centered: 'center', justified: 'justify', 'justified-all': 'justify-all' }
                 return `<div style="text-align: ${overrides[groups.what] ?? groups.what};">${groups.TEXT}</div>`
@@ -500,7 +504,7 @@ namespace SHML {
                 matchToken('number', /(?<text>\b(?:0(?:x[0-9a-f][0-9a-f_]*|b[01][01_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?[dfl]?(?<!_))\b)/gi);
                 matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${keywords.join('|')})\b)`, 'g'));
 
-                matchToken('annotation', /(?<text>@[a-zA-Z_$][a-zA-Z_$0-9]*)/g);
+                matchToken('annotation', /(?<text>@[a-zA-Z_$][a-zA-Z_$0-9]*)\b/g);
 
                 return args;
             }
