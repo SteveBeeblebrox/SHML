@@ -10,3 +10,4 @@
 ## Planned Features
 1. More syntax highlighters for Rust and other languages
 2. CLI Tool
+3. Wiki for documentation
