@@ -23,7 +23,7 @@
 
 namespace SHML {
 
-    export const VERSION = '1.5.0';
+    export const VERSION = '1.6.0';
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -144,7 +144,7 @@ namespace SHML {
             '_': {'D': 'Đ', 'H': 'Ħ', 'L': 'Ł', 'T': 'Ŧ', 'd': 'đ', 'h': 'ħ', 'l': 'ł', 't': 'ŧ'}
         }
 
-        export function inlineMarkup(customTokens: Map<string,string> = new Map()) {
+        export function inlineMarkup(customTokens: Map<string,string> | {get(name:string): string} = new Map()) {
             const args: FormatArgs = new Map();       
 
             args.set('escaped', {pattern: /\\(?<what>[^ntp])/g, reviver({groups}) {
@@ -220,11 +220,11 @@ namespace SHML {
 
             args.set('autolink', {pattern: /(?<text>(?:(?<protocol>https?:\/\/)|(?<www>www\.))(?<link>\w[\w\-]*(?<=\w)\.\w[\w.\/?&#%=+\-]*(?<=[\w\/])))/g, reviver({groups}) {
                 return `<a href="${groups.protocol ?? 'https://'}${groups.www ?? ''}${groups.link}">${groups.text}</a>`
-            }})
+            }});
 
             args.set('autolink_email', {pattern: /(?<text>\w[\w.\-]*?@[\w.\-]+\.\w+)/g, reviver({groups}) {
                 return `<a href="mailto:${groups.text}">${groups.text}</a>`
-            }})
+            }});
 
             args.set('html', {pattern: /&lt;(?<what>\/?(?:code|em|i|strong|b|u|del|sub|sup|mark|span|wbr|br))&gt;/g, isInline: true, reviver({blockType, text, groups}) {
                 return `<${groups.what}>`
@@ -232,7 +232,7 @@ namespace SHML {
             return args
         }
 
-        export function blockMarkup(customTokens: Map<string,string> = new Map(), properties: Map<string,string> = new Map(), ids: Set<string> = new Set()) {
+        export function blockMarkup(customTokens: Map<string,string> | {get(name:string): string} = new Map(), properties: Map<string,string> = new Map(), ids: Set<string> = new Set()) {
             const args: FormatArgs = new Map(), inlineArgs: FormatArgs = inlineMarkup(customTokens);
 
             args.set('escaped', inlineArgs.get('escaped')!)
@@ -254,7 +254,7 @@ namespace SHML {
                 }).trim(), groups.language, false) : groups.text.trim()}</code></pre>`;
             }});
 
-            args.set('property', {pattern: /^\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({groups}) {
+            args.set('property', {pattern: /^\s*?!\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({groups}) {
                 properties.set(groups.key, groups.value.trim())
                 return ''
             }});
@@ -511,11 +511,11 @@ namespace SHML {
         }
     }
 
-    export function parseInlineMarkup(text: string, customTokens?: Map<string,string>) {
+    export function parseInlineMarkup(text: string, customTokens?: Map<string,string> | {get(name:string): string}) {
         return abstractParse(text, Configuration.inlineMarkup(customTokens))
     }
 
-    export function parseMarkup(text: string, customTokens?: Map<string,string>, properties?: Map<string,string>): String & {properties: Map<string,string>, ids: Set<string>} {
+    export function parseMarkup(text: string, customTokens?: Map<string,string> | {get(name:string): string}, properties?: Map<string,string>): String & {properties: Map<string,string>, ids: Set<string>} {
         const props: Map<string,string> = new Map((properties?.entries() ?? [])), ids: Set<string> = new Set()
         const result = new String(abstractParse(text, Configuration.blockMarkup(customTokens, props, ids)))
         Object.defineProperty(result, 'properties', {value: props})
