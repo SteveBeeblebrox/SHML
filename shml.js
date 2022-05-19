@@ -253,10 +253,10 @@ var SHML;
                     const rows = groups.contents.trim().split('\n').map((row, index) => `\n<tr>${row.split(',').map((column) => `<t${index && 'd' || 'h'}>${column.trim()}</t${index && 'd' || 'h'}>`).join('')}</tr>`);
                     return `<table>${groups.title ? `\n<caption>${groups.title.trim()}</caption>` : ''}\n<thead>${rows.shift()}\n<thead>\n<tbody>${rows.join('')}\n<tbody>\n</table>`;
                 } });
-            args.set('bull', { pattern: /(?<text>(?<=\n|^)(?<whitespace>[^\S\n\r]*)\+ .*(?:\n\k<whitespace>\+ .*)?)/g, isInline: false, reviver({ groups }) {
+            args.set('bull', { pattern: /(?<text>(?<=\n|^)(?<whitespace>[^\S\n\r]*)\+ .*(?:\n\k<whitespace>\+ .*)*)/g, isInline: false, reviver({ groups }) {
                     return `<ul>\n${groups.text.split('\n').filter((line) => line.trim()).map((line) => `<li>${line.replace(/^\s*?\+\s*/, '')}</li>`).join('\n')}\n</ul>`;
                 } });
-            args.set('list', { pattern: /(?<text>(?<=\n|^)(?<whitespace>[^\S\n\r]*)\d+[.)] .*(?:\n\k<whitespace>\d+[.)] .*)?)/g, isInline: false, reviver({ groups }) {
+            args.set('list', { pattern: /(?<text>(?<=\n|^)(?<whitespace>[^\S\n\r]*)\d+[.)] .*(?:\n\k<whitespace>\d+[.)] .*)*)/g, isInline: false, reviver({ groups }) {
                     return `<ol>\n${groups.text.split('\n').filter((line) => line.trim()).map((line) => `<li>${line.replace(/^\s*?\d+[.)] \s*/, '')}</li>`).join('\n')}\n</ol>`;
                 } });
             args.set('blockquote', { pattern: /(?<text>(?:(?:&gt;){3}[\s\S]*?(?:-\s*?(?<citation>.*?))?(?:\n|$))+)/g, isInline: false, reviver({ groups }) {
