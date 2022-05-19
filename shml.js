@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.6.1';
+    SHML.VERSION = '1.6.2';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -143,10 +143,11 @@ var SHML;
                         default: return (_b = (_a = Configuration.SYMBOLS[groups.what.substring(0, groups.what.length - 1)]) === null || _a === void 0 ? void 0 : _a[groups.what.substring(groups.what.length - 1)]) !== null && _b !== void 0 ? _b : `/${groups.what}/`;
                     }
                 } });
-            args.set('unicode_shortcut', { pattern: /(?<=\b)(?:TM|SS)(?=\b)|\([cCrR]\)|-&gt;|&lt;-/g, reviver({ text }) {
+            args.set('unicode_shortcut', { pattern: /(?<=\b)(?:TM|SS|PG|SM)(?=\b)|\([cCrR]\)|-&gt;|&lt;-/g, reviver({ text }) {
                     switch (text) {
-                        case 'SS': return '&section;';
+                        case 'SS': return '&sect;';
                         case 'PG': return '&para;';
+                        case 'SM': return '&#8480;';
                         case 'TM': return '&trade;';
                         case '(C)':
                         case '(c)': return '&copy';
@@ -167,7 +168,7 @@ var SHML;
             args.set('sup', { pattern: SimpleInlineRegExp('^^') });
             args.set('sub', { pattern: SimpleInlineRegExp(',,') });
             args.set('mark', { pattern: /(\|\|)(\[(?:color=)?(?<color>[^;]*?)\])?(?<TEXT>.*?)\1/g, reviver({ groups }) {
-                    return `<mark${groups.color ? ` style="color:${groups.color}"` : ''}>${groups.TEXT}</mark>`;
+                    return `<mark${groups.color ? ` style="background-color:${groups.color}"` : ''}>${groups.TEXT}</mark>`;
                 } });
             args.set('span', { pattern: /(&amp;&amp;)(\[(?:color=)?(?<color>[^;]*?)\])?(?<TEXT>.*?)\1/g, reviver({ groups }) {
                     var _a;
