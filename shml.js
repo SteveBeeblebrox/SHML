@@ -23,7 +23,7 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.6.0';
+    SHML.VERSION = '1.6.1';
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -215,7 +215,7 @@ var SHML;
                         }
                     }).trim(), groups.language, false) : groups.text.trim()}</code></pre>`;
                 } });
-            args.set('property', { pattern: /^\s*?!\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)(?=\n)/gm, isInline: false, reviver({ groups }) {
+            args.set('property', { pattern: /^\s*?!\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)$/gm, isInline: false, reviver({ groups }) {
                     properties.set(groups.key, groups.value.trim());
                     return '';
                 } });
