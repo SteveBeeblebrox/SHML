@@ -24,7 +24,7 @@
 namespace SHML {
     export const VERSION: Readonly<{major: number, minor: number, patch: number, metadata?: string, prerelease?: string, toString(): string}> = Object.freeze({
         toString() {return `${VERSION.major}.${VERSION.minor}.${VERSION.patch}${VERSION.prerelease !== undefined ? `-${VERSION.prerelease}` : ''}${VERSION.metadata !== undefined ? `+${VERSION.metadata}` : ''}`},
-        major: 1, minor: 6, patch: 3
+        major: 1, minor: 6, patch: 4
     });
 
     function cyrb64(text: string, seed = 0) {
@@ -257,7 +257,7 @@ namespace SHML {
                 }).trim(), groups.language, false) : groups.text.trim()}</code></pre>`;
             }});
 
-            args.set('property', {pattern: /^\s*?!\s*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)$/gm, isInline: false, reviver({groups}) {
+            args.set('property', {pattern: /^[\t ]*?![\t ]*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)$/gm, isInline: false, reviver({groups}) {
                 properties.set(groups.key, groups.value.trim())
                 return ''
             }});
@@ -265,7 +265,7 @@ namespace SHML {
                 return properties.get(groups.key) ?? `\${${groups.key}}`
             }});
 
-            args.set('image', {pattern: /!\[(?<src>\S*?)(?:\s*?(?<height>auto|\d*)(?:[xX](?<width>auto|\d*))?)?\](?:\((?<alt>.*?)\))?/g, reviver({groups}) {
+            args.set('image', {pattern: /!\[(?<src>\S*?)(?:[\t ]*?(?<height>auto|\d*)(?:[xX](?<width>auto|\d*))?)?\](?:\((?<alt>.*?)\))?/g, reviver({groups}) {
                 groups.width ??= groups.height
                 return `<img src="${groups.src}"${groups.alt ? ` alt="${groups.alt}"`: ''}${groups.height ? ` height="${groups.height}"` : ''}${groups.width ? ` width="${groups.width}"` : ''}>`
             }})
@@ -274,29 +274,29 @@ namespace SHML {
                 if(!args.has(entry[0]))
                     args.set(...entry)
 
-            args.set('details', {pattern: /(?<=\n|^)\s*!(?<mode>[vV]|&gt;)?!(?<summary>.*?)\[\s*(?<DETAILS>[\s\S]*?)\s*(?<!\])\](?!\])/g, isInline: false, reviver({groups}) {
+            args.set('details', {pattern: /(?<=\n|^)[\t ]*!(?<mode>[vV]|&gt;)?!(?<summary>.*?)\[\s*(?<DETAILS>[\s\S]*?)\s*(?<!\])\](?!\])/g, isInline: false, reviver({groups}) {
                 return `<details${groups.mode?.toLowerCase?.() === 'v' ? ' open' : ''}><summary>${groups.summary}</summary>\n${groups.DETAILS}</details>`
             }});
 
-            args.set('text-align', {pattern: /(?<=\n|^)[^\S\n]*?@@\s*?(?<what>center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)\s*?(?<TEXT>[\s\S]*?)(?:$|(?:(?<=\n)[^\S\n]*?@@\s*?reset)|(?=\n[^\S\n]*?@@\s*?(?:center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)))/g, isInline: false, reviver({groups}) {
+            args.set('text-align', {pattern: /(?<=\n|^)[^\S\n]*?@@\s*?(?<what>center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)\s*?(?<TEXT>[\s\S]*?)(?:$|(?:(?<=\n)[^\S\n]*?@@[\t ]*?reset)|(?=\n[^\S\n]*?@@[\t ]*?(?:center(?:ed)?|left|right|justif(?:y|ied)(?:-all)?)))/g, isInline: false, reviver({groups}) {
                 const overrides: {[match: string]: string} = { centered: 'center', justified: 'justify', 'justified-all': 'justify-all' }
                 return `<div style="text-align: ${overrides[groups.what] ?? groups.what};">${groups.TEXT}</div>`
             }})
 
-            args.set('numbered_header', {pattern: /^\s*?(?<count>#{1,6})(?:\[(?<id>[a-zA-Z_][a-zA-Z_0-9]*?)\])?\s?(?<TEXT>[^\uffff]*?)\k<count>?(?=\n|$)/gm, isInline: false, reviver({groups}) {
+            args.set('numbered_header', {pattern: /^[\t ]*?(?<count>#{1,6})(?:\[(?<id>[a-zA-Z_][a-zA-Z_0-9]*?)\])?[\t ]?(?<TEXT>[^\uffff]*?)\k<count>?(?=\n|$)/gm, isInline: false, reviver({groups}) {
                 if(groups.id) ids.add(`h${groups.count.length}:${groups.id}`)
                 groups.id ??= cyrb64(groups.TEXT)
                 return `<h${groups.count.length} id="h${groups.count.length}:${groups.id}"><a href="#h${groups.count.length}:${groups.id}" title="Link to section">${groups.TEXT}</a></h${groups.count.length}>`
             }});
 
-            args.set('hr', {pattern: /^\s*([-=])\1{2,}\s*$/gm, isInline: false, reviver() {return '<hr>'}});
+            args.set('hr', {pattern: /^[\t ]*([-=])\1{2,}[\t ]*$/gm, isInline: false, reviver() {return '<hr>'}});
             
             args.set('table', {pattern: /\[\[(?:\n\s*(?:title=)?(?<title>[^,\n]*)\n)?(?<contents>[\s\S]*?)\]\]/g, isInline: false, reviver({groups}) {
                 const rows = groups.contents.trim().split('\n').map((row: string, index:number) => `\n<tr>${row.split(',').map((column: string) => `<t${index && 'd' || 'h'}>${column.trim()}</t${index && 'd' || 'h'}>`).join('')}</tr>`)
                 return `<table>${groups.title ? `\n<caption>${groups.title.trim()}</caption>`: ''}\n<thead>${rows.shift()}\n<thead>\n<tbody>${rows.join('')}\n<tbody>\n</table>`
             }})
 
-            args.set('list', {pattern: /(?<text>(?<=\n|^)[^\n\S]*?(?:\+|\d+[.)])[\s\S]*?(?=\n\n|$))/g, isInline: false, reviver({groups}) {
+            args.set('list', {pattern: /(?<text>(?<=\n|^)[\t ]*?(?:\+|\d+[.)])[\s\S]*?(?=\n\n|$))/g, isInline: false, reviver({groups}) {
                 type ListType = 'ol' | 'ul'
 
                 const openTags: ListType[] = [];
@@ -335,7 +335,7 @@ namespace SHML {
                 return result;
             }});
 
-            args.set('blockquote', {pattern: /(?<text>(?:(?:&gt;){3}[\s\S]*?(?:-\s*?(?<citation>.*?))?(?:\n|$))+)/g, isInline: false, reviver({groups}) {
+            args.set('blockquote', {pattern: /(?<text>(?:(?:&gt;){3}[\s\S]*?(?:-[\t ]*?(?<citation>.*?))?(?:\n|$))+)/g, isInline: false, reviver({groups}) {
                 return `<figure><blockquote>${groups.text.replace(/(?:&gt;){3}/g, '').replace(new RegExp(String.raw`-\s*?${groups.citation?.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}\s*?$`),'')}</blockquote>${groups.citation && `<figcaption><cite>- ${groups.citation}</cite></figcaption>` || ''}</figure>`
             }});
 
