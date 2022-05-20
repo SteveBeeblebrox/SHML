@@ -5,8 +5,6 @@
 
 **This README is out of date, changes coming soon!**
 
-## Known Issues
-1. Bullet points and lists do not nest/indent
 ## Planned Features
 1. More syntax highlighters for Rust and other languages
 2. CLI Tool
