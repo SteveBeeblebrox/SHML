@@ -23,7 +23,10 @@
  */
 var SHML;
 (function (SHML) {
-    SHML.VERSION = '1.6.2';
+    SHML.VERSION = Object.freeze({
+        toString() { return `${SHML.VERSION.major}.${SHML.VERSION.minor}.${SHML.VERSION.patch}${SHML.VERSION.prerelease !== undefined ? `-${SHML.VERSION.prerelease}` : ''}${SHML.VERSION.metadata !== undefined ? `+${SHML.VERSION.metadata}` : ''}`; },
+        major: 1, minor: 6, patch: 3
+    });
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
         for (let i = 0, ch; i < text.length; i++) {
@@ -253,11 +256,38 @@ var SHML;
                     const rows = groups.contents.trim().split('\n').map((row, index) => `\n<tr>${row.split(',').map((column) => `<t${index && 'd' || 'h'}>${column.trim()}</t${index && 'd' || 'h'}>`).join('')}</tr>`);
                     return `<table>${groups.title ? `\n<caption>${groups.title.trim()}</caption>` : ''}\n<thead>${rows.shift()}\n<thead>\n<tbody>${rows.join('')}\n<tbody>\n</table>`;
                 } });
-            args.set('bull', { pattern: /(?<text>(?<=\n|^)(?<whitespace>[^\S\n\r]*)\+ .*(?:\n\k<whitespace>\+ .*)*)/g, isInline: false, reviver({ groups }) {
-                    return `<ul>\n${groups.text.split('\n').filter((line) => line.trim()).map((line) => `<li>${line.replace(/^\s*?\+\s*/, '')}</li>`).join('\n')}\n</ul>`;
-                } });
-            args.set('list', { pattern: /(?<text>(?<=\n|^)(?<whitespace>[^\S\n\r]*)\d+[.)] .*(?:\n\k<whitespace>\d+[.)] .*)*)/g, isInline: false, reviver({ groups }) {
-                    return `<ol>\n${groups.text.split('\n').filter((line) => line.trim()).map((line) => `<li>${line.replace(/^\s*?\d+[.)] \s*/, '')}</li>`).join('\n')}\n</ol>`;
+            args.set('list', { pattern: /(?<text>(?<=\n|^)[^\n\S]*?(?:\+|\d+[.)])[\s\S]*?(?=\n\n|$))/g, isInline: false, reviver({ groups }) {
+                    var _a;
+                    const openTags = [];
+                    let lastType = null, lastIndent = 0, result = '';
+                    function openTag(tag) {
+                        result += `<${tag}>`;
+                        openTags.push(tag);
+                    }
+                    function closeTag() {
+                        result += `</${openTags.pop()}>`;
+                    }
+                    for (const line of groups.text.trim().split('\n')) {
+                        const groups = (_a = line.match(/(?<whitespace>\s*?)(?<what>\+|\d+[.)])(?:\s*)(?<text>.*)/)) === null || _a === void 0 ? void 0 : _a.groups;
+                        if (!groups) {
+                            result = result.replace(/(<\/..\>)$/, '<br>' + line.trim() + '$1');
+                            continue;
+                        }
+                        const currentType = groups.what === '+' ? 'ul' : 'ol';
+                        if (lastType == null || groups.whitespace.length > lastIndent)
+                            openTag(currentType);
+                        else if (groups.whitespace.length < lastIndent)
+                            closeTag();
+                        else if (currentType !== lastType) {
+                            closeTag();
+                            openTag(currentType);
+                        }
+                        result += `<li>${groups.text}</li>`;
+                        [lastType, lastIndent] = [currentType, groups.whitespace.length];
+                    }
+                    while (openTags.length)
+                        closeTag();
+                    return result;
                 } });
             args.set('blockquote', { pattern: /(?<text>(?:(?:&gt;){3}[\s\S]*?(?:-\s*?(?<citation>.*?))?(?:\n|$))+)/g, isInline: false, reviver({ groups }) {
                     var _a;
