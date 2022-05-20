@@ -22,8 +22,10 @@
  */
 
 namespace SHML {
-
-    export const VERSION = '1.6.2';
+    export const VERSION: Readonly<{major: number, minor: number, patch: number, metadata?: string, prerelease?: string, toString(): string}> = Object.freeze({
+        toString() {return `${VERSION.major}.${VERSION.minor}.${VERSION.patch}${VERSION.prerelease !== undefined ? `-${VERSION.prerelease}` : ''}${VERSION.metadata !== undefined ? `+${VERSION.metadata}` : ''}`},
+        major: 1, minor: 6, patch: 4
+    });
 
     function cyrb64(text: string, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -294,17 +296,48 @@ namespace SHML {
                 return `<table>${groups.title ? `\n<caption>${groups.title.trim()}</caption>`: ''}\n<thead>${rows.shift()}\n<thead>\n<tbody>${rows.join('')}\n<tbody>\n</table>`
             }})
 
-            args.set('bull', {pattern: /(?<text>(?<=\n|^)(?<whitespace>[^\S\n\r]*)\+ .*(?:\n\k<whitespace>\+ .*)*)/g, isInline: false, reviver({groups}) {
-                return `<ul>\n${groups.text.split('\n').filter((line:string)=>line.trim()).map((line:string)=>`<li>${line.replace(/^\s*?\+\s*/, '')}</li>`).join('\n')}\n</ul>`
-            }})
+            args.set('list', {pattern: /(?<text>(?<=\n|^)[^\n\S]*?(?:\+|\d+[.)])[\s\S]*?(?=\n\n|$))/g, isInline: false, reviver({groups}) {
+                type ListType = 'ol' | 'ul'
 
-            args.set('list', {pattern: /(?<text>(?<=\n|^)(?<whitespace>[^\S\n\r]*)\d+[.)] .*(?:\n\k<whitespace>\d+[.)] .*)*)/g, isInline: false, reviver({groups}) {
-                return `<ol>\n${groups.text.split('\n').filter((line:string)=>line.trim()).map((line:string)=>`<li>${line.replace(/^\s*?\d+[.)] \s*/, '')}</li>`).join('\n')}\n</ol>`
-            }})
+                const openTags: ListType[] = [];
+
+                let lastType: ListType | null = null, lastIndent = 0, result = '';
+
+                function openTag(tag: ListType) {
+                    result += `<${tag}>`
+                    openTags.push(tag);
+                }
+                function closeTag() {
+                    result += `</${openTags.pop()}>`;
+                }
+
+                for(const line of groups.text.trim().split('\n')) {
+                    const groups = line.match(/(?<whitespace>\s*?)(?<what>\+|\d+[.)])(?:\s*)(?<text>.*)/)?.groups;
+                    
+                    if(!groups) {
+                        result = result.replace(/(<\/..\>)$/, '<br>'+line.trim()+'$1');
+                        continue;
+                    }
+
+                    const currentType: ListType = groups.what === '+' ? 'ul' : 'ol';
+
+                    if(lastType == null || groups.whitespace.length > lastIndent) openTag(currentType);
+                    else if (groups.whitespace.length < lastIndent) closeTag();
+                    else if(currentType !== lastType) {
+                        closeTag();
+                        openTag(currentType);
+                    }
+                    result += `<li>${groups.text}</li>`;
+                    [lastType, lastIndent] = [currentType, groups.whitespace.length];
+                }
+                while(openTags.length) closeTag();
+
+                return result;
+            }});
 
             args.set('blockquote', {pattern: /(?<text>(?:(?:&gt;){3}[\s\S]*?(?:-\s*?(?<citation>.*?))?(?:\n|$))+)/g, isInline: false, reviver({groups}) {
                 return `<figure><blockquote>${groups.text.replace(/(?:&gt;){3}/g, '').replace(new RegExp(String.raw`-\s*?${groups.citation?.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}\s*?$`),'')}</blockquote>${groups.citation && `<figcaption><cite>- ${groups.citation}</cite></figcaption>` || ''}</figure>`
-            }})
+            }});
 
             args.set('block_html', {pattern: /&lt;(?<what>\/?(?:h[123456]|hr|blockquote|ul|ol|li))&gt;/g, isInline: false, reviver({groups}) {
                 return `<${groups.what}>`
