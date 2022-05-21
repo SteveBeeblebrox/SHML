@@ -24,7 +24,7 @@
 namespace SHML {
     export const VERSION: Readonly<{major: number, minor: number, patch: number, metadata?: string, prerelease?: string, toString(): string}> = Object.freeze({
         toString() {return `${VERSION.major}.${VERSION.minor}.${VERSION.patch}${VERSION.prerelease !== undefined ? `-${VERSION.prerelease}` : ''}${VERSION.metadata !== undefined ? `+${VERSION.metadata}` : ''}`},
-        major: 1, minor: 6, patch: 6
+        major: 1, minor: 6, patch: 7
     });
 
     function cyrb64(text: string, seed = 0) {
@@ -74,7 +74,7 @@ namespace SHML {
     }
 
     type Block = {blockType: string, text: string, groups?: any}
-    type FormatArgs = Map<string, {pattern: RegExp, isInline?: boolean, reviver?: {(block: Block, decode:(text:string)=>string): string}}>
+    type FormatArgs = Map<string, {pattern: RegExp, isInline?: boolean, reviver?: {(block: Block, decode:(text:string,literal?:boolean)=>string): string}}>
 
     function abstractParse(text: string, args: FormatArgs) {
         if(UnicodeHelper.isInvalid(text)) throw 'Invalid Unicode Noncharacters present in text'
@@ -115,11 +115,11 @@ namespace SHML {
                 })
             return text
         }
-        function decode(text: string) {
+        function decode(text: string, literal?: boolean) {
             while(text.includes(UnicodeHelper.INLINE_MARKER) || text.includes(UnicodeHelper.BLOCK_MARKER))
                 text = text.replace(/([\ufffe\uffff]).*?\1/, hash => {
                     const block = hashmap.get(hash)!;
-                    return (args.get(block.blockType)!.reviver ?? (({blockType, groups}) => `<${blockType}>${groups.TEXT}</${blockType}>`))(block, decode)
+                    return literal ? block.text : (args.get(block.blockType)!.reviver ?? (({blockType, groups}) => `<${blockType}>${groups.TEXT}</${blockType}>`))(block, decode)
                 })
             return text
         }
@@ -159,8 +159,8 @@ namespace SHML {
             args.set('comment', {pattern: /&lt;!--(?<text>[\s\S]*?)--&gt;/g, isInline: true, reviver({groups}) {
                 return `<!--${groups.text}-->`
             }});
-            args.set('code', {pattern: /(`)(?<text>.*?)\1/g, reviver({groups}) {
-                return `<code>${groups.text}</code>`
+            args.set('code', {pattern: /(`)(?<text>.*?)\1/g, reviver({groups}, decode) {
+                return `<code>${decode(groups.text, true)}</code>`
             }});
             args.set('symbol', {pattern: /\/(?<what>(&#x27;|&quot;|.).|\?|!)\//g, reviver({groups}) {
                 switch(groups.what) {
@@ -244,7 +244,7 @@ namespace SHML {
             args.set('comment', inlineArgs.get('comment')!)
 
             args.set('code_block', {pattern: /(```)(?<lines>#)?(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({groups}, decode) {
-                return `<pre><code>${groups.language || groups.lines ? SHML.parseCode(decode(groups.text).replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match: string) => {
+                return `<pre><code>${groups.language || groups.lines ? SHML.parseCode(decode(groups.text, true).replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match: string) => {
                     switch(match) {
                         case '&lt;': return '<';
                         case '&gt;': return '>';
@@ -254,7 +254,7 @@ namespace SHML {
                         
                         default: throw null;
                     }
-                }).trim(), groups.language ?? 'none', groups.lines === '#') : groups.text.trim()}</code></pre>`;
+                }).trim(), groups.language ?? 'none', groups.lines === '#') : decode(groups.text, true).trim()}</code></pre>`;
             }});
 
             args.set('property', {pattern: /^[\t ]*?![\t ]*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)$/gm, isInline: false, reviver({groups}) {
