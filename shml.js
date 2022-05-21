@@ -25,7 +25,7 @@ var SHML;
 (function (SHML) {
     SHML.VERSION = Object.freeze({
         toString() { return `${SHML.VERSION.major}.${SHML.VERSION.minor}.${SHML.VERSION.patch}${SHML.VERSION.prerelease !== undefined ? `-${SHML.VERSION.prerelease}` : ''}${SHML.VERSION.metadata !== undefined ? `+${SHML.VERSION.metadata}` : ''}`; },
-        major: 1, minor: 6, patch: 4
+        major: 1, minor: 6, patch: 5
     });
     function cyrb64(text, seed = 0) {
         let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -359,8 +359,8 @@ var SHML;
                 matchToken('keyword', new RegExp(String.raw `(?<text>@(?:${CSS_AT_RULES.join('|')})\b)`, 'g'));
                 matchToken('selector', /(?<text>[^\s{};\uffff\ufffe][^{};\uffff\ufffe]*?[^\s{};\uffff\ufffe]?(?=\s*{))/g);
                 matchToken('property', /(?<text>\b[a-z\-]+:)/g);
-                matchToken('number', /(?<text>\b(\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?n?(?<!_))(?:%|\b|[a-z]+))/gi);
                 matchToken('hexadecimal', /(?<text>#(?:(?:[0-9a-f]){8}|(?:[0-9a-f]){6}|(?:[0-9a-f]){3,4})\b)/gi);
+                matchToken('number', /(?<text>\b(\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?n?(?<!_))(?:%|\b|[a-z]+))/gi);
                 matchToken('function', /(?<text>\b[a-z\-]+\b(?=\())/g);
                 matchToken('other', /(?<text>\b[a-z\-]+\b)/g);
                 return args;
