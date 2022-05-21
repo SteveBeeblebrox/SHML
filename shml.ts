@@ -24,7 +24,7 @@
 namespace SHML {
     export const VERSION: Readonly<{major: number, minor: number, patch: number, metadata?: string, prerelease?: string, toString(): string}> = Object.freeze({
         toString() {return `${VERSION.major}.${VERSION.minor}.${VERSION.patch}${VERSION.prerelease !== undefined ? `-${VERSION.prerelease}` : ''}${VERSION.metadata !== undefined ? `+${VERSION.metadata}` : ''}`},
-        major: 1, minor: 6, patch: 5
+        major: 1, minor: 6, patch: 6
     });
 
     function cyrb64(text: string, seed = 0) {
@@ -243,8 +243,8 @@ namespace SHML {
             args.set('src_comment', inlineArgs.get('src_comment')!)
             args.set('comment', inlineArgs.get('comment')!)
 
-            args.set('code_block', {pattern: /(```)(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({groups}, decode) {
-                return `<pre><code>${groups.language ? SHML.parseCode(decode(groups.text).replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match: string) => {
+            args.set('code_block', {pattern: /(```)(?<lines>#)?(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({groups}, decode) {
+                return `<pre><code>${groups.language || groups.lines ? SHML.parseCode(decode(groups.text).replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match: string) => {
                     switch(match) {
                         case '&lt;': return '<';
                         case '&gt;': return '>';
@@ -254,7 +254,7 @@ namespace SHML {
                         
                         default: throw null;
                     }
-                }).trim(), groups.language, false) : groups.text.trim()}</code></pre>`;
+                }).trim(), groups.language ?? 'none', groups.lines === '#') : groups.text.trim()}</code></pre>`;
             }});
 
             args.set('property', {pattern: /^[\t ]*?![\t ]*?(?<key>[a-zA-Z_][a-zA-Z_0-9]*?)(?<!http|https):(?<value>.*?)$/gm, isInline: false, reviver({groups}) {
