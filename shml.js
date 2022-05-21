@@ -207,7 +207,7 @@ var SHML;
             args.set('raw', inlineArgs.get('raw'));
             args.set('src_comment', inlineArgs.get('src_comment'));
             args.set('comment', inlineArgs.get('comment'));
-            args.set('code_block', { pattern: /(```)(?<lines>#)?(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({ groups }, decode) {
+            args.set('code_block', { pattern: /(```+)(?<lines>#)?(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({ groups }, decode) {
                     var _a;
                     return `<pre><code>${groups.language || groups.lines ? SHML.parseCode(decode(groups.text, true).replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match) => {
                         switch (match) {
