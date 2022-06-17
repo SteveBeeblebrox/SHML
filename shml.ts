@@ -24,7 +24,7 @@
 namespace SHML {
     export const VERSION: Readonly<{major: number, minor: number, patch: number, metadata?: string, prerelease?: string, toString(): string}> = Object.freeze({
         toString() {return `${VERSION.major}.${VERSION.minor}.${VERSION.patch}${VERSION.prerelease !== undefined ? `-${VERSION.prerelease}` : ''}${VERSION.metadata !== undefined ? `+${VERSION.metadata}` : ''}`},
-        major: 1, minor: 6, patch: 7
+        major: 1, minor: 6, patch: 8
     });
 
     function cyrb64(text: string, seed = 0) {
@@ -391,7 +391,7 @@ namespace SHML {
                     return groups.OPENTAG + parseCode(desanitize(decode(groups.content)), 'javascript', false) + groups.CLOSETAG;
                 }});
 
-                args.set('tag-open', {pattern: /(?<name>&lt;[a-z\-0-9]+)(?<DATA>[^\uffff\ufffe]*?)(?<close>&gt;)/gi, reviver({groups}) {
+                args.set('tag-open', {pattern: /(?<name>&lt;[a-z\-0-9]+)(?<DATA>[^\uffff\ufffe]*?)(?<close>\/?&gt;)/gi, reviver({groups}) {
                     return `<span data-code-token="tag">${groups.name}</span>${groups.DATA ?? ''}<span data-code-token="tag">${groups.close}</span>`
                 }});
 
@@ -399,7 +399,7 @@ namespace SHML {
                     return groups.front + `<span data-code-token="string">${groups.text}</span>`;
                 }});
                 
-                args.set('tag-close', {pattern: /(?<text>&lt;\/[a-z\-\s0-9]+&gt;)/gi, reviver({groups}) {
+                args.set('tag-close', {pattern: /(?<text>&lt;\/[a-z\-0-9]+\s*?&gt;)/gi, reviver({groups}) {
                     return `<span data-code-token="tag">${groups.text}</span>`;
                 }});
 
@@ -472,9 +472,15 @@ namespace SHML {
                     return `<span data-code-token="cdata">${groups.open}</span><span data-code-token="cdata-content">${groups.content}</span><span data-code-token="cdata">${groups.close}</span>`
                 }});
 
-                inheritFromHTML('tag-open');
+                args.set('tag-open', {pattern: /(?<name>&lt;[a-z\-0-9]+(?:\:[a-z\-0-9]+)?)(?<DATA>[^\uffff\ufffe]*?)(?<close>\/?&gt;)/gi, reviver({groups}) {
+                    return `<span data-code-token="tag">${groups.name}</span>${groups.DATA ?? ''}<span data-code-token="tag">${groups.close}</span>`
+                }});
+
                 inheritFromHTML('string');
-                inheritFromHTML('tag-close');
+
+                args.set('tag-close', {pattern: /(?<text>&lt;\/[a-z\-0-9]+(?:\:[a-z\-0-9]+)?\s*?&gt;)/gi, reviver({groups}) {
+                    return `<span data-code-token="tag">${groups.text}</span>`;
+                }});
 
                 return args;
             }
