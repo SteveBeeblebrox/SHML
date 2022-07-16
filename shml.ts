@@ -24,7 +24,7 @@
 namespace SHML {
     export const VERSION: Readonly<{major: number, minor: number, patch: number, metadata?: string, prerelease?: string, toString(): string}> = Object.freeze({
         toString() {return `${VERSION.major}.${VERSION.minor}.${VERSION.patch}${VERSION.prerelease !== undefined ? `-${VERSION.prerelease}` : ''}${VERSION.metadata !== undefined ? `+${VERSION.metadata}` : ''}`},
-        major: 1, minor: 6, patch: 8
+        major: 1, minor: 6, patch: 9
     });
 
     function cyrb64(text: string, seed = 0) {
@@ -552,18 +552,19 @@ namespace SHML {
     }
 
     export function parseInlineMarkup(text: string, customTokens?: Map<string,string> | {get(name:string): string}) {
-        return abstractParse(text, Configuration.inlineMarkup(customTokens))
+        return abstractParse(normalize(text), Configuration.inlineMarkup(customTokens))
     }
 
     export function parseMarkup(text: string, customTokens?: Map<string,string> | {get(name:string): string}, properties?: Map<string,string>): String & {properties: Map<string,string>, ids: Set<string>} {
         const props: Map<string,string> = new Map((properties?.entries() ?? [])), ids: Set<string> = new Set()
-        const result = new String(abstractParse(text, Configuration.blockMarkup(customTokens, props, ids)))
+        const result = new String(abstractParse(normalize(text), Configuration.blockMarkup(customTokens, props, ids)))
         Object.defineProperty(result, 'properties', {value: props})
         Object.defineProperty(result, 'ids', {value: ids})
         return result as String & {properties: Map<string,string>, ids: Set<string>}
     }
 
     export function parseCode(text: string, language: typeof Configuration.Code.SUPPORTED_LANGUAGES[number] = 'none', markLines: boolean = true, lineOffset: number = 1): string {
+        text = normalize(text);
         if(language !== 'none') {
             const args: FormatArgs = (function() {
                 switch(language) {
@@ -587,5 +588,9 @@ namespace SHML {
             text = text.split('\n').map((line: string, i: number)=>`<span data-code-token="line-number">${(i+lineOffset).toString().padStart((text.split('\n').length+lineOffset).toString().length,' ')}</span><span data-code-token="line" data-code-line="${i+lineOffset}">${line}</span>`).join('\n');
 
         return `<span data-code-language="${language}">${text}</span>`;
+    }
+
+    function normalize(text: string) {
+        return text.replace(/\r(?=\n)/g,'');
     }
 }
