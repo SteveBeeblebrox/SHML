@@ -212,10 +212,10 @@ namespace SHML {
             }
 
             args.set('u', {pattern: SimpleInlineRegExp('__'), reviver({groups}, decode) {
-                return decode(groups.TEXT).replace(/[a-z0-9]/gi, char=>String.fromCharCode(char.charCodeAt(0),'a͟'.charCodeAt(1)));
+                return decode(groups.TEXT).replace(/[a-z0-9]/gi, char=>String.fromCharCode(char.charCodeAt(0),8203,'a͟'.charCodeAt(1)));
             }});
             args.set('del', {pattern: SimpleInlineRegExp('~~'), reviver({groups}, decode) {
-                return decode(groups.TEXT).replace(/[a-z0-9]/gi, char=>String.fromCharCode(char.charCodeAt(0),'a̶'.charCodeAt(1)));
+                return decode(groups.TEXT).replace(/[a-z0-9]/gi, char=>String.fromCharCode(char.charCodeAt(0),8203,'a̶'.charCodeAt(1)));
             }});
 
             args.set('custom_token', {pattern: /:(?<what>[a-zA-Z0-9][a-zA-Z0-9_\-]*?):/g, isInline: true, reviver({groups}) {return customTokens.get(groups.what) ?? `:${groups.what}:`}});
@@ -632,7 +632,7 @@ namespace SHML {
         }
     }
 
-    function parseUnicodeMarkup(text: string, customTokens?: Map<string,string> | {get(name:string): string}) {
+    export function parseUnicodeMarkup(text: string, customTokens?: Map<string,string> | {get(name:string): string}) {
         return unescapeHTMLEntities(abstractParse(normalize(text), Configuration.unicodeMarkup(customTokens)));
     }
 
