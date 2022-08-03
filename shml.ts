@@ -89,7 +89,7 @@ namespace SHML {
                 
                 default: throw null;
             }
-        })
+        });
 
         const hashmap = new Map<string, Block>()
         
@@ -144,6 +144,87 @@ namespace SHML {
             '?': {'A': 'Ą', 'E': 'Ę', 'I': 'Į', 'U': 'Ų', 'a': 'ą', 'e': 'ę', 'i': 'į', 'u': 'ų'},
             'v': {'C': 'Č', 'D': 'Ď', 'E': 'Ě', 'L': 'Ľ', 'N': 'Ň', 'R': 'Ř', 'S': 'Š', 'T': 'Ť', 'Z': 'Ž', 'c': 'č', 'd': 'ď', 'e': 'ě', 'l': 'ľ', 'n': 'ň', 'r': 'ř', 's': 'š', 't': 'ť', 'z': 'ž'},
             '_': {'D': 'Đ', 'H': 'Ħ', 'L': 'Ł', 'T': 'Ŧ', 'd': 'đ', 'h': 'ħ', 'l': 'ł', 't': 'ŧ'}
+        }
+
+        export function unicodeMarkup(customTokens: Map<string,string> | {get(name:string): string} = new Map()) {
+            const args: FormatArgs = new Map();       
+
+            args.set('escaped', {pattern: /\\(?<what>[^ntp])/g, reviver({groups}) {
+                return groups.what
+            }});
+            args.set('raw', {pattern: /&lt;&lt;\/(?<text>[\s\S]*?)\/&gt;&gt;/g, reviver({groups}) {
+                return groups.text
+            }});
+            args.set('code', {pattern: /(`)(?<text>.*?)\1/g, reviver({groups}, decode) {
+                return decode(groups.text, true)
+                    .replace(/[a-z]/g,char=>shiftChar(char,'a','𝚊'))
+                    .replace(/[A-Z]/g,char=>shiftChar(char,'A','𝙰'))
+                    .replace(/\d/g,char=>shiftChar(char,'1','𝟷'));
+            }});
+            args.set('symbol', {pattern: /\/(?<what>('&#x27;|&quot;|.).|\?|!)\//g, reviver({groups}) {
+                switch(groups.what) {
+                    case '!': return '¡';
+                    case '?': return '¿';
+                    default: return Configuration.SYMBOLS[groups.what.substring(0,groups.what.length-1)]?.[groups.what.substring(groups.what.length-1)] ?? `/${groups.what}/`;
+                }
+            }});
+
+            args.set('unicode_shortcut', {pattern: /(?<=\b)(?:TM|SS|PG|SM)(?=\b)|\([cCrR]\)|-&gt;|&lt;-/g, reviver({text}) {
+                switch(text) {
+                    case 'SS': return '§';
+                    case 'PG': return '¶';
+                    case 'SM': return '℠';
+                    case 'TM': return '™';
+                    case '(C)':
+                    case '(c)': return '©';
+                    case '(R)':
+                    case '(r)': return '®';
+                    case '-&gt;': return '→';
+                    case '&lt;-': return '←';
+                    default: return text;
+                }
+            }})
+
+            function shiftChar(char: string, base: string, to: string): string {
+                return String.fromCharCode(55349,char.charCodeAt(0)+(to.charCodeAt(1)-base.charCodeAt(0)))
+            }
+
+            args.set('em_strong', {pattern: /(\*\*\*)(?=[^*])(?<TEXT>.*?)\1/g, reviver({groups}, decode) {
+                return decode(groups.TEXT)
+                    .replace(/[a-z]/g,char=>shiftChar(char,'a','𝙖'))
+                    .replace(/[A-Z]/g,char=>shiftChar(char,'A','𝘼'))
+                    .replace(/\d/g,char=>shiftChar(char,'1','𝟭'));
+            }});
+            args.set('strong', {pattern: /(\*\*)(?=[^*])(?<TEXT>.*?)\1/g, reviver({groups}, decode) {
+                return decode(groups.TEXT)
+                    .replace(/[a-z]/g,char=>shiftChar(char,'a','𝗮'))
+                    .replace(/[A-Z]/g,char=>shiftChar(char,'A','𝗔'))
+                    .replace(/\d/g,char=>shiftChar(char,'1','𝟭'));
+            }});
+            args.set('em', {pattern: /(\*)(?=[^*])(?<TEXT>.*?)\1/g, reviver({groups}, decode) {
+                return decode(groups.TEXT)
+                    .replace(/[a-z]/g, char=>shiftChar(char,'a','𝘢'))
+                    .replace(/[A-Z]/g, char=>shiftChar(char,'A','𝘈'));
+            }});
+
+            function SimpleInlineRegExp(marker: string) {
+                return new RegExp(String.raw`(${marker.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')})(?<TEXT>.*?)\1`, 'g')
+            }
+
+            args.set('u', {pattern: SimpleInlineRegExp('__'), reviver({groups}, decode) {
+                return decode(groups.TEXT).replace(/[a-z0-9]/gi, char=>String.fromCharCode(char.charCodeAt(0),'a͟'.charCodeAt(1)));
+            }});
+            args.set('del', {pattern: SimpleInlineRegExp('~~'), reviver({groups}, decode) {
+                return decode(groups.TEXT).replace(/[a-z0-9]/gi, char=>String.fromCharCode(char.charCodeAt(0),'a̶'.charCodeAt(1)));
+            }});
+
+            args.set('custom_token', {pattern: /:(?<what>[a-zA-Z0-9][a-zA-Z0-9_\-]*?):/g, isInline: true, reviver({groups}) {return customTokens.get(groups.what) ?? `:${groups.what}:`}});
+
+            args.set('nbsp', {pattern: /\\p/g, reviver() {return ' '}});
+            args.set('emsp', {pattern: /\\t/g, reviver() {return ' '}});
+            args.set('linebreak', {pattern: /\\n/g, reviver() {return '\n'}});
+            
+            return args;
         }
 
         export function inlineMarkup(customTokens: Map<string,string> | {get(name:string): string} = new Map()) {
@@ -232,7 +313,7 @@ namespace SHML {
             args.set('html', {pattern: /&lt;(?<what>\/?(?:code|em|i|strong|b|u|del|sub|sup|mark|span|wbr|br))&gt;/g, isInline: true, reviver({blockType, text, groups}) {
                 return `<${groups.what}>`
             }});
-            return args
+            return args;
         }
 
         export function blockMarkup(customTokens: Map<string,string> | {get(name:string): string} = new Map(), properties: Map<string,string> = new Map(), ids: Set<string> = new Set()) {
@@ -551,16 +632,48 @@ namespace SHML {
         }
     }
 
+    function parseUnicodeMarkup(text: string, customTokens?: Map<string,string> | {get(name:string): string}) {
+        return unescapeHTMLEntities(abstractParse(normalize(text), Configuration.unicodeMarkup(customTokens)));
+    }
+
+    function unescapeHTMLEntities(text: string): string {
+        return text.replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match: string) => {
+            switch(match) {
+                case '&lt;': return '<';
+                case '&gt;': return '>';
+                case '&amp;': return '&';
+                case '&quot;': return '"';
+                case '&#x27;': return '\'';
+                
+                default: throw null;
+            }
+        });
+    }
+
+    function escapeHTMLEntities(text: string): string {
+        return text.replace(/[<>&"']/g, (match: string) => {
+            switch(match) {
+                case '<': return '&lt;';
+                case '>': return '&gt;';
+                case '&': return '&amp;';
+                case '"': return '&quot;';
+                case '\'': return '&#x27;';
+                
+                default: throw null;
+            }
+        });
+    }
+
     export function parseInlineMarkup(text: string, customTokens?: Map<string,string> | {get(name:string): string}) {
-        return abstractParse(normalize(text), Configuration.inlineMarkup(customTokens))
+        return abstractParse(normalize(text), Configuration.inlineMarkup(customTokens));
     }
 
     export function parseMarkup(text: string, customTokens?: Map<string,string> | {get(name:string): string}, properties?: Map<string,string>): String & {properties: Map<string,string>, ids: Set<string>} {
-        const props: Map<string,string> = new Map((properties?.entries() ?? [])), ids: Set<string> = new Set()
-        const result = new String(abstractParse(normalize(text), Configuration.blockMarkup(customTokens, props, ids)))
-        Object.defineProperty(result, 'properties', {value: props})
-        Object.defineProperty(result, 'ids', {value: ids})
-        return result as String & {properties: Map<string,string>, ids: Set<string>}
+        const props: Map<string,string> = new Map((properties?.entries() ?? [])), ids: Set<string> = new Set();
+        const result = new String(abstractParse(normalize(text), Configuration.blockMarkup(customTokens, props, ids)));
+        Object.defineProperty(result, 'properties', {value: props});
+        Object.defineProperty(result, 'ids', {value: ids});
+        return result as String & {properties: Map<string,string>, ids: Set<string>};
     }
 
     export function parseCode(text: string, language: typeof Configuration.Code.SUPPORTED_LANGUAGES[number] = 'none', markLines: boolean = true, lineOffset: number = 1): string {
