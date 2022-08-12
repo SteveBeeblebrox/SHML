@@ -24,7 +24,7 @@
 namespace SHML {
     export const VERSION: Readonly<{major: number, minor: number, patch: number, metadata?: string, prerelease?: string, toString(): string}> = Object.freeze({
         toString() {return `${VERSION.major}.${VERSION.minor}.${VERSION.patch}${VERSION.prerelease !== undefined ? `-${VERSION.prerelease}` : ''}${VERSION.metadata !== undefined ? `+${VERSION.metadata}` : ''}`},
-        major: 1, minor: 6, patch: 9
+        major: 1, minor: 7, patch: 0
     });
 
     function cyrb64(text: string, seed = 0) {
@@ -76,20 +76,21 @@ namespace SHML {
     type Block = {blockType: string, text: string, groups?: any}
     type FormatArgs = Map<string, {pattern: RegExp, isInline?: boolean, reviver?: {(block: Block, decode:(text:string,literal?:boolean)=>string): string}}>
 
-    function abstractParse(text: string, args: FormatArgs) {
+    function abstractParse(text: string, args: FormatArgs, sanitizer?: 'disable sanitizer') {
         if(UnicodeHelper.isInvalid(text)) throw 'Invalid Unicode Noncharacters present in text'
         
-        text = text.replace(/[<>&"']/g, match => {
-            switch(match) {
-                case '<': return '&lt;';
-                case '>': return '&gt;';
-                case '&': return '&amp;';
-                case '"': return '&quot;';
-                case '\'': return '&#x27;';
-                
-                default: throw null;
-            }
-        });
+        if(sanitizer !== 'disable sanitizer')
+            text = text.replace(/[<>&"']/g, match => {
+                switch(match) {
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '&': return '&amp;';
+                    case '"': return '&quot;';
+                    case '\'': return '&#x27;';
+                    
+                    default: throw null;
+                }
+            });
 
         const hashmap = new Map<string, Block>()
         
@@ -152,7 +153,7 @@ namespace SHML {
             args.set('escaped', {pattern: /\\(?<what>[^ntp])/g, reviver({groups}) {
                 return groups.what
             }});
-            args.set('raw', {pattern: /&lt;&lt;\/(?<text>[\s\S]*?)\/&gt;&gt;/g, reviver({groups}) {
+            args.set('raw', {pattern: /<<\/(?<text>[\s\S]*?)\/>>/g, reviver({groups}) {
                 return groups.text
             }});
             args.set('code', {pattern: /(`)(?<text>.*?)\1/g, reviver({groups}, decode) {
@@ -161,7 +162,8 @@ namespace SHML {
                     .replace(/[A-Z]/g,char=>shiftChar(char,'A','𝙰'))
                     .replace(/\d/g,char=>shiftChar(char,'1','𝟷'));
             }});
-            args.set('symbol', {pattern: /\/(?<what>('&#x27;|&quot;|.).|\?|!)\//g, reviver({groups}) {
+            args.set('symbol', {pattern: /\/(?<what>('|"|.).|\?|!)\//g, reviver({groups}) {
+                groups.what = groups.what.replace('"', '&quot;').replace('\'', '&#x27;');
                 switch(groups.what) {
                     case '!': return '¡';
                     case '?': return '¿';
@@ -179,8 +181,8 @@ namespace SHML {
                     case '(c)': return '©';
                     case '(R)':
                     case '(r)': return '®';
-                    case '-&gt;': return '→';
-                    case '&lt;-': return '←';
+                    case '->;': return '→';
+                    case '<-': return '←';
                     default: return text;
                 }
             }})
@@ -633,7 +635,7 @@ namespace SHML {
     }
 
     export function parseUnicodeMarkup(text: string, customTokens?: Map<string,string> | {get(name:string): string}) {
-        return unescapeHTMLEntities(abstractParse(normalize(text), Configuration.unicodeMarkup(customTokens)));
+        return abstractParse(normalize(text), Configuration.unicodeMarkup(customTokens), 'disable sanitizer');
     }
 
     function unescapeHTMLEntities(text: string): string {
