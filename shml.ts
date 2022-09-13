@@ -293,6 +293,16 @@ namespace SHML {
                 return `<span style="filter: blur(0.25em); cursor: pointer;" title="Show spoiler?" onclick="this.removeAttribute('style'); this.removeAttribute('title'); this.removeAttribute('onclick');">${groups.TEXT}</span>`
             }});
 
+            const abbrs = new Map<string, string>();
+            args.set('abbr_def', {pattern: /\b(?<name>[A-Z]+)\b\s*?\((?<def>[\s\S]*?)\)/g, reviver({groups}) {
+                abbrs.set(groups.name, groups.def);
+                return`<abbr title="${groups.def}">${groups.name}</abbr> (${groups.def})`;
+            }});
+
+            args.set('abbr_ref', {pattern: /\b(?<name>[A-Z]+)\b/g, reviver({groups}) {
+                return abbrs.has(groups.name) ? `<abbr title="${abbrs.get(groups.name)}">${groups.name}</abbr>` : groups.name;
+            }});
+
             args.set('custom_token', {pattern: /:(?<what>[a-zA-Z0-9][a-zA-Z0-9_\-]*?):/g, isInline: true, reviver({groups}) {return customTokens.get(groups.what) ?? `:${groups.what}:`}});
 
             args.set('nbsp', {pattern: /\\p/g, reviver() {return '&nbsp;'}});
