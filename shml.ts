@@ -1,6 +1,6 @@
 /*
  * MIT License
- * Copyright (c) 2020-2022 S. Beeblebrox
+ * Copyright (c) 2020-2023 S. Beeblebrox
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -434,7 +434,7 @@ namespace SHML {
         }
 
         export namespace Code {
-            export const SUPPORTED_LANGUAGES = ['html', 'css', 'javascript', 'typescript', 'xml', 'json', 'python', 'diff', 'java', 'none'] as const;
+            export const SUPPORTED_LANGUAGES = ['html', 'css', 'js', 'javascript', 'ts', 'typescript', 'xml', 'json', 'py', 'python', 'diff', 'c', 'c++', 'cpp', 'java', 'none'] as const;
 
             function appendTokenMatcher(name: string, pattern: RegExp, args: FormatArgs): void {
                 args.set(name, {pattern, reviver({groups}) {
@@ -706,12 +706,18 @@ namespace SHML {
                 switch(language) {
                     case 'html': return Configuration.Code.htmlHighlighter();
                     case 'css': return Configuration.Code.cssHighlighter();
+                    case 'js':
                     case 'javascript': return Configuration.Code.javascriptHighlighter();
+                    case 'ts':
                     case 'typescript': return Configuration.Code.typescriptHighlighter();
                     case 'xml': return Configuration.Code.xmlHighlighter();
                     case 'json': return Configuration.Code.jsonHighlighter();
+                    case 'py':
                     case 'python': return Configuration.Code.pythonHighlighter();
                     case 'diff': return Configuration.Code.diffHighlighter();
+                    case 'c':
+                    case 'c++':
+                    case 'cpp': return Configuration.Code.cppHighlighter()
                     case 'java': return Configuration.Code.javaHighlighter();
                     default: return new Map();
                 }
