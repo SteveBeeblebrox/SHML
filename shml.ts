@@ -631,6 +631,27 @@ namespace SHML {
 
                 return args;
             }
+
+            export function cppHighlighter() {
+               const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
+
+               args.set('compiler-directive', {pattern: /(?<directive>#\s*?[a-z]+)(?<text>(?:\\\n|[^\n])*?(?:\n|$))/g, reviver({groups}) {
+                  return `<span data-code-token="compiler-directive">${groups.directive}<span data-code-token="compiler-directive-value">${groups.text}</span></span>`;
+               }});
+
+               args.set('multiline-string', {pattern: /(?<text>R&quot;(?<what>[^\uffff\ufffe]{0,16}?)\([^\uffff\ufffe]*?\)\k<what>&quot;)/g, reviver: ({groups}) => `<span data-code-token="string">${groups.text}</span>`});
+               matchToken('string',/(?<text>(?:L|u8|u|U)?(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+                
+               args.set('comment', {pattern: /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g, reviver({groups}, decode) {
+                  return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
+               }});
+               
+               const keywords = ['alignas','alignof','and','and_eq','asm','atomic_cancel','atomic_commit','atomic_noexcept','auto','bitand','bitor','bool','break','case','catch','char','char8_t','char16_t','char32_t','class','compl','concept','const','consteval','constexpr','constinit','const_cast','continue','co_await','co_return','co_yield','decltype','default','delete','do','double','dynamic_cast','else','enum','explicit','export','extern','false','float','for','friend','goto','if','inline','int','long','mutable','namespace','new','noexcept','not','not_eq','nullptr','operator','or','or_eq','private','protected','public','reflexpr','register','reinterpret_cast','requires','return','short','signed','sizeof','static','static_assert','static_cast','struct','switch','synchronized','template','this','thread_local','throw','true','try','typedef','typeid','typename','union','unsigned','using','virtual','void','volatile','wchar_t','while','xor','xor_eq','final','override','transaction_safe','transaction_safe_dynamic','import','module','_Pragma','NULL'];
+               matchToken('number', /(?<text>\b(?:0(?:x[0-9a-f](?:[0-9a-f]|&#x27;)*|b[01](?:[01]|&#x27;)*)(?<!&#x27;)|\d(?:\d|&#x27;)*\.?(?:\d|&#x27;)*((?<=[\d.])e[+\-]?\d(?:\d|&#x27;)*)?[fulz]{0,3}(?<!&#x27;))\b)/gi);
+               matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${keywords.join('|')})\b)`, 'g'));
+
+               return args;
+            }
         }
     }
 
