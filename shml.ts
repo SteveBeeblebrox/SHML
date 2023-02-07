@@ -326,7 +326,7 @@ namespace SHML {
             args.set('src_comment', inlineArgs.get('src_comment')!)
             args.set('comment', inlineArgs.get('comment')!)
 
-            args.set('code_block', {pattern: /(```+)(?<lines>#)?(?<language>[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({groups}, decode) {
+            args.set('code_block', {pattern: /(```+)(?<lines>#)?(?<language>c\+\+|[a-z]+)?(?<text>[\s\S]*?)\1/g, isInline: false, reviver({groups}, decode) {
                 return `<pre><code>${groups.language || groups.lines ? SHML.parseCode(decode(groups.text, true).replace(/&lt;|&gt;|&amp;|&quot;|&#x27;/g, (match: string) => {
                     switch(match) {
                         case '&lt;': return '<';
