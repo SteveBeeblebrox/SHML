@@ -508,7 +508,7 @@ namespace SHML {
                 matchToken('selector', /(?<text>[^\s{};\uffff\ufffe][^{};\uffff\ufffe]*?[^\s{};\uffff\ufffe]?(?=\s*{))/g);
                 matchToken('property', /(?<text>\b[a-z\-]+:)/g);
 
-                matchToken('hexadecimal', /(?<text>#(?:(?:[0-9a-f]){8}|(?:[0-9a-f]){6}|(?:[0-9a-f]){3,4})\b)/gi);
+                matchToken('hexadecimal', /(?<text>(?<!&)#(?:(?:[0-9a-f]){8}|(?:[0-9a-f]){6}|(?:[0-9a-f]){3,4})\b)/gi);
                 matchToken('number', /(?<text>\b(\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?n?(?<!_))(?:%|\b|[a-z]+))/gi);
 
                 matchToken('function', /(?<text>\b[a-z\-]+\b(?=\())/g);
@@ -589,7 +589,7 @@ namespace SHML {
                 args.set('multiline-string', {pattern: /(?<text>(?<what>(?<qtype>&quot;|&#x27;)\k<qtype>{2})(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => wrapMultiline('<span data-code-token="string">', groups.text, '</span>')});
                 matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
 
-                args.set('comment', {pattern: /(?<text>(?:#.*))/g, reviver({groups}, decode) {
+                args.set('comment', {pattern: /(?<text>(?:(?<!&)#.*))/g, reviver({groups}, decode) {
                     return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
                 }});
                 
@@ -639,7 +639,7 @@ namespace SHML {
             export function cppHighlighter() {
                const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
 
-               args.set('compiler-directive', {pattern: /(?<directive>#\s*?[a-z]+)(?<text>(?:\\\n|[^\n])*?(?:\n|$))/g, reviver({groups}) {
+               args.set('compiler-directive', {pattern: /(?<directive>(?<!&)#\s*?[a-z]+)(?<text>(?:\\\n|[^\n])*?(?:\n|$))/g, reviver({groups}) {
                   return `<span data-code-token="compiler-directive">${groups.directive}<span data-code-token="compiler-directive-value">${groups.text}</span></span>`;
                }});
 
