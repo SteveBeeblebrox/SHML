@@ -512,7 +512,7 @@ namespace SHML {
                 matchToken('number', /(?<text>\b(\d[\d_]*\.?[\d_]*((?<=[\d.])e[+\-]?\d[\d_]*)?n?(?<!_))(?:%|\b|[a-z]+))/gi);
 
                 matchToken('function', /(?<text>\b[a-z\-]+\b(?=\())/g);
-                matchToken('other', /(?<text>\b[a-z\-]+\b)/g);
+                matchToken('other', /(?<text>(?<!&)\b[a-z\-]+\b)/g);
 
                 return args;
             }
