@@ -660,7 +660,7 @@ namespace SHML {
             export function bashHighlighter() {
                 const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
 
-                args.set('multiline-string', {pattern: /(?<text>(?<what>&#x27;)(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => wrapMultiline('<span data-code-token="string">', groups.text, '</span>')});
+                args.set('multiline-string', {pattern: /(?<text>&#x27;&#x27;|(?:(?<what>&#x27;)(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>))/g, reviver: ({groups}) => wrapMultiline('<span data-code-token="string">', groups.text, '</span>')});
                 matchToken('string',/(?<text>(?<what>&quot;))/g);
                 
                 args.set('comment', {pattern: /(?<text>(?:(?<!&)#.*))/g, reviver({groups}, decode) {
