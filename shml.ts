@@ -434,7 +434,7 @@ namespace SHML {
         }
 
         export namespace Code {
-            export const SUPPORTED_LANGUAGES = ['html', 'css', 'js', 'javascript', 'ts', 'typescript', 'xml', 'json', 'py', 'python', 'diff', 'c', 'c++', 'cpp', 'java', 'none'] as const;
+            export const SUPPORTED_LANGUAGES = ['html', 'css', 'js', 'javascript', 'ts', 'typescript', 'xml', 'json', 'py', 'python', 'diff', 'c', 'c++', 'cpp', 'sh', 'shell', 'bash', 'java', 'none'] as const;
 
             function wrapMultiline(open: string, text: string, close: string): string {
                return text.split('\n').map(line=>open+line+close).join('\n');
@@ -482,7 +482,7 @@ namespace SHML {
                     return `<span data-code-token="tag">${groups.name}</span>${groups.DATA ?? ''}<span data-code-token="tag">${groups.close}</span>`
                 }});
 
-                args.set('string',{pattern: /(?<front>=\s*?)(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g, reviver({groups}) {
+                args.set('string',{pattern: /(?<front>=\s*?)(?<text>&#x27;&#x27;|&quot;&quot;|(?:(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>))/g, reviver({groups}) {
                     return groups.front + `<span data-code-token="string">${groups.text}</span>`;
                 }});
                 
@@ -497,7 +497,7 @@ namespace SHML {
             export function cssHighlighter(): FormatArgs {
                 const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
 
-                matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+                matchToken('string',/(?<text>&#x27;&#x27;|&quot;&quot;|(?:(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>))/g);
         
                 args.set('comment', {pattern: /(?<text>(?:\/\*[\s\S]*?\*\/))/g, reviver({groups}, decode) {
                     return wrapMultiline('<span data-code-token="comment">', decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, ''), '</span>');
@@ -532,7 +532,7 @@ namespace SHML {
                 const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
 
                 args.set('multiline-string', {pattern: /(?<text>(?<what>`)(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => wrapMultiline('<span data-code-token="string">', groups.text, '</span>')});
-                matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+                matchToken('string',/(?<text>&#x27;&#x27;|&quot;&quot;|(?:(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>))/g);
                 
                 args.set('comment', {pattern: /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g, reviver({groups}, decode) {
                     return wrapMultiline('<span data-code-token="comment">', decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, ''), '</span>');
@@ -575,7 +575,7 @@ namespace SHML {
             export function jsonHighlighter(): FormatArgs {
                 const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
 
-                matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+                matchToken('string',/(?<text>&quot;&quot;|(?:(?<what>&quot;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>))/g);
                 matchToken('number', /(?<text>-?\b\d+(\.\d+)?(e[+\-]?\d+)?\b)/gi);
                 matchToken('keyword', /(?<text>\b(?:true|false|null)\b)/g);
 
@@ -587,7 +587,7 @@ namespace SHML {
                 const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
 
                 args.set('multiline-string', {pattern: /(?<text>(?<what>(?<qtype>&quot;|&#x27;)\k<qtype>{2})(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => wrapMultiline('<span data-code-token="string">', groups.text, '</span>')});
-                matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+                matchToken('string',/(?<text>&#x27;&#x27;|&quot;&quot;|(?:(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>))/g);
 
                 args.set('comment', {pattern: /(?<text>(?:(?<!&)#.*))/g, reviver({groups}, decode) {
                     return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
@@ -621,7 +621,7 @@ namespace SHML {
                 const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
 
                 args.set('multiline-string', {pattern: /(?<text>(?<what>(?<qtype>&quot;){3})(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => wrapMultiline('<span data-code-token="string">', groups.text, '</span>')});
-                matchToken('string',/(?<text>(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+                matchToken('string',/(?<text>&#x27;&#x27;|&quot;&quot;|(?:(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>))/g);
                 
                 args.set('comment', {pattern: /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g, reviver({groups}, decode) {
                     return wrapMultiline('<span data-code-token="comment">', decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, ''), '</span>');
@@ -643,8 +643,8 @@ namespace SHML {
                   return `<span data-code-token="compiler-directive">${groups.directive}<span data-code-token="compiler-directive-value">${groups.text}</span></span>`;
                }});
 
-               args.set('multiline-string', {pattern: /(?<text>R&quot;(?<what>[^\uffff\ufffe]{0,16}?)\([^\uffff\ufffe]*?\)\k<what>&quot;)/g, reviver: ({groups}) => wrapMultiline('<span data-code-token="string">', groups.text, '</span>'});
-               matchToken('string',/(?<text>(?:L|u8|u|U)?(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)/g);
+               args.set('multiline-string', {pattern: /(?<text>R&quot;(?<what>[^\uffff\ufffe]{0,16}?)\([^\uffff\ufffe]*?\)\k<what>&quot;)/g, reviver: ({groups}) => wrapMultiline('<span data-code-token="string">', groups.text, '</span>')});
+               matchToken('string',/(?<text>(?:L|u8|u|U)?(?:&#x27;&#x27;|&quot;&quot;|(?:(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>)))/g);
                 
                args.set('comment', {pattern: /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g, reviver({groups}, decode) {
                   return wrapMultiline('<span data-code-token="comment">', decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, ''), '</span>');
@@ -656,11 +656,32 @@ namespace SHML {
 
                return args;
             }
+
+            export function bashHighlighter() {
+                const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
+
+                args.set('multiline-string', {pattern: /(?<text>(?<what>&#x27;)(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => wrapMultiline('<span data-code-token="string">', groups.text, '</span>')});
+                matchToken('string',/(?<text>(?<what>&quot;))/g);
+                
+                args.set('comment', {pattern: /(?<text>(?:(?<!&)#.*))/g, reviver({groups}, decode) {
+                    return `<span data-code-token="comment">${decode(groups.text).replace(/<span data-code-token="string">|<\/span>/g, '')}</span>`;
+                }});
+
+                const keywords = ['if','then','else','elif','fi','case','esac','for','select','while','until','do','done','in','function','time','{','}','!','[[',']]','coproc'];
+                matchToken('number', /(?<text>(?<!\$)\b\d+\b)/g);
+                matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${keywords.map(escapeRegex).join('|')})\b)`, 'g'));
+
+                return args;
+            }
         }
     }
 
     export function parseUnicodeMarkup(text: string, customTokens?: Map<string,string> | {get(name:string): string}) {
         return abstractParse(normalize(text), Configuration.unicodeMarkup(customTokens), 'disable sanitizer');
+    }
+
+    function escapeRegex(text: string) {
+        return text.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
     }
 
     function unescapeHTMLEntities(text: string): string {
@@ -721,7 +742,10 @@ namespace SHML {
                     case 'diff': return Configuration.Code.diffHighlighter();
                     case 'c':
                     case 'c++':
-                    case 'cpp': language = 'c++'; return Configuration.Code.cppHighlighter()
+                    case 'cpp': language = 'c++'; return Configuration.Code.cppHighlighter();
+                    case 'sh':
+                    case 'shell':
+                    case 'bash': language = 'bash'; return Configuration.Code.bashHighlighter();
                     case 'java': return Configuration.Code.javaHighlighter();
                     default: return new Map();
                 }
