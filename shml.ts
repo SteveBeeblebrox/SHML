@@ -24,7 +24,7 @@
 namespace SHML {
     export const VERSION: Readonly<{major: number, minor: number, patch: number, metadata?: string, prerelease?: string, toString(): string}> = Object.freeze({
         toString() {return `${VERSION.major}.${VERSION.minor}.${VERSION.patch}${VERSION.prerelease !== undefined ? `-${VERSION.prerelease}` : ''}${VERSION.metadata !== undefined ? `+${VERSION.metadata}` : ''}`},
-        major: 1, minor: 7, patch: 2
+        major: 1, minor: 7, patch: 3
     });
 
     function cyrb64(text: string, seed = 0) {
@@ -379,7 +379,7 @@ namespace SHML {
                 return `<table>${groups.title ? `\n<caption>${groups.title.trim()}</caption>`: ''}\n<thead>${rows.shift()}\n<thead>\n<tbody>${rows.join('')}\n<tbody>\n</table>`
             }})
 
-            args.set('list', {pattern: /(?<text>(?<=\n|^)[\t ]*?(?:\+|\d+[.)])[\s\S]*?(?=\n\n|$))/g, isInline: false, reviver({groups}) {
+            args.set('list', {pattern: /(?<text>(?<=\n|^)[\t ]*?(?:\+|\d+\.)[\s\S]*?(?=\n\n|$))/g, isInline: false, reviver({groups}) {
                 type ListType = 'ol' | 'ul'
 
                 const openTags: ListType[] = [];
@@ -395,7 +395,7 @@ namespace SHML {
                 }
 
                 for(const line of groups.text.trim().split('\n')) {
-                    const groups = line.match(/(?<whitespace>\s*?)(?<what>\+|\d+[.)])(?:\s*)(?<text>.*)/)?.groups;
+                    const groups = line.match(/^(?<whitespace>\s*?)(?<what>\+|\d+\.)(?:\s*)(?<text>.*)/)?.groups;
                     
                     if(!groups) {
                         result = result.replace(/(<\/..\>)$/, '<br>'+line.trim()+'$1');
