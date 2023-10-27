@@ -600,6 +600,8 @@ namespace SHML {
                 matchToken('value', /(?<text>\b(?:True|False|None)\b)/g);
                 matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${PYTHON_KEYWORDS.join('|')})\b)`, 'g'));
 
+                matchToken('annotation', /(?<text>@[a-zA-Z_$][a-zA-Z_$0-9]*)\b/g);
+                
                 return args;
             }
 
