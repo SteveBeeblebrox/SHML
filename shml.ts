@@ -531,7 +531,7 @@ namespace SHML {
             export function ecmascriptHighlighter(keywords: string[]): FormatArgs {
                 const args: FormatArgs = new Map(), matchToken = (name: string, pattern: RegExp) => appendTokenMatcher(name, pattern, args);
 
-                args.set('multiline-string', {pattern: /(?<text>(?<what>`)(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>)/g, reviver: ({groups}) => wrapMultiline('<span data-code-token="string">', groups.text, '</span>')});
+                args.set('multiline-string', {pattern: /(?<text>(?<what>`)(?:\k<what>|(?:[^\uffff\ufffe]*?[^\\])?(?:\\\\)*\k<what>))/g, reviver: ({groups}) => wrapMultiline('<span data-code-token="string">', groups.text, '</span>')});
                 matchToken('string',/(?<text>&#x27;&#x27;|&quot;&quot;|(?:(?<what>&quot;|&#x27;)(?:.*?[^\\\n])?(?:\\\\)*\k<what>))/g);
                 
                 args.set('comment', {pattern: /(?<text>(?:\/\/.*)|(?:\/\*[\s\S]*?\*\/))/g, reviver({groups}, decode) {
@@ -541,6 +541,8 @@ namespace SHML {
                 matchToken('number', /(?<text>\b(?:Infinity|NaN|0(?:[xX][0-9a-fA-F][0-9a-fA-F_]*|[bB][01][01_]*|[oO][0-7][0-7_]*)(?<!_)|\d[\d_]*\.?[\d_]*((?<=[\d.])[eE][+\-]?\d[\d_]*)?n?(?<!_))\b)/g);
                 matchToken('keyword', new RegExp(String.raw`(?<text>\b(?:${keywords.join('|')})\b)`, 'g'));
 
+                matchToken('annotation', /(?<text>@[a-zA-Z_$][a-zA-Z_$0-9]*)\b/g);
+                
                 return args;
             }
 
